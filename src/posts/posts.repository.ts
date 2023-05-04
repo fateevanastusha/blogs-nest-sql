@@ -4,8 +4,6 @@ import { Model } from "mongoose";
 import { PostsDto } from "./posts.dto";
 import { Injectable } from "@nestjs/common";
 
-
-//vvv
 @Injectable()
 export class PostsRepository {
   constructor(@InjectModel('posts') private postsModel: Model<PostDocument>) {
