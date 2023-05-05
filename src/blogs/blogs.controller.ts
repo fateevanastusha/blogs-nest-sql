@@ -78,13 +78,13 @@ export class BlogsController{
   @Post(':id/posts')
   async createPost(@Param('id') blogId : string,
                    @Body() post : PostsDto){
-  const status : PostModel | null = await this.postsService.createPost({
+  const createdPost : PostModel | null = await this.postsService.createPost({
     title: post.title,
     shortDescription: post.shortDescription,
     content: post.content,
     blogId: blogId
   })
-    if (!status) return errorHandler(ErrorCodes.BadRequest)
-    return
+    if (!createdPost) return errorHandler(ErrorCodes.BadRequest)
+    return createdPost
   }
 }
