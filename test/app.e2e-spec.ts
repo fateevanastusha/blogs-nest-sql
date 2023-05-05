@@ -5,7 +5,11 @@ import { AppModule } from './../src/app.module';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
-
+  beforeAll(async () => {
+    request(app)
+      .delete('/testing/all-data')
+      .expect(200)
+  })
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -13,6 +17,7 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+
   });
 
   it('/ (GET)', () => {

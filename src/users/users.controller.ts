@@ -1,6 +1,8 @@
 import { Body, Controller, DefaultValuePipe, Delete, Get, Param, Post, Query } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { UsersDto } from "./users.dto";
+import { ErrorCodes, errorHandler } from "../helpers/errors";
+import { UserModel } from "./users.schema";
 
 @Controller('users')
 export class UsersController{
@@ -25,11 +27,15 @@ export class UsersController{
   }
   @Delete(':id')
   async deleteUser(@Param('id') userId : string){
-    return await this.usersService.deleteUser(userId)
+    const status : boolean = await this.usersService.deleteUser(userId)
+    if (!status) return errorHandler(ErrorCodes.NotFound)
+    return
   }
   @Post()
   async createUser(
     @Body() user : UsersDto){
-    return await this.usersService.createUser(user)
+    const createdUser : UserModel | null = await this.usersService.createUser(user)
+    if (!createdUser) return errorHandler(ErrorCodes.BadRequest)
+    return createdUser
   }
 }

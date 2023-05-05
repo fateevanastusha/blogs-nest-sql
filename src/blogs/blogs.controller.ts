@@ -33,18 +33,24 @@ export class BlogsController{
   }
   @Delete(':id')
   async deleteBlog(@Param('id') blogId : string){
-    return await this.blogsService.deleteBlog(blogId)
+    const status : boolean = await this.blogsService.deleteBlog(blogId)
+    if (!status) return errorHandler(ErrorCodes.NotFound)
+    return
   }
   @Post()
   async createBlog(
     @Body() blog : BlogDto){
-    return await this.blogsService.createBlog(blog)
+    const createdBlog : BlogModel | null = await this.blogsService.createBlog(blog)
+    if (!createdBlog) return errorHandler(ErrorCodes.BadRequest)
+    return createdBlog
   }
   @Put(':id')
   async updateBlog(
     @Body() blog : BlogDto,
     @Param('id') blogId : string){
-    return await this.blogsService.updateBlog(blog, blogId)
+    const status : boolean = await this.blogsService.updateBlog(blog, blogId)
+    if(!status) return errorHandler(ErrorCodes.NotFound)
+    return
   }
   @Get(':id')
   async getPosts(@Param('id') blogId : string,

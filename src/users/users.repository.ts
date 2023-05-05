@@ -18,26 +18,6 @@ export class UsersRepository {
       .findOne({id: id}, {_id: 0, password : 0,  isConfirmed: 0, confirmedCode : 0, __v: 0})
 
   }
-
-  async getUserWithField(field : string) : Promise <UserModel | null> {
-    const user = await this.usersModel
-      .findOne({$or : [{login: field} , {email: field}]})
-    return user
-
-
-  }
-  async getUserWithLogin(login : string) : Promise <UserModel | null> {
-    const user =  this.usersModel
-      .findOne({login : login}, {_id: 0, __v: 0})
-    return user
-
-  }
-  async getUserWithPassword(email : string) : Promise <UserModel | null> {
-    const user =  this.usersModel
-      .findOne({email : email},{_id: 0, __v: 0})
-    return user
-
-  }
   async createUser(newUser : UserModel) : Promise <UserModel | null> {
     await this.usersModel.insertMany([newUser])
     const updatedUser = await this.getUserWithId(newUser.id)
