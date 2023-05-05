@@ -17,7 +17,9 @@ export class PostsService {
     const items = await this.queryRepository.paginatorForPosts(query)
     return await this.queryRepository.paginationForm(pageCount,total,items,query)
   }
-  async getPostsByBlogId (query : QueryModelPosts, blogId: string) : Promise<PaginatedClass>{
+  async getPostsByBlogId (query : QueryModelPosts, blogId: string) : Promise<PaginatedClass | null>{
+    const blog : BlogModel | null = await this.blogsRepository.getBlog(blogId)
+    if(!blog) return null
     let total : number = await this.postsRepository.countPostsByBlogId(blogId)
     const pageCount = Math.ceil( total / query.pageSize)
     const items : PostModel[] = await this.queryRepository.paginatorForPostsWithBlog(query, blogId);

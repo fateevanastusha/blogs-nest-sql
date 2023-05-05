@@ -3,10 +3,11 @@ import { BlogsService } from "./blogs.service";
 import { BlogDto } from "./blogs.dto";
 import { PostsService } from "../posts/posts.service";
 import { PostsDto } from "../posts/posts.dto";
-import { BlogModel } from "./blogs.schema";
+import { BlogModel, PaginatedClass } from "./blogs.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { Response } from "express";
 import { PostModel } from "../posts/posts.schema";
+
 @Controller('blogs')
 export class BlogsController{
   constructor(protected blogsService : BlogsService,
@@ -65,12 +66,14 @@ export class BlogsController{
                  @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
                  @Query('sortDirection', new DefaultValuePipe('asc')) sortDirection : "asc" | "desc",
   ){
-  return await this.postsService.getPostsByBlogId({
+  const posts : PaginatedClass | null = await this.postsService.getPostsByBlogId({
     pageSize : pageSize,
     pageNumber : pageNumber,
     sortBy : sortBy,
     sortDirection : sortDirection
   }, blogId)
+    if (!posts) return errorHandler(ErrorCodes.NotFound)
+    return posts
   }
   @Post(':id/posts')
   async createPost(@Param('id') blogId : string,
