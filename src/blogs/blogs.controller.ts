@@ -51,9 +51,11 @@ export class BlogsController{
   @Put(':id')
   async updateBlog(
     @Body() blog : BlogDto,
-    @Param('id') blogId : string){
+    @Param('id') blogId : string,
+    @Res() res : Response){
     const status : boolean = await this.blogsService.updateBlog(blog, blogId)
     if(!status) return errorHandler(ErrorCodes.NotFound)
+    res.sendStatus(204)
     return
   }
   @Get(':id/posts')

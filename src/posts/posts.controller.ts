@@ -1,8 +1,9 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, DefaultValuePipe, Delete, Get, Param, Post, Put, Query, Res } from "@nestjs/common";
 import { PostsService } from "./posts.service";
 import { PostsDto } from "./posts.dto";
 import { PostModel } from "./posts.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
+import { Response } from "express";
 
 @Controller('posts')
 export class PostsController{
@@ -31,10 +32,11 @@ export class PostsController{
 
   }
   @Delete(':id')
-  async deletePost(@Param('id') postId : string){
+  async deletePost(@Param('id') postId : string,
+                   @Res() res : Response){
     const status : boolean = await this.postsService.deletePost(postId)
     if (!status) return errorHandler(ErrorCodes.NotFound)
-    return
+    return res.sendStatus(204)
   }
   @Post()
   async createPost(
@@ -46,9 +48,11 @@ export class PostsController{
   @Put(':id')
   async updatePost(
     @Body() post : PostsDto,
-    @Param('id') postId : string){
+    @Param('id') postId : string,
+    @Res() res : Response){
     const status : boolean = await this.postsService.updatePost(post, postId)
     if (!status) return errorHandler(ErrorCodes.NotFound)
+    res.sendStatus(204)
     return
   }
 }
