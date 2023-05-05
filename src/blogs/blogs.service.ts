@@ -27,7 +27,7 @@ export class BlogsService {
       description: blog.description,
       websiteUrl: blog.websiteUrl,
       createdAt: new Date().toISOString(),
-      isMemberShip: false
+      isMembership: false
     }
     // @ts-ignore
     return await this.blogsRepository.createBlog(newBlog);

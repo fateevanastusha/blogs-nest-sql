@@ -17,9 +17,8 @@ export class BlogModel {
   id : string
   @Prop({required : true})
   createdAt : string
-
   @Prop({required: true})
-  isMemberShip : boolean
+  isMembership : boolean
 }
 
 @Schema()
