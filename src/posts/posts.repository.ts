@@ -10,7 +10,7 @@ export class PostsRepository {
   }
   async getPosts() : Promise<PostModel[]>{
     return this.postsModel
-      .find({}, {_id: 0, __v: 0})
+      .find({}, {_id: 0, __v: 0, 'extendedLikesInfo' : {_id : 0}})
       .lean()
   }
   async getPostsCount() : Promise<number>{

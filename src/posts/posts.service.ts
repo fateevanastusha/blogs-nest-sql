@@ -37,14 +37,20 @@ export class PostsService {
     const blog : BlogModel | null = await this.blogsRepository.getBlog(post.blogId)
     if (!blog) return null
     const blogName = blog.name
-    const newPost = {
+    const newPost : PostModel = {
       id: '' + (+(new Date())),
       title : post.title,
       shortDescription: post.shortDescription,
       content: post.content,
       blogId: post.blogId,
       blogName: blogName,
-      createdAt : new Date().toISOString()
+      createdAt : new Date().toISOString(),
+      extendedLikesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: "None",
+        newestLikes: []
+      }
     };
     const createdPost = await this.postsRepository.createPost(newPost);
     if (!createdPost) return null

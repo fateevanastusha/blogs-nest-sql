@@ -22,7 +22,7 @@ export class QueryRepository {
   async paginatorForPosts(query : QueryModelBlogs): Promise<PostModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.postsModel
-      .find({},{_id: 0, __v: 0})
+      .find({},{_id: 0, __v: 0, 'extendedLikesInfo' : {_id : 0}})
       .sort({[query.sortBy]: query.sortDirection})
       .skip(skipSize)
       .limit(+query.pageSize)
