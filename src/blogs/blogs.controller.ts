@@ -17,7 +17,7 @@ export class BlogsController{
   async getBlogs(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
                  @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
-                 @Query('sortDirection', new DefaultValuePipe('asc')) sortDirection : "asc" | "desc",
+                 @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                  @Query('searchNameTerm', new DefaultValuePipe('')) searchNameTerm : string){
     return await this.blogsService.getBlogs({
       pageSize : pageSize,
@@ -64,7 +64,7 @@ export class BlogsController{
                  @Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
                  @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
-                 @Query('sortDirection', new DefaultValuePipe('asc')) sortDirection : "asc" | "desc",
+                 @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
   ){
   const posts : PaginatedClass | null = await this.postsService.getPostsByBlogId({
     pageSize : pageSize,

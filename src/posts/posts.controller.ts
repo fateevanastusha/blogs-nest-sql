@@ -12,7 +12,7 @@ export class PostsController{
   async getPosts(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
                  @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
-                 @Query('sortDirection', new DefaultValuePipe('asc')) sortDirection : "asc" | "desc",
+                 @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                  ){
     return await this.postsService.getPosts({
       pageSize : pageSize,
