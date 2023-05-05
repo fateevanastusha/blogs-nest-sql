@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument } from "mongoose";
+import { HydratedDocument } from "mongoose";
 
 export type UserDocument = HydratedDocument<UserModel>
 
@@ -19,4 +19,3 @@ export class UserModel {
 
 export const UserSchema = SchemaFactory.createForClass(UserModel)
 
-export const UserModelClass = mongoose.model('users', UserSchema)

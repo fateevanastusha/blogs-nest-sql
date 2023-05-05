@@ -16,6 +16,7 @@ export class UsersController{
                  @Query('searchLoginTerm', new DefaultValuePipe('')) searchLoginTerm : string,
                  @Query('searchEmailTerm', new DefaultValuePipe('')) searchEmailTerm : string,
   ){
+    console.log(pageNumber);
     return await this.usersService.getUsers({
       pageSize : pageSize,
       pageNumber : pageNumber,

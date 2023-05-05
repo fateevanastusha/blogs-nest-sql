@@ -19,7 +19,7 @@ import { UserSchema } from "./users/users.schema";
 
 @Module({
   imports: [
-    MongoModule,
+     MongoModule,
      MongooseModule.forFeature([{
         name : "blogs",
        schema : BlogSchema

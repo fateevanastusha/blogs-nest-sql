@@ -4,13 +4,15 @@ import { QueryRepository } from "../helpers/query.repository";
 import { QueryModelUsers } from "../helpers/helpers.schema";
 import { PaginatedClass } from "../blogs/blogs.schema";
 import { UsersDto } from "./users.dto";
-import bcrypt from "bcrypt"
+import * as bcrypt from 'bcrypt';
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class UsersService {
   constructor(protected usersRepository : UsersRepository,
               protected queryRepository : QueryRepository) {}
   async getUsers(query : QueryModelUsers) : Promise<PaginatedClass>{
-    const total = await this.usersRepository.getUsersCount(query.searchLoginTerm, query.searchEmailTerm);
+    const total : number = await this.usersRepository.getUsersCount(query.searchLoginTerm, query.searchEmailTerm);
     const pageCount = Math.ceil( total / query.pageSize);
     const items : UserModel[] = await this.queryRepository.paginationForUsers(query);
     return this.queryRepository.paginationForm(pageCount, total, items, query)

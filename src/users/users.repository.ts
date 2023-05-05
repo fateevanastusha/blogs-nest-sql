@@ -1,9 +1,11 @@
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { UserModel } from "./users.schema";
+import { UserDocument, UserModel } from "./users.schema";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class UsersRepository {
-  constructor(@InjectModel('users') private usersModel: Model<UserModel> ) {
+  constructor(@InjectModel('users') private usersModel: Model<UserDocument> ) {
   }
   async getUsersCount(searchLoginTerm : string, searchEmailTerm : string) : Promise<number>{
     return this.usersModel.countDocuments({
