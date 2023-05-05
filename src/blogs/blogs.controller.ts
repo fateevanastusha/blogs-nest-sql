@@ -1,10 +1,11 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, DefaultValuePipe, Delete, Get, Param, Post, Put, Query, Res } from "@nestjs/common";
 import { BlogsService } from "./blogs.service";
 import { BlogDto } from "./blogs.dto";
 import { PostsService } from "../posts/posts.service";
 import { PostsDto } from "../posts/posts.dto";
 import { BlogModel } from "./blogs.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
+import { Response } from "express";
 @Controller('blogs')
 export class BlogsController{
   constructor(protected blogsService : BlogsService,
@@ -32,9 +33,11 @@ export class BlogsController{
     return blog
   }
   @Delete(':id')
-  async deleteBlog(@Param('id') blogId : string){
+  async deleteBlog(@Param('id') blogId : string,
+                   @Res() res : Response){
     const status : boolean = await this.blogsService.deleteBlog(blogId)
     if (!status) return errorHandler(ErrorCodes.NotFound)
+    res.sendStatus(204)
     return
   }
   @Post()
@@ -52,7 +55,7 @@ export class BlogsController{
     if(!status) return errorHandler(ErrorCodes.NotFound)
     return
   }
-  @Get(':id')
+  @Get(':id/posts')
   async getPosts(@Param('id') blogId : string,
                  @Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
@@ -66,7 +69,7 @@ export class BlogsController{
     sortDirection : sortDirection
   }, blogId)
   }
-  @Post(':id')
+  @Post(':id/posts')
   async createPost(@Param('id') blogId : string,
                    @Body() post : PostsDto){
   return await this.postsService.createPost({
