@@ -17,7 +17,7 @@ export class PostsRepository {
     return this.postsModel.countDocuments({}, {_id: 0, __v: 0})
   }
   async getPost(id: string) : Promise<PostModel | null>{
-    return this.postsModel.findOne({id : id}, {_id: 0, __v: 0}).lean();
+    return this.postsModel.findOne({id : id}, {_id: 0, __v: 0, 'extendedLikesInfo' : {_id : 0}}).lean();
   }
   async deletePost(id:string) : Promise<boolean>{
     const result = await this.postsModel.deleteOne({id: id});
