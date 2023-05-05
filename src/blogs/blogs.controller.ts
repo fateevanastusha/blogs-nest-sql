@@ -6,6 +6,7 @@ import { PostsDto } from "../posts/posts.dto";
 import { BlogModel } from "./blogs.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { Response } from "express";
+import { PostModel } from "../posts/posts.schema";
 @Controller('blogs')
 export class BlogsController{
   constructor(protected blogsService : BlogsService,
@@ -72,11 +73,13 @@ export class BlogsController{
   @Post(':id/posts')
   async createPost(@Param('id') blogId : string,
                    @Body() post : PostsDto){
-  return await this.postsService.createPost({
+  const status : PostModel | null = await this.postsService.createPost({
     title: post.title,
     shortDescription: post.shortDescription,
     content: post.content,
     blogId: blogId
   })
+    if (!status) return errorHandler(ErrorCodes.BadRequest)
+    return
   }
 }
