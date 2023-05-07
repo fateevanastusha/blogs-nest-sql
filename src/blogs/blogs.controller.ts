@@ -1,4 +1,16 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Param, Post, Put, Query, Res } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Res
+} from "@nestjs/common";
 import { BlogsService } from "./blogs.service";
 import { BlogDto } from "./blogs.dto";
 import { PostsService } from "../posts/posts.service";
@@ -45,6 +57,10 @@ export class BlogsController{
   @Post()
   async createBlog(
     @Body() blog : BlogDto){
+    //how make the error
+    if(11 > 10){
+      throw new BadRequestException({ message : ['bad kiskis'] })
+    }
     const createdBlog : BlogModel | null = await this.blogsService.createBlog(blog)
     if (!createdBlog) return errorHandler(ErrorCodes.BadRequest)
     return createdBlog

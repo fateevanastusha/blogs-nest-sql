@@ -9,6 +9,7 @@ export class BlogDto {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   description: string;
   @IsUrl()
+  @Length(1, 500)
   @Transform(({ value }: TransformFnParams) => value?.trim())
   websiteUrl: string;
 }
