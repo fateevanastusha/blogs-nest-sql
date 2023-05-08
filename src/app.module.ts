@@ -16,6 +16,8 @@ import { PostsController } from "./posts/posts.controller";
 import { UsersController } from "./users/users.controller";
 import { PostSchema } from "./posts/posts.schema";
 import { UserSchema } from "./users/users.schema";
+import { CommentSchema } from "./comments/comments.schema";
+import { LikeSchema } from "./likes/likes.schema";
 
 @Module({
   imports: [
@@ -31,6 +33,14 @@ import { UserSchema } from "./users/users.schema";
        {
          name : "users",
          schema : UserSchema
+       },
+       {
+         name : "comments",
+         schema : CommentSchema
+       },
+       {
+         name : "likes",
+         schema : LikeSchema
        }
      ])
   ],

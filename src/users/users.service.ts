@@ -17,6 +17,9 @@ export class UsersService {
     const items : UserModel[] = await this.queryRepository.paginationForUsers(query);
     return this.queryRepository.paginationForm(pageCount, total, items, query)
   }
+  async getUser(id : string) : Promise<UserModel | null>{
+    return this.usersRepository.getUser(id)
+  }
   async createUser(user : UsersDto ) : Promise<UserModel | null>{
     const hash = bcrypt.hashSync(user.password, 10, )
     const newUser =  {

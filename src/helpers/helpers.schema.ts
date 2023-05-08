@@ -68,5 +68,32 @@ export class QueryModelUsers {
   searchEmailTerm?: string = ''
 }
 
+export class QueryCommentsUsers {
+  @IsOptional()
+  @Prop({ default: 10 })
+  pageSize?: number = 10
+
+  @IsOptional()
+  @Prop({ default: 1 })
+  pageNumber?: number = 1
+
+  @IsOptional()
+  @Prop({ default: "createdAt" })
+  sortBy?: string = 'createdAt'
+
+  @IsOptional()
+  @Prop({ default: 'asc'})
+  sortDirection?: "asc" | "desc" = 'asc'
+
+  @IsOptional()
+  @Prop({ default: "" })
+  searchLoginTerm?: string = ''
+
+  @IsOptional()
+  @Prop({ default: "" })
+  searchEmailTerm?: string = ''
+}
+
+
 
 

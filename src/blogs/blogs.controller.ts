@@ -9,7 +9,7 @@ import {
   Post,
   Put,
   Query,
-  Res
+  Res, UseGuards
 } from "@nestjs/common";
 import { BlogsService } from "./blogs.service";
 import { BlogDto } from "./blogs.dto";
@@ -19,6 +19,7 @@ import { BlogModel, PaginatedClass } from "./blogs.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { Response } from "express";
 import { PostModel } from "../posts/posts.schema";
+import { AuthGuard } from "../auth.guard";
 
 @Controller('blogs')
 export class BlogsController{
@@ -46,6 +47,7 @@ export class BlogsController{
     if(!blog) return errorHandler(ErrorCodes.NotFound);
     return blog
   }
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async deleteBlog(@Param('id') blogId : string,
                    @Res() res : Response){
@@ -54,6 +56,7 @@ export class BlogsController{
     res.sendStatus(204)
     return
   }
+  @UseGuards(AuthGuard)
   @Post()
   async createBlog(
     @Body() blog : BlogDto){
@@ -65,6 +68,7 @@ export class BlogsController{
     if (!createdBlog) return errorHandler(ErrorCodes.BadRequest)
     return createdBlog
   }
+  @UseGuards(AuthGuard)
   @Put(':id')
   async updateBlog(
     @Body() blog : BlogDto,

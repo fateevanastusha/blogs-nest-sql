@@ -15,6 +15,9 @@ export class UsersRepository {
       ]
     })
   }
+  async getUser (id : string) : Promise<UserModel | null>{
+    return this.usersModel.findOne({id: id}, {_id: 0, __v: 0})
+  }
   async getUserWithId(id : string) : Promise <UserModel | null> {
     return this.usersModel
       .findOne({id: id}, {_id: 0, password : 0,  isConfirmed: 0, confirmedCode : 0, __v: 0})
@@ -27,6 +30,12 @@ export class UsersRepository {
       return updatedUser
     }
     return null
+  }
+  async getLoginById(id : string) : Promise <string> {
+    const user = await this.usersModel
+      .findOne({id: id}, {_id: 0, password : 0,  isConfirmed: 0, confirmedCode : 0, __v: 0})
+    if (!user) return 'login'
+    return user.login
   }
   async deleteUser(id: string) : Promise<boolean>{
     const result = await this.usersModel.deleteOne({id: id, __v: 0})
