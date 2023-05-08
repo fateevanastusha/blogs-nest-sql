@@ -15,6 +15,10 @@ export class UserModel {
   id : string
   @Prop({required : true})
   createdAt : string
+  @Prop({required : true})
+  isConfirmed : boolean
+  @Prop({required : true})
+  confirmedCode : string
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserModel)

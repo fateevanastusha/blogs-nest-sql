@@ -27,9 +27,15 @@ export class UsersService {
       login: user.login,
       email: user.email,
       password : hash,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      isConfirmed: false,
+      confirmedCode: ""
     }
     return await this.usersRepository.createUser(newUser)
+  }
+  async changeUserPassword(code : string, password : string) : Promise<boolean>{
+    const hash = bcrypt.hashSync(password, 10, )
+    return await this.usersRepository.changeUserPassword(code, hash)
   }
   async deleteUser(id: string) : Promise<boolean>{
     return await this.usersRepository.deleteUser(id)
