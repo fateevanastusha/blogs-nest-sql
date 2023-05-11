@@ -2,7 +2,7 @@ import { AuthRepository } from "./auth.repository";
 import { UsersService } from "../users/users.service";
 import { UsersRepository } from "../users/users.repository";
 import { JwtService } from "../jwt.service";
-import { AccessToken, RefreshToken, RefreshTokensMeta, TokenList } from "../security/security.schema";
+import { AccessToken, RefreshToken, RefreshTokensMetaModel, TokenList } from "../security/security.schema";
 import { SecurityRepository } from "../security/security.repository";
 import { UserModel } from "../users/users.schema";
 import { BusinessService } from "../business.service";
@@ -37,7 +37,7 @@ export class AuthService {
     const date : string | null = await this.jwtService.getRefreshTokenDate(refreshToken.refreshToken)
     if (!date) return null
     //CREATE REFRESH TOKENS META
-    const refreshTokenMeta : RefreshTokensMeta = {
+    const refreshTokenMeta : RefreshTokensMetaModel = {
       userId : userId,
       ip: ip,
       title: title,
@@ -67,7 +67,7 @@ export class AuthService {
 
   async createNewToken (refreshToken : string, ip : string, title : string) : Promise<TokenList | null> {
     await this.authRepository.addRefreshTokenToBlackList(refreshToken)
-    const session : RefreshTokensMeta | null = await this.securityRepository.findSessionByIp(ip)
+    const session : RefreshTokensMetaModel | null = await this.securityRepository.findSessionByIp(ip)
     if (!session) return null
     const deviceId : string = session.deviceId
     const userId : string = await this.jwtService.getUserByIdToken(refreshToken)

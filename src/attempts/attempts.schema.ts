@@ -1,4 +1,4 @@
-import { Prop, Schema } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 
 export type AttemptDocument = HydratedDocument<AttemptsModel>
@@ -12,3 +12,5 @@ export class AttemptsModel {
   @Prop({required : true})
   time: Date
 }
+
+export const AttemptsSchema = SchemaFactory.createForClass(AttemptsModel)

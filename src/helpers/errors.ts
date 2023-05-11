@@ -1,8 +1,9 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 export enum ErrorCodes {
   Success,
   BadRequest,
   NotFound,
+  NotAutorized
 }
 
 export const errorHandler = (code: ErrorCodes) => {
@@ -12,6 +13,9 @@ export const errorHandler = (code: ErrorCodes) => {
     }
     case ErrorCodes.NotFound: {
       throw new NotFoundException();
+    }
+    case ErrorCodes.NotAutorized : {
+      throw new UnauthorizedException()
     }
   }
 };

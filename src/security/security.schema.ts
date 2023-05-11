@@ -1,7 +1,7 @@
-import { Prop, Schema } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 
-export type RefreshTokensMetaDocument = HydratedDocument<RefreshTokensMeta>
+export type RefreshTokensMetaDocument = HydratedDocument<RefreshTokensMetaModel>
 
 @Schema()
 
@@ -28,7 +28,7 @@ export class TokenList {
 
 @Schema()
 
-export class RefreshTokensMeta {
+export class RefreshTokensMetaModel {
   @Prop({required : true})
   userId : string
   @Prop({required : true})
@@ -40,3 +40,5 @@ export class RefreshTokensMeta {
   @Prop({required : true})
   deviceId: string
 }
+
+export const RefreshTokensMetaSchema = SchemaFactory.createForClass(RefreshTokensMetaModel)

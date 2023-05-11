@@ -1,11 +1,15 @@
-import { Controller, Get, Post } from "@nestjs/common";
+import { Controller, Get, Post, UseGuards } from "@nestjs/common";
+import { CheckAttempts, CheckForRefreshToken, CheckForSameDevice } from "../auth.guard";
 
+@UseGuards(CheckAttempts)
 @Controller('auth')
 export class AuthController {
+  @UseGuards(CheckForSameDevice)
   @Post('/login')
   async loginRequest(){
 
   }
+
   @Get('/me')
   async getInformation(){
 
@@ -30,10 +34,12 @@ export class AuthController {
   async emailResendingRequest(){
 
   }
+  @UseGuards(CheckForRefreshToken)
   @Post('/logout')
   async logoutRequest(){
 
   }
+  @UseGuards(CheckForRefreshToken)
   @Post('/refresh-token')
   async refreshTokenRequest(){
 

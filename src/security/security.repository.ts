@@ -1,11 +1,11 @@
-import { RefreshTokensMeta, RefreshTokensMetaDocument } from "./security.schema";
+import { RefreshTokensMetaModel, RefreshTokensMetaDocument } from "./security.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { BlogDocument } from "../blogs/blogs.schema";
 
 export class SecurityRepository {
   constructor(@InjectModel('refresh token meta') private refreshTokensMetaModel: Model<RefreshTokensMetaDocument>) {}
-  async getAllSessions(userId : string) : Promise<RefreshTokensMeta[] | null> {
+  async getAllSessions(userId : string) : Promise<RefreshTokensMetaModel[] | null> {
     return this.refreshTokensMetaModel
       .find({userId}, {_id: 0, __v: 0, userId : 0})
       .lean()
@@ -23,7 +23,7 @@ export class SecurityRepository {
       .deleteOne({deviceId})
     return result.deletedCount === 1
   }
-  async createNewSession(refreshTokensMeta : RefreshTokensMeta) : Promise<boolean> {
+  async createNewSession(refreshTokensMeta : RefreshTokensMetaModel) : Promise<boolean> {
     await this.refreshTokensMetaModel
       .insertMany({
         userId : refreshTokensMeta.userId,
@@ -38,15 +38,15 @@ export class SecurityRepository {
 
 
   }
-  async findSessionByIp(ip : string) : Promise<RefreshTokensMeta | null> {
+  async findSessionByIp(ip : string) : Promise<RefreshTokensMetaModel | null> {
     return this.refreshTokensMetaModel
       .findOne({ip: ip})
   }
-  async findSessionByDeviceId(deviceId: string) : Promise<RefreshTokensMeta | null> {
+  async findSessionByDeviceId(deviceId: string) : Promise<RefreshTokensMetaModel | null> {
     return this.refreshTokensMetaModel
       .findOne({deviceId: deviceId})
   }
-  async findSessionByDeviceIdAndUserId(userId : string, deviceId: string) : Promise<RefreshTokensMeta | null> {
+  async findSessionByDeviceIdAndUserId(userId : string, deviceId: string) : Promise<RefreshTokensMetaModel | null> {
     return this.refreshTokensMetaModel
       .findOne({userId : userId, deviceId: deviceId})
   }

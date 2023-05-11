@@ -38,6 +38,17 @@ export class PostsRepository {
   async countPostsByBlogId(blogId : string) : Promise<number>{
     return this.postsModel.countDocuments({blogId}, {projection: {_id: 0}})
   }
+  async changeLikesTotalCount(postId: string, likesCount: number, dislikesCount: number): Promise<boolean> {
+    const status = await this.postsModel.updateOne({
+      id: postId,
+    }, {
+      $set: {
+        'extendedLikesInfo.likesCount': likesCount,
+        'extendedLikesInfo.dislikesCount': dislikesCount
+      }
+    })
+    return status.matchedCount === 1
+  }
   async deleteAllData() {
     await this.postsModel.deleteMany({});
     return [];

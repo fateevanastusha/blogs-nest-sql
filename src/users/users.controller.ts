@@ -1,10 +1,12 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Param, Post, Query, Res } from "@nestjs/common";
+import { Body, Controller, DefaultValuePipe, Delete, Get, Param, Post, Query, Res, UseGuards } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { UsersDto } from "./users.dto";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { UserModel } from "./users.schema";
 import { Response } from "express";
+import { AuthGuard } from "../auth.guard";
 
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController{
   constructor(protected usersService : UsersService
@@ -17,7 +19,6 @@ export class UsersController{
                  @Query('searchLoginTerm', new DefaultValuePipe('')) searchLoginTerm : string,
                  @Query('searchEmailTerm', new DefaultValuePipe('')) searchEmailTerm : string,
   ){
-    console.log(pageNumber);
     return await this.usersService.getUsers({
       pageSize : pageSize,
       pageNumber : pageNumber,

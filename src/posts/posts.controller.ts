@@ -1,9 +1,23 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Param, Post, Put, Query, Res } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query, Req,
+  Res,
+  UseGuards
+} from "@nestjs/common";
 import { PostsService } from "./posts.service";
-import { PostsDto } from "./posts.dto";
+import { CommentsDto, PostsDto } from "./posts.dto";
 import { PostModel } from "./posts.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { Response } from "express";
+import { AuthGuard, CheckForExistingUser } from "../auth.guard";
+import { LikesDto } from "../likes/likes.dto";
 
 @Controller('posts')
 export class PostsController{
@@ -27,10 +41,7 @@ export class PostsController{
     if (!post) return errorHandler(ErrorCodes.NotFound)
     return post
   }
-  @Get(':id/comments')
-  async getComments(@Param('id') postId : string){
-
-  }
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async deletePost(@Param('id') postId : string,
                    @Res() res : Response){
@@ -38,6 +49,7 @@ export class PostsController{
     if (!status) return errorHandler(ErrorCodes.NotFound)
     return res.sendStatus(204)
   }
+  @UseGuards(AuthGuard)
   @Post()
   async createPost(
     @Body() post : PostsDto){
@@ -55,4 +67,36 @@ export class PostsController{
     res.sendStatus(204)
     return
   }
+  //COMMENTS 2 REQ + LIKES 1 REQ
+  @Get(':id/comments')
+  async getComments(@Param('id') postId : string,
+                    @Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
+                    @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
+                    @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
+                    @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
+                    @Req() req: any){
+    const token = req.headers.authorization!.split(" ")[1]
+    return await this.postsService.getComments({
+      pageSize : pageSize,
+      pageNumber : pageNumber,
+      sortBy : sortBy,
+      sortDirection : sortDirection,
+    }, token, postId)
+  }
+  @Post(':id/comments')
+  async postComment(@Param('id') postId : string,
+                    @Body() comment : CommentsDto,
+                    @Req() req: any){
+    const token = req.headers.authorization!.split(" ")[1]
+    return await this.postsService.createComment(postId, comment.content, token)
+  }
+  @UseGuards(AuthGuard)
+  @Put(':id/like-status')
+  async setLike(@Param('id') postId : string,
+                @Body() like : LikesDto,
+                @Req() req: any){
+    const token = req.headers.authorization!.split(" ")[1]
+    return await this.postsService.changeLikeStatus(like.likeStatus, postId, token)
+  }
+
 }
