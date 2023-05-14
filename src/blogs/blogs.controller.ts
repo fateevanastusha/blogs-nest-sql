@@ -61,9 +61,9 @@ export class BlogsController{
   async createBlog(
     @Body() blog : BlogDto){
     //how make the error
-    if(11 > 10){
-      throw new BadRequestException({ message : ['bad kiskis'] })
-    }
+    //if(11 > 10){
+    //  throw new BadRequestException({ message : ['bad kiskis'] })
+    //}
     const createdBlog : BlogModel | null = await this.blogsService.createBlog(blog)
     if (!createdBlog) return errorHandler(ErrorCodes.BadRequest)
     return createdBlog
