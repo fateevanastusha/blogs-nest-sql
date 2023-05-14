@@ -9,7 +9,6 @@ export class AccessToken {
   @Prop({required : true})
   accessToken : string
 }
-
 @Schema()
 
 export class RefreshToken {
