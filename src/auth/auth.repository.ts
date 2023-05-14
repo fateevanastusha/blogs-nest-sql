@@ -4,7 +4,9 @@ import bcrypt from "bcrypt";
 import { RefreshToken, RefreshTokensMetaDocument } from "../security/security.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class AuthRepository {
   constructor(protected usersRepository : UsersRepository, @InjectModel('refresh token meta') private refreshTokensMetaModel: Model<RefreshTokensMetaDocument>) {}
   //AUTH

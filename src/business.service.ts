@@ -1,4 +1,3 @@
-import nodemailer from 'nodemailer';
 import { transport } from "./node.mailer.utils";
 
 export class BusinessService {

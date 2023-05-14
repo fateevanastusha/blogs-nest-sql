@@ -35,6 +35,7 @@ import { AuthService } from "./auth/auth.service";
 import { AuthGuard } from "./auth.guard";
 import { PassportModule } from '@nestjs/passport'
 import { LocalStrategy } from "./auth/strategies/passport.strategy";
+import { BusinessService } from "./business.service";
 
 @Module({
   imports: [
@@ -75,6 +76,6 @@ import { LocalStrategy } from "./auth/strategies/passport.strategy";
      ])
   ],
   controllers: [AppController, BlogsController, PostsController, UsersController, CommentsController, AppController, AuthController],
-  providers: [AppService, BlogsRepository, BlogsService, QueryRepository, PostsService, PostsRepository, UsersService, UsersRepository, SecurityRepository, AttemptsRepository, AuthRepository, CommentsService, CommentsRepository, LikesRepository, SecurityService, UsersRepository, LikesHelpers, JwtService, AuthService, AuthGuard, LocalStrategy],
+  providers: [AppService, BlogsRepository, BlogsService, QueryRepository, PostsService, PostsRepository, UsersService, UsersRepository, SecurityRepository, AttemptsRepository, AuthRepository, CommentsService, CommentsRepository, LikesRepository, SecurityService, UsersRepository, LikesHelpers, JwtService, AuthService, AuthGuard, LocalStrategy, BusinessService],
 })
 export class AppModule {}

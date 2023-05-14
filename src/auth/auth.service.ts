@@ -7,7 +7,8 @@ import { SecurityRepository } from "../security/security.repository";
 import { UserModel } from "../users/users.schema";
 import { BusinessService } from "../business.service";
 import { UsersDto } from "../users/users.dto";
-
+import { Injectable } from "@nestjs/common";
+@Injectable()
 export class AuthService {
   constructor(
     protected authRepository : AuthRepository,
