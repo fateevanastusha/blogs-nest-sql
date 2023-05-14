@@ -5,6 +5,7 @@ import { AccessToken, TokenList } from "../security/security.schema";
 import { UserModel } from "../users/users.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { UsersDto } from "../users/users.dto";
+import { BlogDto } from "../blogs/blogs.dto";
 
 @UseGuards(CheckAttempts)
 @Controller('auth')
@@ -86,6 +87,7 @@ export class AuthController {
       return
     }
   }
+  @HttpCode(204)
   @Post('/registration-confirmation')
   async confirmationRequest(@Req() req: any){
     const status = await this.authService.checkForConfirmationCode(req.body.code)
@@ -98,8 +100,8 @@ export class AuthController {
   }
   @HttpCode(204)
   @Post('/registration-email-resending')
-  async emailResendingRequest(@Req() req: any){
-    const status: boolean = await this.authService.emailResending(req.body)
+  async emailResendingRequest(@Body() email : string){
+    const status: boolean = await this.authService.emailResending(email)
     if (status) {
       return
     } else {

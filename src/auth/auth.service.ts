@@ -9,6 +9,7 @@ import { BusinessService } from "../business.service";
 import { UsersDto } from "../users/users.dto";
 import { BadRequestException, HttpException, Injectable } from "@nestjs/common";
 import { HttpExceptionFilter } from "../exception.filters";
+import { ErrorCodes, errorHandler } from "../helpers/errors";
 @Injectable()
 export class AuthService {
   constructor(
@@ -118,11 +119,14 @@ export class AuthService {
   }
   async checkForConfirmationCode (confirmationCode : string) : Promise <boolean>  {
     //check for existing confirmation code
-    const status : boolean = await this.usersRepository.checkForConfirmationCode(confirmationCode)
-    if (!status) {
+    const statusOfCode : boolean = await this.usersRepository.checkForConfirmationCode(confirmationCode)
+    if (!statusOfCode) {
       throw new BadRequestException({ message : ['code is wrong'] })
-    } else {
-      return true
+    }
+    //check for not confirmed
+    const statusOfConfirmed : boolean = await this.usersRepository.checkForConfirmedAccountByEmailOrCode(confirmationCode)
+    if (statusOfConfirmed) {
+      return false
     }
     return await this.usersRepository.changeConfirmedStatus(confirmationCode)
   }
@@ -179,26 +183,23 @@ export class AuthService {
 
   //EMAIL RESENDING
 
-  async emailResending (user: UserModel) : Promise <boolean> {
-
+  async emailResending (email : string) : Promise <boolean> {
+    //check for not confirmed
+    const statusOfConfirmed : boolean = await this.usersRepository.checkForConfirmedAccountByEmailOrCode(email)
+    if (statusOfConfirmed) {
+      return false
+    }
     let confirmationCode : string = (+new Date()).toString()
-    let email : string = user.email
-
     //UPDATE CONFIRMATION CODE
-
     const status = await this.updateConfirmationCode(confirmationCode, email)
     if (!status) {
       return false
     }
     //SEND EMAIL
-
-    await this.businessService.sendConfirmationCode(user.email, confirmationCode)
+    await this.businessService.sendConfirmationCode(email, confirmationCode)
     return true
-
   }
-
   //GET INFORMATION ABOUT CURRENT USER
-
   async getInformationAboutCurrentUser (accessToken : string) : Promise <UserModel | null> {
 
     const token : string = accessToken
