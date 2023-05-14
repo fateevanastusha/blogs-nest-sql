@@ -20,7 +20,7 @@ export class UsersService {
   async getUser(id : string) : Promise<UserModel | null>{
     return this.usersRepository.getUser(id)
   }
-  async createUser(user : UsersDto ) : Promise<UserModel | null>{
+  async createUser(user : UsersDto, confirmedCode : string ) : Promise<UserModel | null>{
     const hash = bcrypt.hashSync(user.password, 10, )
     const newUser : UserModel =  {
       id: (+new Date()).toString(),
@@ -29,7 +29,7 @@ export class UsersService {
       password : hash,
       createdAt: new Date().toISOString(),
       isConfirmed: false,
-      confirmedCode: "no code"
+      confirmedCode: confirmedCode
     }
     return await this.usersRepository.createUser(newUser)
   }

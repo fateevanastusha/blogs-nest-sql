@@ -116,12 +116,15 @@ export class AuthService {
       loginOrEmail
     )
   }
-
-  //
-
   async checkForConfirmationCode (confirmationCode : string) : Promise <boolean>  {
+    //check for existing confirmation code
+    const status : boolean = await this.usersRepository.checkForConfirmationCode(confirmationCode)
+    if (!status) {
+      throw new BadRequestException({ message : ['code is wrong'] })
+    } else {
+      return true
+    }
     return await this.usersRepository.changeConfirmedStatus(confirmationCode)
-
   }
 
   //CHANGE PASSWORD
@@ -150,7 +153,7 @@ export class AuthService {
       throw new BadRequestException({ message : ['email is already exist'] })
       return false;
     }
-    const newUser : UserModel | null = await this.usersService.createUser(user)
+    const newUser : UserModel | null = await this.usersService.createUser(user, confirmationCode)
     if (!newUser) {
       return false
     }

@@ -49,7 +49,8 @@ export class UsersController{
   @Post()
   async createUser(
     @Body() user : UsersDto){
-    const createdUser : UserModel | null = await this.usersService.createUser(user)
+
+    const createdUser : UserModel | null = await this.usersService.createUser(user, (+new Date()).toString())
     if (!createdUser) return errorHandler(ErrorCodes.BadRequest)
     return createdUser
   }

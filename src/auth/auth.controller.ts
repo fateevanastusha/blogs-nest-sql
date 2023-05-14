@@ -96,6 +96,7 @@ export class AuthController {
       return
     }
   }
+  @HttpCode(204)
   @Post('/registration-email-resending')
   async emailResendingRequest(@Req() req: any){
     const status: boolean = await this.authService.emailResending(req.body)
