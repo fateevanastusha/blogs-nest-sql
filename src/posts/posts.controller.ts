@@ -3,7 +3,7 @@ import {
   Controller,
   DefaultValuePipe,
   Delete,
-  Get,
+  Get, HttpCode,
   Param,
   Post,
   Put,
@@ -90,6 +90,7 @@ export class PostsController{
     const token = req.headers.authorization!.split(" ")[1]
     return await this.postsService.createComment(postId, comment.content, token)
   }
+  @HttpCode(204)
   @Put(':id/like-status')
   async setLike(@Param('id') postId : string,
                 @Body() like : LikesDto,
