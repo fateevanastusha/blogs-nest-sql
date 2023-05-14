@@ -90,13 +90,16 @@ export class PostsController{
     const token = req.headers.authorization!.split(" ")[1]
     return await this.postsService.createComment(postId, comment.content, token)
   }
-  @UseGuards(AuthGuard)
   @Put(':id/like-status')
   async setLike(@Param('id') postId : string,
                 @Body() like : LikesDto,
                 @Req() req: any){
     const token = req.headers.authorization!.split(" ")[1]
-    return await this.postsService.changeLikeStatus(like.likeStatus, postId, token)
+    const status : boolean = await this.postsService.changeLikeStatus(like.likeStatus, postId, token)
+    if (!status){
+      return errorHandler(ErrorCodes.NotFound)
+    }
+    return
   }
 
 }
