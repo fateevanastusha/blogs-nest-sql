@@ -12,7 +12,7 @@ import {
   Res, UseGuards
 } from "@nestjs/common";
 import { BlogsService } from "./blogs.service";
-import { BlogDto } from "./blogs.dto";
+import { BlogDto, PostsBlogDto } from "./blogs.dto";
 import { PostsService } from "../posts/posts.service";
 import { PostsDto } from "../posts/posts.dto";
 import { BlogModel, PaginatedClass } from "./blogs.schema";
@@ -97,7 +97,7 @@ export class BlogsController{
   }
   @Post(':id/posts')
   async createPost(@Param('id') blogId : string,
-                   @Body() post : PostsDto){
+                   @Body() post : PostsBlogDto){
   const createdPost : PostModel | null = await this.postsService.createPost({
     title: post.title,
     shortDescription: post.shortDescription,

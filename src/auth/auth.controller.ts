@@ -6,6 +6,7 @@ import { UserModel } from "../users/users.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { UsersDto } from "../users/users.dto";
 import { BlogDto } from "../blogs/blogs.dto";
+import { EmailDto } from "./auth.dto";
 
 @UseGuards(CheckAttempts)
 @Controller('auth')
@@ -100,13 +101,12 @@ export class AuthController {
   }
   @HttpCode(204)
   @Post('/registration-email-resending')
-  async emailResendingRequest(@Body() email : string){
-    const status: boolean = await this.authService.emailResending(email)
+  async emailResendingRequest(@Body() body : EmailDto){
+    const status: boolean = await this.authService.emailResending(body.email)
     if (status) {
       return
     } else {
-      errorHandler(ErrorCodes.BadRequest)
-      return
+      return errorHandler(ErrorCodes.BadRequest)
     }
   }
   @UseGuards(CheckForRefreshToken)
