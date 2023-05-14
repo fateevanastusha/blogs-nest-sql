@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Req, UseGuards, Res } from "@nestjs/common";
+import { Controller, Get, Post, Req, UseGuards, Res, Body } from "@nestjs/common";
 import { CheckAttempts, CheckForRefreshToken, CheckForSameDevice } from "../auth.guard";
 import { AuthService } from "./auth.service";
 import { AccessToken, TokenList } from "../security/security.schema";
 import { UserModel } from "../users/users.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
+import { UsersDto } from "../users/users.dto";
 
 @UseGuards(CheckAttempts)
 @Controller('auth')
@@ -18,8 +19,10 @@ export class AuthController {
       let token: AccessToken = {
         accessToken: tokenList.accessToken
       }
+      console.log(token);
       res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: true, secure: true})
-      return token
+      res.send(token)
+      return
     } else {
       errorHandler(ErrorCodes.NotAutorized)
       return
@@ -73,8 +76,8 @@ export class AuthController {
   }
 
   @Post('/registration')
-  async registrationRequest(@Req() req: any){
-    const status: boolean = await this.authService.registrationUser(req.body);
+  async registrationRequest(@Body() user: UsersDto){
+    const status: boolean = await this.authService.registrationUser(user);
     if (status) {
       return
     } else {

@@ -18,13 +18,9 @@ import { AttemptsRepository } from "./attempts/attempts.repository";
 export class AuthGuard implements CanActivate {
   constructor(
               protected jwtService : JwtService,
-              protected commentsService : CommentsService,
               protected authRepository : AuthRepository,
               protected securityRepository : SecurityRepository,
-              protected authService : AuthService,
-              protected usersRepository : UsersRepository,
-              protected securityService : SecurityService,
-              protected attemptsRepository : AttemptsRepository) {}
+              protected usersRepository : UsersRepository) {}
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {

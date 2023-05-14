@@ -1,6 +1,6 @@
 import { UserModel } from "../users/users.schema";
 import { UsersRepository } from "../users/users.repository";
-import bcrypt from "bcrypt";
+import * as bcrypt from 'bcrypt';
 import { RefreshToken, RefreshTokensMetaDocument } from "../security/security.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";

@@ -2,7 +2,8 @@ import { RefreshTokensMetaModel, RefreshTokensMetaDocument } from "./security.sc
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { BlogDocument } from "../blogs/blogs.schema";
-
+import { Injectable } from "@nestjs/common";
+@Injectable()
 export class SecurityRepository {
   constructor(@InjectModel('refresh token meta') private refreshTokensMetaModel: Model<RefreshTokensMetaDocument>) {}
   async getAllSessions(userId : string) : Promise<RefreshTokensMetaModel[] | null> {
@@ -67,7 +68,6 @@ export class SecurityRepository {
     await this.refreshTokensMetaModel.deleteMany({});
     return [];
   }
-  //CHECK FOR THE SAME SESSION
   async checkSameDevice(title : string, userId : string) : Promise<boolean> {
     const result = await this.refreshTokensMetaModel.find({title: title, userId : userId})
     if (result) return true

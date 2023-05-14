@@ -2,7 +2,8 @@ import { SecurityRepository } from "./security.repository";
 import { JwtService } from "../jwt.service";
 import { RefreshTokensMetaModel } from "./security.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
-
+import { Injectable } from "@nestjs/common";
+@Injectable()
 export class SecurityService {
   constructor(protected securityRepository : SecurityRepository, protected jwtService : JwtService) {
   }

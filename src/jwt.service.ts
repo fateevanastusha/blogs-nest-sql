@@ -1,5 +1,4 @@
-import jwt from 'jsonwebtoken'
-
+import * as jwt from 'jsonwebtoken';
 import { Injectable } from "@nestjs/common";
 import { AccessToken, RefreshToken } from "./security/security.schema";
 import { settings } from "./settings";
