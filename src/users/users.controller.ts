@@ -1,4 +1,16 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, Param, Post, Query, Res, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  Injectable,
+  Param,
+  Post,
+  Query,
+  Res,
+  UseGuards
+} from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { UsersDto } from "./users.dto";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
@@ -6,11 +18,11 @@ import { UserModel } from "./users.schema";
 import { Response } from "express";
 import { AuthGuard } from "../auth.guard";
 
+@Injectable()
 @UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController{
-  constructor(protected usersService : UsersService
-  ) {}
+  constructor(protected usersService : UsersService) {}
   @Get()
   async getUsers(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,

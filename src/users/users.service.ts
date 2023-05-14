@@ -22,14 +22,14 @@ export class UsersService {
   }
   async createUser(user : UsersDto ) : Promise<UserModel | null>{
     const hash = bcrypt.hashSync(user.password, 10, )
-    const newUser =  {
+    const newUser : UserModel =  {
       id: (+new Date()).toString(),
       login: user.login,
       email: user.email,
       password : hash,
       createdAt: new Date().toISOString(),
       isConfirmed: false,
-      confirmedCode: ""
+      confirmedCode: "no code"
     }
     return await this.usersRepository.createUser(newUser)
   }

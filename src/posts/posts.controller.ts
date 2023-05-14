@@ -16,7 +16,7 @@ import { CommentsDto, PostsDto } from "./posts.dto";
 import { PostModel } from "./posts.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { Response } from "express";
-import { AuthGuard, CheckForExistingUser } from "../auth.guard";
+import { AuthGuard } from "../auth.guard";
 import { LikesDto } from "../likes/likes.dto";
 
 @Controller('posts')
