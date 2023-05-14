@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UseGuards, Res, Body } from "@nestjs/common";
+import { Controller, Get, Post, Req, UseGuards, Res, Body, HttpCode } from "@nestjs/common";
 import { CheckAttempts, CheckForRefreshToken, CheckForSameDevice } from "../auth.guard";
 import { AuthService } from "./auth.service";
 import { AccessToken, TokenList } from "../security/security.schema";
@@ -10,6 +10,7 @@ import { UsersDto } from "../users/users.dto";
 @Controller('auth')
 export class AuthController {
   constructor(protected authService : AuthService){}
+  @HttpCode(200)
   @UseGuards(CheckForSameDevice)
   @Post('/login')
   async loginRequest(@Req() req: any, @Res() res: any){
@@ -74,7 +75,7 @@ export class AuthController {
       return
     }
   }
-
+  @HttpCode(204)
   @Post('/registration')
   async registrationRequest(@Body() user: UsersDto){
     const status: boolean = await this.authService.registrationUser(user);
