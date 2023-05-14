@@ -7,7 +7,8 @@ import { SecurityRepository } from "../security/security.repository";
 import { UserModel } from "../users/users.schema";
 import { BusinessService } from "../business.service";
 import { UsersDto } from "../users/users.dto";
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, Injectable } from "@nestjs/common";
+import { HttpExceptionFilter } from "../exception.filters";
 @Injectable()
 export class AuthService {
   constructor(
@@ -129,34 +130,29 @@ export class AuthService {
     //change confirmed code
     return await this.usersService.changeUserPassword(confirmationCode, newPassword)
   }
-
-  //UPDATE CONFIRMATION CODE
-
   async updateConfirmationCode (confirmationCode : string, email : string) : Promise <boolean> {
     return this.usersRepository.changeConfirmationCode(confirmationCode,email)
   }
-
-  //REGISTRATION USER
-
   async registrationUser (user: UsersDto) : Promise <boolean> {
-
     let confirmationCode : string = (+new Date()).toString()
-
-    //CREATE NEW USER
-
+    //check for not existing email and login
+    const loginStatus : UserModel | null = await this.usersRepository.returnUserByField(user.login)
+    if(loginStatus) {
+      throw new BadRequestException({ message : ['login is already exist'] })
+      return false;
+    }
+    const emailStatus : UserModel | null = await this.usersRepository.returnUserByField(user.email);
+    if(emailStatus) {
+      throw new BadRequestException({ message : ['email is already exist'] })
+      return false;
+    }
     const newUser : UserModel | null = await this.usersService.createUser(user)
     if (!newUser) {
       return false
     }
-    //SEND EMAIL
-
     await this.businessService.sendConfirmationCode(user.email, confirmationCode)
     return true
-
   }
-
-  //PASSWORD RECOVERY
-
   async passwordRecovery (email : string) : Promise <boolean> {
 
     let confirmationCode : string = (+new Date()).toString()
