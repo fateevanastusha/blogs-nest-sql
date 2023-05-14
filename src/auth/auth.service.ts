@@ -137,11 +137,15 @@ export class AuthService {
     let confirmationCode : string = (+new Date()).toString()
     //check for not existing email and login
     const loginStatus : UserModel | null = await this.usersRepository.returnUserByField(user.login)
+    const emailStatus : UserModel | null = await this.usersRepository.returnUserByField(user.email);
     if(loginStatus) {
       throw new BadRequestException({ message : ['login is already exist'] })
-      return false;
+      if(emailStatus) {
+        throw new BadRequestException({ message : ['email is already exist'] })
+        return false;
+      }
+      return false
     }
-    const emailStatus : UserModel | null = await this.usersRepository.returnUserByField(user.email);
     if(emailStatus) {
       throw new BadRequestException({ message : ['email is already exist'] })
       return false;
