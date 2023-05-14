@@ -104,7 +104,7 @@ export class BlogsController{
     content: post.content,
     blogId: blogId
   })
-    if (!createdPost) return errorHandler(ErrorCodes.NotFound)
+    if (!createdPost) return errorHandler(ErrorCodes.NotAutorized)
     return createdPost
   }
 }
