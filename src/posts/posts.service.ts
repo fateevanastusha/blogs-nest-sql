@@ -48,9 +48,12 @@ export class PostsService {
     return await this.queryRepository.paginationForm(pageCount, total, items, query)
   }
   async getPostWithUser(id: string, header : string) : Promise<null | PostModel> {
-    const token = header.split(" ")[1];
-    const userId : string = await this.jwtService.getUserByIdToken(token)
-    let myStatus  = await this.likesRepository.findStatus(id, userId)
+    let myStatus = 'None'
+    if(header){
+      const token = header.split(" ")[1];
+      const userId : string = await this.jwtService.getUserByIdToken(token)
+      myStatus = (await this.likesRepository.findStatus(id, userId)).status
+    }
     const newestLikes : LikeViewModel[] = await this.queryRepository.getLastLikes(id)
     const post =  await this.postsRepository.getPost(id);
     if (!post) return null
@@ -58,7 +61,7 @@ export class PostsService {
     if(myStatus === null){
       post.extendedLikesInfo.myStatus = 'None'
     } else {
-      post.extendedLikesInfo.myStatus = myStatus.status
+      post.extendedLikesInfo.myStatus = myStatus
     }
     return post
   }
