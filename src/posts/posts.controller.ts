@@ -47,9 +47,12 @@ export class PostsController{
     }
   }
   @Get(':id')
-  async getPost(@Param('id') postId : string){
-    const post : PostModel | null =  await this.postsService.getPost(postId)
+  async getPost(@Param('id') postId : string,
+                @Req() req: any){
+    const post : PostModel | null =  await this.postsService.getPostWithUser(postId, req.headers.authorization)
     if (!post) return errorHandler(ErrorCodes.NotFound)
+    //mapping for likes
+
     return post
   }
   @UseGuards(AuthGuard)

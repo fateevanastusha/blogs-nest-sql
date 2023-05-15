@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
+import { LikeViewModel } from "../likes/likes.schema";
 
 export type PostDocument = HydratedDocument<PostModel>
 
@@ -12,7 +13,7 @@ export class extendedLikesInfo {
   @Prop({required : true} )
   myStatus: string
   @Prop({required : true} )
-  newestLikes: []
+  newestLikes: LikeViewModel[]
 }
 
 @Schema()

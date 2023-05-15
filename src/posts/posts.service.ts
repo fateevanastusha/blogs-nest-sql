@@ -12,6 +12,7 @@ import { CommentModel } from "../comments/comments.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { LikesRepository } from "../likes/likes.repository";
 import { LikesHelpers } from "../helpers/likes.helper";
+import { LikeViewModel } from "../likes/likes.schema";
 
 @Injectable()
 export class PostsService {
@@ -46,8 +47,23 @@ export class PostsService {
     const items : PostModel[] = await this.queryRepository.paginatorForPostsWithBlog(query, blogId);
     return await this.queryRepository.paginationForm(pageCount, total, items, query)
   }
+  async getPostWithUser(id: string, header : string) : Promise<null | PostModel> {
+    const token = header.split(" ")[1];
+    const userId : string = await this.jwtService.getUserByIdToken(token)
+    let myStatus  = await this.likesRepository.findStatus(id, userId)
+    const newestLikes : LikeViewModel[] = await this.queryRepository.getLastLikes(id)
+    const post =  await this.postsRepository.getPost(id);
+    if (!post) return null
+    post.extendedLikesInfo.newestLikes = newestLikes
+    if(myStatus === null){
+      post.extendedLikesInfo.myStatus = 'None'
+    } else {
+      post.extendedLikesInfo.myStatus = myStatus.status
+    }
+    return post
+  }
   async getPost(id: string) : Promise<null | PostModel> {
-    const post =  await this.postsRepository.getPost(id)
+    const post =  await this.postsRepository.getPost(id);
     if (!post) return null
     return post
   }
