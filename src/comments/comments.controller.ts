@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Put, UseGuards } from "@nestjs/common";
 import { CommentsDto } from "./comments dto";
-import { AuthGuard, CheckForExistingUser, CheckForUser } from "../auth.guard";
+import { AuthGuard, CheckForExistingUser, CheckCommentForUser } from "../auth.guard";
 import { LocalStrategy } from "../auth/strategies/passport.strategy";
 
 @Controller('comments')
@@ -10,13 +10,13 @@ export class CommentsController {
 
   }
   @UseGuards(CheckForExistingUser)
-  @UseGuards(CheckForUser)
+  @UseGuards(CheckCommentForUser)
   @Delete(':id')
   async deleteComment(@Param('id') commentId : string){
 
   }
   @UseGuards(CheckForExistingUser)
-  @UseGuards(CheckForUser)
+  @UseGuards(CheckCommentForUser)
   @Put(':id')
   async updateComment(@Param('id') commentId : string,
                       @Body() comment : CommentsDto){
