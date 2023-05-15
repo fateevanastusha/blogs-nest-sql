@@ -27,13 +27,24 @@ export class PostsController{
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
                  @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
                  @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
+                 @Req() req: any
                  ){
-    return await this.postsService.getPosts({
-      pageSize : pageSize,
-      pageNumber : pageNumber,
-      sortBy : sortBy,
-      sortDirection : sortDirection,
-    })
+    if (!req.headers.authorization){
+      return await this.postsService.getPosts({
+        pageSize : pageSize,
+        pageNumber : pageNumber,
+        sortBy : sortBy,
+        sortDirection : sortDirection,
+      })
+    } else {
+      const token = req.headers.authorization!.split(" ")[1]
+      return await this.postsService.getPostsWithUser({
+        pageSize : pageSize,
+        pageNumber : pageNumber,
+        sortBy : sortBy,
+        sortDirection : sortDirection,
+      }, token)
+    }
   }
   @Get(':id')
   async getPost(@Param('id') postId : string){

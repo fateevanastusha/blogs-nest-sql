@@ -10,7 +10,6 @@ import { JwtService } from "../jwt.service";
 import { CommentsService } from "../comments/comments.service";
 import { CommentModel } from "../comments/comments.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
-import { LikesDto } from "../likes/likes.dto";
 import { LikesRepository } from "../likes/likes.repository";
 import { LikesHelpers } from "../helpers/likes.helper";
 
@@ -28,7 +27,16 @@ export class PostsService {
     const total : number = (await this.postsRepository.getPosts()).length
     const pageCount = Math.ceil( total / query.pageSize)
     const items = await this.queryRepository.paginatorForPosts(query)
-    return await this.queryRepository.paginationForm(pageCount,total,items,query)
+    const paginatedItems = await this.queryRepository.postsMapping(items, undefined)
+    return await this.queryRepository.paginationForm(pageCount,total,paginatedItems,query)
+  }
+  async getPostsWithUser(query : QueryModelPosts, token : string) : Promise<PaginatedClass>{
+    const userId : string = await this.jwtService.getUserByIdToken(token)
+    const total : number = (await this.postsRepository.getPosts()).length
+    const pageCount = Math.ceil( total / query.pageSize)
+    const items = await this.queryRepository.paginatorForPosts(query)
+    const paginatedItems = await this.queryRepository.postsMapping(items, userId)
+    return await this.queryRepository.paginationForm(pageCount,total,paginatedItems,query)
   }
   async getPostsByBlogId (query : QueryModelPosts, blogId: string) : Promise<PaginatedClass | null>{
     const blog : BlogModel | null = await this.blogsRepository.getBlog(blogId)

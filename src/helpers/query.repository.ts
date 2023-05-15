@@ -126,12 +126,11 @@ export class QueryRepository {
 
   //PAGINATION FOR POSTS
 
-  async PostsMapping(posts : PostModel[], userId : string) {
+  async postsMapping(posts : PostModel[], userId : string) {
     return await Promise.all(
       posts.map(async (post) => {
         let newestLikes = await this.getLastLikes(post.id)
         let status = null;
-
         if (userId) {
           status = await this.likesRepository.findStatus(post.id, userId);
           if (status) status = status.status
