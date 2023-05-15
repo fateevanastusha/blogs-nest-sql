@@ -15,7 +15,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
     console.log({
       url: request.url,
       method: request.method,
-      status,
+      body: request.body,
+      errorsStatus: status,
       error: exception.getResponse()
     });
 
