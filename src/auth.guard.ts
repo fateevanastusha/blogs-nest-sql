@@ -85,19 +85,6 @@ export class CheckForExistingUser implements CanActivate {
     if(!user) throw new UnauthorizedException(401)
     req.user = user
     return true
-    // if (!req.headers.authorization) {
-    //   throw new UnauthorizedException(401);
-    //   return false;
-    // } else {
-    //   const token: string = req.headers.authorization.split(" ")[1];
-    //   const user = await this.jwtService.getUserByIdToken(token);
-    //   if (user) {
-    //     return true;
-    //   } else {
-    //     throw new UnauthorizedException(401);
-    //     return false;
-    //   }
-    // }
   }
 }
 
@@ -192,6 +179,48 @@ export class CheckForRefreshToken implements CanActivate {
 
 @Injectable()
 export class CheckForSameUser implements CanActivate {
+  constructor(
+    protected jwtService: JwtService,
+    protected authRepository: AuthRepository,
+    protected securityRepository: SecurityRepository) {
+  }
+
+  async canActivate(
+    context: ExecutionContext
+  ): Promise<boolean> {
+    const req = context.switchToHttp().getRequest();
+    //CHECK FOR EXISTING REFRESH TOKEN
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      throw new UnauthorizedException(401);
+      return false;
+    }
+    const isTokenBlocked: boolean = await this.authRepository.checkRefreshToken(refreshToken);
+    if (isTokenBlocked) {
+      throw new UnauthorizedException(401);
+      return false;
+    }
+    const tokenList = await this.jwtService.getIdByRefreshToken(refreshToken);
+    if (!tokenList) {
+      throw new UnauthorizedException(401);
+      return false;
+    }
+    const session: RefreshTokensMetaModel | null = await this.securityRepository.findSessionByDeviceId(tokenList.deviceId);
+    if (!session) {
+      throw new UnauthorizedException(401);
+      return false;
+    }
+    const userId = await this.jwtService.getIdByRefreshToken(refreshToken);
+    if (!userId) {
+      throw new UnauthorizedException(401);
+      return false;
+    }
+    return true;
+  }
+}
+
+@Injectable()
+export class CheckForSameUserForComment implements CanActivate {
   constructor(
     protected jwtService: JwtService,
     protected authRepository: AuthRepository,

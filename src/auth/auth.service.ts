@@ -144,21 +144,6 @@ export class AuthService {
   }
   async registrationUser (user: UsersDto) : Promise <boolean> {
     let confirmationCode : string = (+new Date()).toString()
-    //check for not existing email and login
-    const loginStatus : UserModel | null = await this.usersRepository.returnUserByField(user.login)
-    const emailStatus : UserModel | null = await this.usersRepository.returnUserByField(user.email);
-    if(loginStatus) {
-      throw new BadRequestException({ message : ['login is already exist'] })
-      if(emailStatus) {
-        throw new BadRequestException({ message : ['email is already exist'] })
-        return false;
-      }
-      return false
-    }
-    if(emailStatus) {
-      throw new BadRequestException({ message : ['email is already exist'] })
-      return false;
-    }
     const newUser : UserModel | null = await this.usersService.createUser(user, confirmationCode)
     if (!newUser) {
       return false

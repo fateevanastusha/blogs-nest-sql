@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Put, Req, UseGuards } from "@nestjs/common";
 import { CommentsDto } from "./comments dto";
-import { CheckForExistingUser, CheckCommentForUser } from "../auth.guard";
+import { CheckForExistingUser, CheckCommentForUser, CheckForSameUser } from "../auth.guard";
 import { CommentsService } from "./comments.service";
 import { CommentModel } from "./comments.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
@@ -61,6 +61,7 @@ export class CommentsController {
   }
 
   @HttpCode(204)
+  @UseGuards(CheckCommentForUser)
   @UseGuards(CheckForExistingUser)
   @Put(':id/like-status')
   async changeLikeStatus(@Param('id') commentId : string,

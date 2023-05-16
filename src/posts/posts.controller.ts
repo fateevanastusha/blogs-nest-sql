@@ -16,7 +16,7 @@ import { CommentsDto, PostsDto } from "./posts.dto";
 import { PostModel } from "./posts.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { Request, Response } from "express";
-import { AuthGuard, CheckCommentForUser, CheckPostForUser } from "../auth.guard";
+import { AuthGuard, CheckCommentForUser, CheckForExistingUser, CheckPostForUser } from "../auth.guard";
 import { LikesDto } from "../likes/likes.dto";
 
 @Controller('posts')
@@ -98,6 +98,7 @@ export class PostsController{
       sortDirection : sortDirection,
     }, req.headers.authorization, postId)
   }
+  @UseGuards(CheckForExistingUser)
   @Post(':id/comments')
   async postComment(@Param('id') postId : string,
                     @Body() comment : CommentsDto,
