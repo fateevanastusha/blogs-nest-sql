@@ -36,6 +36,7 @@ import { AuthGuard } from "./auth.guard";
 import { PassportModule } from '@nestjs/passport'
 import { LocalStrategy } from "./auth/strategies/passport.strategy";
 import { BusinessService } from "./business.service";
+import { IsUserAlreadyExistConstraint } from "./users/users.dto";
 
 @Module({
   imports: [
@@ -76,6 +77,6 @@ import { BusinessService } from "./business.service";
      ])
   ],
   controllers: [AppController, BlogsController, PostsController, UsersController, CommentsController, AppController, AuthController],
-  providers: [AppService, BlogsRepository, BlogsService, QueryRepository, PostsService, PostsRepository, UsersService, UsersRepository, SecurityRepository, AttemptsRepository, AuthRepository, CommentsService, CommentsRepository, LikesRepository, SecurityService, UsersRepository, LikesHelpers, JwtService, AuthService, AuthGuard, LocalStrategy, BusinessService],
+  providers: [IsUserAlreadyExistConstraint, AppService, BlogsRepository, BlogsService, QueryRepository, PostsService, PostsRepository, UsersService, UsersRepository, SecurityRepository, AttemptsRepository, AuthRepository, CommentsService, CommentsRepository, LikesRepository, SecurityService, UsersRepository, LikesHelpers, JwtService, AuthService, AuthGuard, LocalStrategy, BusinessService],
 })
 export class AppModule {}
