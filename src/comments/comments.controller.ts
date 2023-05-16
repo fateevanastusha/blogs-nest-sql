@@ -62,7 +62,7 @@ export class CommentsController {
 
   @HttpCode(204)
   @UseGuards(CheckForExistingUser)
-  @Put(':id')
+  @Put(':id/like-status')
   async changeLikeStatus(@Param('id') commentId : string,
                          @Body() requestType : LikesDto,
                          @Req() req: any){
