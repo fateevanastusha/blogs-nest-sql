@@ -91,13 +91,12 @@ export class PostsController{
                     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
                     @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                     @Req() req: any){
-    const token = req.headers.authorization!.split(" ")[1]
     return await this.postsService.getComments({
       pageSize : pageSize,
       pageNumber : pageNumber,
       sortBy : sortBy,
       sortDirection : sortDirection,
-    }, token, postId)
+    }, req.headers.authorization, postId)
   }
   @Post(':id/comments')
   async postComment(@Param('id') postId : string,

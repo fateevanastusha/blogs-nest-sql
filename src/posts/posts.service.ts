@@ -104,12 +104,13 @@ export class PostsService {
   async updatePost(post : PostsDto, id : string) : Promise <boolean>{
     return await this.postsRepository.updatePost(post,id)
   }
-  async getComments(query : QueryModelComments, token : string, postId : string) : Promise<PaginatedClass>{
+  async getComments(query : QueryModelComments, header : string, postId : string) : Promise<PaginatedClass>{
     const foundPost = await this.getPost(postId)
     if (foundPost === null) {
       errorHandler(ErrorCodes.NotFound)
       return null
     } else {
+      const token = header.split(" ")[1]
       let userId = await this.jwtService.getUserByIdToken(token)
       const foundComments = await this.commentsService.getAllCommentsByPostId(query, postId, userId)
       return foundComments
