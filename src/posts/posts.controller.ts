@@ -71,6 +71,8 @@ export class PostsController{
     if (!createdPost) return errorHandler(ErrorCodes.BadRequest)
     return createdPost
   }
+  
+  @UseGuards(AuthGuard)
   @Put(':id')
   async updatePost(
     @Body() post : PostsDto,

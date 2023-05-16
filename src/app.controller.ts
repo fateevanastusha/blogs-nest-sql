@@ -1,4 +1,4 @@
-import { Controller, Delete, Res } from "@nestjs/common";
+import { Controller, Delete, Get, Res } from "@nestjs/common";
 import { BlogsRepository } from "./blogs/blogs.repository";
 import { PostsRepository } from "./posts/posts.repository";
 import { UsersRepository } from "./users/users.repository";
@@ -26,5 +26,14 @@ export class AppController {
     await this.commentsRepository.deleteAllData();
     res.sendStatus(204)
     return;
+  }
+
+  @Get('/likes')
+  async getAllLikes(){
+    return await this.likesRepository.getAllLikes()
+  }
+  @Get('/all-comments')
+  async getAllComments(){
+    return await this.commentsRepository.getAllComments()
   }
 }

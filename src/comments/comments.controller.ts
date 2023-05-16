@@ -59,6 +59,7 @@ export class CommentsController {
       return errorHandler(ErrorCodes.NotFound)
     }
   }
+
   @HttpCode(204)
   @UseGuards(CheckForExistingUser)
   @Put(':id')

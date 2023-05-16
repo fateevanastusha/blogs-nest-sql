@@ -67,26 +67,37 @@ export class AuthGuard implements CanActivate {
 @Injectable()
 export class CheckForExistingUser implements CanActivate {
   constructor(
-    protected jwtService: JwtService) {
+    protected jwtService: JwtService,
+    private userRepo: UsersRepository) {
   }
 
   async canActivate(
     context: ExecutionContext
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    if (!req.headers.authorization) {
-      throw new UnauthorizedException(401);
-      return false;
-    } else {
-      const token: string = req.headers.authorization.split(" ")[1];
-      const user = await this.jwtService.getUserByIdToken(token);
-      if (user) {
-        return true;
-      } else {
-        throw new UnauthorizedException(401);
-        return false;
-      }
-    }
+    const auth = req.headers.authorization
+    if (!auth) throw new UnauthorizedException(401)
+    const [authType, token] = auth.split(' ')
+    if (authType !== 'Bearer') throw new UnauthorizedException(401)
+    const userId = await this.jwtService.getUserByIdToken(token)
+    if(!userId) throw new UnauthorizedException(401)
+    const user = await this.userRepo.getUser(userId)
+    if(!user) throw new UnauthorizedException(401)
+    req.user = user
+    return true
+    // if (!req.headers.authorization) {
+    //   throw new UnauthorizedException(401);
+    //   return false;
+    // } else {
+    //   const token: string = req.headers.authorization.split(" ")[1];
+    //   const user = await this.jwtService.getUserByIdToken(token);
+    //   if (user) {
+    //     return true;
+    //   } else {
+    //     throw new UnauthorizedException(401);
+    //     return false;
+    //   }
+    // }
   }
 }
 
