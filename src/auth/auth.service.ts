@@ -122,10 +122,12 @@ export class AuthService {
     const statusOfCode : boolean = await this.usersRepository.checkForConfirmationCode(confirmationCode)
     if (!statusOfCode) {
       throw new BadRequestException({ message : ['code is wrong'] })
+      return false
     }
     //check for not confirmed
     const statusOfConfirmed : boolean = await this.usersRepository.checkForConfirmedAccountByEmailOrCode(confirmationCode)
     if (statusOfConfirmed) {
+      throw new BadRequestException({ message : ['code is confirmed'] })
       return false
     }
     return await this.usersRepository.changeConfirmedStatus(confirmationCode)

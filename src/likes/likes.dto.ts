@@ -1,8 +1,14 @@
-import { Length } from "class-validator";
+import { IsEnum, Length } from "class-validator";
 import { Transform, TransformFnParams } from "class-transformer";
 
+enum LikeStatusesEnum {
+  Like = "Like",
+  Dislike = "Dislike",
+  None = "None"
+}
+
 export class LikesDto {
-  @Length(4, 7)
+  @IsEnum(LikeStatusesEnum)
   @Transform(({ value }: TransformFnParams) => value?.trim())
-  likeStatus : 'Like' | 'Dislike' | 'None'
+  likeStatus: string
 }

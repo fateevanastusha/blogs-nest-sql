@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UseGuards, Res, Body, HttpCode } from "@nestjs/common";
+import { Controller, Get, Post, Req, UseGuards, Res, Body, HttpCode, BadRequestException } from "@nestjs/common";
 import { CheckAttempts, CheckForRefreshToken, CheckForSameDevice } from "../auth.guard";
 import { AuthService } from "./auth.service";
 import { AccessToken, TokenList } from "../security/security.schema";
@@ -93,7 +93,7 @@ export class AuthController {
   async confirmationRequest(@Req() req: any){
     const status = await this.authService.checkForConfirmationCode(req.body.code)
     if (!status) {
-      errorHandler(ErrorCodes.BadRequest)
+      throw new BadRequestException({ message : ['code is wrong'] })
       return
     } else {
       return
