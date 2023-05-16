@@ -9,6 +9,8 @@ export class LikeModel {
   status : string
   @Prop({required : true})
   userId : string
+  // @Prop({required : true})
+  // login : string
   @Prop({required : true})
   postOrCommentId : string
   @Prop({required : true})

@@ -6,7 +6,7 @@ import { PostDocument, PostModel } from "../posts/posts.schema";
 import { UserModel } from "../users/users.schema";
 import { CommentDocument, CommentModel } from "../comments/comments.schema";
 import { LikesRepository } from "../likes/likes.repository";
-import { LikeModel, LikeViewModel } from "../likes/likes.schema";
+import { LikeDocument, LikeModel, LikeViewModel } from "../likes/likes.schema";
 import { UsersRepository } from "../users/users.repository";
 
 export class QueryRepository {
@@ -14,6 +14,7 @@ export class QueryRepository {
               @InjectModel('posts') private postsModel: Model<PostDocument>,
               @InjectModel('users') private usersModel: Model<UserModel>,
               @InjectModel('comments') private commentsModel : Model<CommentDocument>,
+              @InjectModel('likes') private likesModel : Model<LikeDocument>,
               protected likesRepository : LikesRepository,
               protected usersRepository : UsersRepository) {
   }
@@ -76,25 +77,16 @@ export class QueryRepository {
       items: items
     }
   }
-  async getLastLikes(id : string) : Promise<LikeViewModel[]> {
-    //get all likes
-    let likes : LikeModel[] = await this.likesRepository.getLikesById(id)
-    const like = await Promise.all(await likes
-      .sort(function( a, b) {
-        return (a.createdAt < b.createdAt) ? -1 : ((a.createdAt > b.createdAt) ? 1 : 0);
-      })
-      .reverse()
-      .map(async like => {
-        return {
-          addedAt : like.createdAt,
-          userId : like.userId,
-          login : await this.usersRepository.getLoginById(like.userId)
-        }
-      }).slice(0,3))
-    //sort likes by created at
-    return like;
-
+  async getLastLikes(id : string): Promise<LikeViewModel[]> {
+    const newestLikes = await  this.likesModel.find({postOrCommentId: id, status: 'Like'},
+      {_id: 0, login: 'any login', userId: 1, addedAt: '$createdAt'}).limit(3)
+    return Promise.all(newestLikes.map(async like => ({
+      addedAt : like.createdAt,
+      userId : like.userId,
+      login : await this.usersRepository.getLoginById(like.userId)
+    })))
   }
+
   async commentsMapping(comments : CommentModel[], userId : string) {
     return Promise.all(
       comments.map(async (comment) => {
