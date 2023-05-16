@@ -52,7 +52,12 @@ export class PostsService {
     if(header){
       const token = header.split(" ")[1];
       const userId : string = await this.jwtService.getUserByIdToken(token)
-      myStatus = (await this.likesRepository.findStatus(id, userId)).status
+      let findStatus = await this.likesRepository.findStatus(id, userId)
+      if (!findStatus) {
+        myStatus = "null";
+      } else {
+        myStatus = findStatus.status
+      }
     }
     const newestLikes : LikeViewModel[] = await this.queryRepository.getLastLikes(id)
     const post =  await this.postsRepository.getPost(id);
