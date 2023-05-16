@@ -186,6 +186,16 @@ export class AuthService {
   //EMAIL RESENDING
 
   async emailResending (email : string) : Promise <boolean> {
+    //check email
+    const user : UserModel | null = await this.usersRepository.returnUserByEmail(email)
+    if(!user){
+      throw new BadRequestException({ message : ['email is wrong'] })
+      return false
+    }
+    if(user.isConfirmed === true){
+      throw new BadRequestException({ message : ['email is confirmed'] })
+      return false
+    }
     //check for not confirmed
     const statusOfConfirmed : boolean = await this.usersRepository.checkForConfirmedAccountByEmailOrCode(email)
     if (statusOfConfirmed) {
