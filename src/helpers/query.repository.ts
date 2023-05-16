@@ -79,7 +79,7 @@ export class QueryRepository {
   }
   async getLastLikes(id : string): Promise<LikeViewModel[]> {
     const newestLikes = await  this.likesModel.find({postOrCommentId: id, status: 'Like'},
-      {_id: 0, login: 'any login', userId: 1, addedAt: '$createdAt'}).limit(3)
+      {_id: 0, login: 'any login', userId: 1, 'addedAt': '$createdAt'}).limit(3)
     return Promise.all(newestLikes.map(async like => ({
       addedAt : like.createdAt,
       userId : like.userId,
