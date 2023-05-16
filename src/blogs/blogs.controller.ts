@@ -95,6 +95,7 @@ export class BlogsController{
     if (!posts) return errorHandler(ErrorCodes.NotFound)
     return posts
   }
+  @UseGuards(AuthGuard)
   @Post(':id/posts')
   async createPost(@Param('id') blogId : string,
                    @Body() post : PostsBlogDto){
