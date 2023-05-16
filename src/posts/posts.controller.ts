@@ -110,8 +110,7 @@ export class PostsController{
   async setLike(@Param('id') postId : string,
                 @Body() like : LikesDto,
                 @Req() req: any){
-    const token = req.headers.authorization!.split(" ")[1]
-    const status : boolean = await this.postsService.changeLikeStatus(like.likeStatus, postId, token)
+    const status : boolean = await this.postsService.changeLikeStatus(like.likeStatus, postId, req.headers.authorization)
     if (!status){
       return errorHandler(ErrorCodes.NotFound)
     }
