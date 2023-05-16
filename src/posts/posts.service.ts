@@ -54,7 +54,7 @@ export class PostsService {
       const userId : string = await this.jwtService.getUserByIdToken(token)
       let findStatus = await this.likesRepository.findStatus(id, userId)
       if (!findStatus) {
-        myStatus = "null";
+        myStatus = "None";
       } else {
         myStatus = findStatus.status
       }
