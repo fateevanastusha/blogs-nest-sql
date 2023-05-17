@@ -83,6 +83,8 @@ export class QueryRepository {
       {_id: 0, login: 'any login', userId: 1, createdAt: 1})
       .sort({createdAt: 'desc'})
       .limit(3)
+    console.log(id);
+    console.log(newestLikes);
     return Promise.all(newestLikes.map(async like => ({
       addedAt : like.createdAt,
       userId : like.userId,
@@ -110,8 +112,8 @@ export class QueryRepository {
           },
           createdAt: comment.createdAt,
           likesInfo: {
-            likesCount: comment.likesInfo.likesCount,
-            dislikesCount: comment.likesInfo.dislikesCount,
+            likesCount: await this.likesModel.countDocuments({postOrCommentId : comment.id, status : "Like"}),
+            dislikesCount: await this.likesModel.countDocuments({postOrCommentId : comment.id, status : "Dislike"}),
             myStatus: status || "None",
           },
         };
@@ -139,8 +141,8 @@ export class QueryRepository {
           blogName: post.blogName,
           createdAt: post.createdAt,
           extendedLikesInfo: {
-            likesCount: post.extendedLikesInfo.likesCount,
-            dislikesCount: post.extendedLikesInfo.dislikesCount,
+            likesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Like"}),
+            dislikesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Like"}),
             myStatus: status || "None",
             newestLikes : newestLikes
           }

@@ -110,7 +110,12 @@ export class PostsService {
       errorHandler(ErrorCodes.NotFound)
       return null
     } else {
-      const token = header.split(" ")[1]
+      let token
+      if(header){
+        token = header.split(" ")[1]
+      } else {
+        token = 'null'
+      }
       let userId = await this.jwtService.getUserByIdToken(token)
       const foundComments = await this.commentsService.getAllCommentsByPostId(query, postId, userId)
       return foundComments
