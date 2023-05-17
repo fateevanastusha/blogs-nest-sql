@@ -99,7 +99,7 @@ export class CheckCommentForUser implements CanActivate {
     context: ExecutionContext
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    if (!req.headers.authorization) throw new UnauthorizedException(403);
+    if (!req.headers.authorization) throw new UnauthorizedException(401);
     const token: string = req.headers.authorization.split(" ")[1];
     const userId = await this.jwtService.getUserByIdToken(token);
     if (!userId) throw new UnauthorizedException();
@@ -148,6 +148,7 @@ export class CheckForRefreshToken implements CanActivate {
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     //CHECK FOR EXISTING REFRESH TOKEN
+    if(!req.cookies) throw new UnauthorizedException(401)
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
       throw new UnauthorizedException(401);
