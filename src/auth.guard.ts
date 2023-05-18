@@ -109,7 +109,7 @@ export class CheckCommentForUser implements CanActivate {
     if (!req.headers.authorization) throw new UnauthorizedException(401);
     const token: string = req.headers.authorization.split(" ")[1];
     const userId = await this.jwtService.getUserByIdToken(token);
-    if (!userId) throw new ForbiddenException();
+    if (!userId) throw new UnauthorizedException();
     const comment = await this.commentsService.getCommentByIdWithUser(req.params.id, userId);
     if (!comment) throw new NotFoundException();
     else if (comment.commentatorInfo.userId === userId) {
