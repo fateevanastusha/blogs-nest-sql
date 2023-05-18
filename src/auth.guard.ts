@@ -115,7 +115,7 @@ export class CheckCommentForUser implements CanActivate {
     else if (comment.commentatorInfo.userId === userId) {
       return true;
     } else {
-      throw new UnauthorizedException(403);
+      throw new ForbiddenException();
       return false;
     }
   }
