@@ -83,6 +83,7 @@ export class CheckForExistingUser implements CanActivate {
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const auth = req.headers.authorization
+    if (auth.split(' ')[0] !== 'Bearer') throw new UnauthorizedException(401)
     if (!auth) throw new UnauthorizedException(401)
     const [authType, token] = auth.split(' ')
     if (authType !== 'Bearer') throw new UnauthorizedException(401)
