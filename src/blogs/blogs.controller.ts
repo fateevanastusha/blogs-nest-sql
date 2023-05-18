@@ -8,7 +8,7 @@ import {
   Param,
   Post,
   Put,
-  Query,
+  Query, Req,
   Res, UseGuards
 } from "@nestjs/common";
 import { BlogsService } from "./blogs.service";
@@ -17,7 +17,7 @@ import { PostsService } from "../posts/posts.service";
 import { PostsDto } from "../posts/posts.dto";
 import { BlogModel, PaginatedClass } from "./blogs.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
-import { Response } from "express";
+import { Response, Request } from "express";
 import { PostModel } from "../posts/posts.schema";
 import { AuthGuard } from "../auth.guard";
 
@@ -85,13 +85,21 @@ export class BlogsController{
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
                  @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
                  @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
+                 @Req() req: Request
   ){
-  const posts : PaginatedClass | null = await this.postsService.getPostsByBlogId({
+    const header = req.headers.authorization
+    let token : string
+    if (!header) {
+      token = 'no token'
+    } else {
+      token  = header.split(" ")[1]
+    }
+    const posts : PaginatedClass | null = await this.postsService.getPostsByBlogId({
     pageSize : pageSize,
     pageNumber : pageNumber,
     sortBy : sortBy,
     sortDirection : sortDirection
-  }, blogId)
+  }, blogId, token)
     if (!posts) return errorHandler(ErrorCodes.NotFound)
     return posts
   }

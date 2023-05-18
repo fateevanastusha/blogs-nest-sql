@@ -39,13 +39,15 @@ export class PostsService {
     const paginatedItems = await this.queryRepository.postsMapping(items, userId)
     return await this.queryRepository.paginationForm(pageCount,total,paginatedItems,query)
   }
-  async getPostsByBlogId (query : QueryModelPosts, blogId: string) : Promise<PaginatedClass | null>{
+  async getPostsByBlogId (query : QueryModelPosts, blogId: string, token : string) : Promise<PaginatedClass | null>{
+    const userId = await this.jwtService.getUserByIdToken(token)
     const blog : BlogModel | null = await this.blogsRepository.getBlog(blogId)
     if(!blog) return null
     let total : number = await this.postsRepository.countPostsByBlogId(blogId)
     const pageCount = Math.ceil( total / query.pageSize)
     const items : PostModel[] = await this.queryRepository.paginatorForPostsWithBlog(query, blogId);
-    return await this.queryRepository.paginationForm(pageCount, total, items, query)
+    const paginatedPosts : PostModel[] = await this.queryRepository.postsMapping(items, userId)
+    return await this.queryRepository.paginationForm(pageCount, total, paginatedPosts, query)
   }
   async getPostWithUser(id: string, header : string) : Promise<null | PostModel> {
     let myStatus = 'None'

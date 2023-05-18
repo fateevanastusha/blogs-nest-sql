@@ -47,8 +47,8 @@ export class CommentsController {
     }
   }
   @HttpCode(204)
-  @UseGuards(CheckForExistingUser)
   @UseGuards(CheckCommentForUser)
+  @UseGuards(CheckForExistingUser)
   @Put(':id')
   async updateComment(@Param('id') commentId : string,
                       @Body() comment : CommentsDto){
