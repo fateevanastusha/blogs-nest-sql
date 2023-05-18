@@ -98,8 +98,10 @@ export class CheckCommentForUser implements CanActivate {
   async canActivate(
     context: ExecutionContext
   ): Promise<boolean> {
+    console.log('a');
     const req = context.switchToHttp().getRequest();
     if (!req.headers.authorization) throw new UnauthorizedException(401);
+    console.log('b');
     const token: string = req.headers.authorization.split(" ")[1];
     const userId = await this.jwtService.getUserByIdToken(token);
     if (!userId) throw new UnauthorizedException();

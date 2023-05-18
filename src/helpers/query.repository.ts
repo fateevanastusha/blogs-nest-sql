@@ -142,7 +142,7 @@ export class QueryRepository {
           createdAt: post.createdAt,
           extendedLikesInfo: {
             likesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Like"}),
-            dislikesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Like"}),
+            dislikesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Dislike"}),
             myStatus: status || "None",
             newestLikes : newestLikes
           }
