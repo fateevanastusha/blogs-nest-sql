@@ -4,7 +4,7 @@ import {
   ExecutionContext,
   UnauthorizedException,
   NotFoundException,
-  ForbiddenException
+  ForbiddenException, HttpStatus, HttpException
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { Request, Response } from "express";
@@ -155,33 +155,18 @@ export class CheckForRefreshToken implements CanActivate {
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     //CHECK FOR EXISTING REFRESH TOKEN
-    if(!req.cookies) throw new UnauthorizedException(401)
+    if(!req.cookies) throw new UnauthorizedException()
     const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) {
-      throw new UnauthorizedException(401);
-      return false;
-    }
+    if (!refreshToken) throw new UnauthorizedException();
     const isTokenBlocked: boolean = await this.authRepository.checkRefreshToken(refreshToken);
-    if (isTokenBlocked) {
-      throw new UnauthorizedException(401);
-      return false;
-    }
+    if (isTokenBlocked) throw new UnauthorizedException();
     const tokenList = await this.jwtService.getIdByRefreshToken(refreshToken);
-    if (!tokenList) {
-      throw new UnauthorizedException(401);
-      return false;
-    }
+    if (!tokenList) throw new UnauthorizedException();
     const session: RefreshTokensMetaModel | null = await this.securityRepository.findSessionByDeviceId(tokenList.deviceId);
-    if (!session) {
-      throw new UnauthorizedException(401);
-      return false;
-    }
+    if (!session) throw new UnauthorizedException();
     const userId = await this.jwtService.getIdByRefreshToken(refreshToken);
-    if (!userId) {
-      throw new UnauthorizedException(401);
-      return false;
-    }
-    return true;
+    if (!userId) throw new UnauthorizedException();
+    return true
   }
 }
 
@@ -289,7 +274,7 @@ export class CheckForSameDevice implements CanActivate {
     const userId: string = user.id;
     const status: boolean = await this.securityService.checkForSameDevice(title, userId);
     if (!status) {
-      throw new UnauthorizedException(403);
+      throw new ForbiddenException();
       return false;
     }
     return true;
@@ -309,7 +294,7 @@ export class CheckAttempts implements CanActivate {
     const timeLimit = new Date(new Date().getTime() - 10000);
     const countOfAttempts = await this.attemptsRepository.countOfAttempts(req.ip, req.url, timeLimit);
     if (countOfAttempts >= 5) {
-      throw new UnauthorizedException(429);
+      throw new HttpException('Too Many Requests', HttpStatus.TOO_MANY_REQUESTS)
       return false;
     }
     const attempt: AttemptsModel = {
