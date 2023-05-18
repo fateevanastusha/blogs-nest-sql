@@ -12,7 +12,6 @@ import { EmailDto } from "./auth.dto";
 @Controller('auth')
 export class AuthController {
   constructor(protected authService : AuthService){}
-  @UseGuards(CheckAttempts)
   @HttpCode(200)
   @UseGuards(CheckForSameDevice)
   @Post('/login')

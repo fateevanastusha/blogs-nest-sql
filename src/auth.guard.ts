@@ -1,4 +1,11 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, NotFoundException } from "@nestjs/common";
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+  NotFoundException,
+  ForbiddenException
+} from "@nestjs/common";
 import { Observable } from "rxjs";
 import { Request, Response } from "express";
 import { UsersService } from "./users/users.service";
@@ -98,13 +105,11 @@ export class CheckCommentForUser implements CanActivate {
   async canActivate(
     context: ExecutionContext
   ): Promise<boolean> {
-    console.log('a');
     const req = context.switchToHttp().getRequest();
     if (!req.headers.authorization) throw new UnauthorizedException(401);
-    console.log('b');
     const token: string = req.headers.authorization.split(" ")[1];
     const userId = await this.jwtService.getUserByIdToken(token);
-    if (!userId) throw new UnauthorizedException();
+    if (!userId) throw new ForbiddenException();
     const comment = await this.commentsService.getCommentByIdWithUser(req.params.id, userId);
     if (!comment) throw new NotFoundException();
     else if (comment.commentatorInfo.userId === userId) {

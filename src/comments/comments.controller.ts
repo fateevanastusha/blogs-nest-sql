@@ -48,11 +48,12 @@ export class CommentsController {
   }
   @HttpCode(204)
   @UseGuards(CheckCommentForUser)
-  @UseGuards(CheckForExistingUser)
+  //@UseGuards(CheckForExistingUser)
   @Put(':id')
   async updateComment(@Param('id') commentId : string,
                       @Body() comment : CommentsDto){
     const status : boolean = await this.commentsService.updateCommentById(comment.content, commentId)
+    console.log('comment ' ,comment);
     if (status) {
       return
     } else {
