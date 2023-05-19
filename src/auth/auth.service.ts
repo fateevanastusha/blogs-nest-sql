@@ -7,9 +7,7 @@ import { SecurityRepository } from "../security/security.repository";
 import { UserModel } from "../users/users.schema";
 import { BusinessService } from "../business.service";
 import { UsersDto } from "../users/users.dto";
-import { BadRequestException, HttpException, Injectable } from "@nestjs/common";
-import { HttpExceptionFilter } from "../exception.filters";
-import { ErrorCodes, errorHandler } from "../helpers/errors";
+import { BadRequestException, Injectable } from "@nestjs/common";
 @Injectable()
 export class AuthService {
   constructor(
@@ -18,33 +16,28 @@ export class AuthService {
     protected usersRepository : UsersRepository,
     protected jwtService : JwtService,
     protected securityRepository : SecurityRepository,
-    protected businessService : BusinessService
+    protected businessService : BusinessService,
+
   ) {
   }
 
   async authRequest (password : string, ip : string, loginOrEmail : string, title : string) : Promise<TokenList | null> {
-    console.log('service 1');
     //CHECK FOR CORRECT PASSWORD
     const status : boolean = await this.authRepository.authRequest(loginOrEmail, password)
     if (!status) return null
-    console.log('service 2');
     //CHECK FOR USER
     const user : UserModel | null = await this.authFindUser(loginOrEmail);
     if (!user) return null;
-    console.log('service 3');
     //CREATE DEVICE ID
     const deviceId : string = (+new Date()).toString();
     //GET USER ID
     const userId : string = user.id;
     //GET TOKENS
     const refreshToken : RefreshToken = await this.jwtService.createJWTRefresh(userId, deviceId);
-    console.log('service 4');
     const accessToken = await this.jwtService.createJWTAccess(userId)
-    console.log('service 5');
     //GET DATE
     const date : string | null = await this.jwtService.getRefreshTokenDate(refreshToken.refreshToken)
     if (!date) return null
-    console.log('service 6');
     //CREATE REFRESH TOKENS META
     const refreshTokenMeta : RefreshTokensMetaModel = {
       userId : userId,
@@ -55,7 +48,6 @@ export class AuthService {
     }
     //CREATE NEW SESSION
     await this.securityRepository.createNewSession(refreshTokenMeta)
-    console.log('service 7');
     //RETURN TOKENS
     console.log(accessToken.accessToken)
     console.log(refreshToken.refreshToken);

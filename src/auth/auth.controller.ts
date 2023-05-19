@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Req, UseGuards, Res, Body, HttpCode, BadRequestException } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Req,
+  UseGuards,
+  Res,
+  Body,
+  HttpCode,
+  BadRequestException,
+  Logger
+} from "@nestjs/common";
 import { CheckAttempts, CheckForRefreshToken, CheckForSameDevice } from "../auth.guard";
 import { AuthService } from "./auth.service";
 import { AccessToken, TokenList } from "../security/security.schema";
@@ -22,8 +33,8 @@ export class AuthController {
       let token: AccessToken = {
         accessToken: tokenList.accessToken
       }
-      console.log(token);
-      res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: true, secure: true})
+      console.log('refresh token', tokenList.refreshToken);
+      res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: false, secure: false})
       res.send(token)
       return
     } else {
@@ -122,15 +133,17 @@ export class AuthController {
   }
   @UseGuards(CheckForRefreshToken)
   @Post('/refresh-token')
-  async refreshTokenRequest(@Req() req: any, @Res() res: any){
+  async refreshTokenRequest(@Req() req: any,
+                            @Res() res: any){
     const title = req.headers["user-agent"] || "unknown"
     const tokenList: TokenList | null = await this.authService.createNewToken(req.cookies.refreshToken, req.ip, title)
     if (tokenList) {
       let token: AccessToken = {
         accessToken: tokenList.accessToken
       }
-      res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: true, secure: true})
-      return token;
+      console.log(token);
+      res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: false, secure: false})
+      res.send(token)
     } else {
       errorHandler(ErrorCodes.NotAutorized)
       return

@@ -20,7 +20,7 @@ import { CommentSchema } from "./comments/comments.schema";
 import { LikeSchema } from "./likes/likes.schema";
 import { CommentsController } from "./comments/comments.controller";
 import { SecurityRepository } from "./security/security.repository";
-import { RefreshTokensMetaModel, RefreshTokensMetaSchema } from "./security/security.schema";
+import { RefreshTokensBlocked, RefreshTokensMetaModel, RefreshTokensMetaSchema } from "./security/security.schema";
 import { AttemptsSchema } from "./attempts/attempts.schema";
 import { AttemptsRepository } from "./attempts/attempts.repository";
 import { AuthRepository } from "./auth/auth.repository";
@@ -73,6 +73,10 @@ import { IsUserAlreadyExistConstraint } from "./users/users.dto";
        {
          name : "attempts",
          schema : AttemptsSchema
+       },
+       {
+         name : 'refresh token blocked',
+         schema : RefreshTokensBlocked
        }
      ])
   ],

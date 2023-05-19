@@ -1,14 +1,16 @@
 import { UserModel } from "../users/users.schema";
 import { UsersRepository } from "../users/users.repository";
 import * as bcrypt from 'bcrypt';
-import { RefreshToken, RefreshTokensMetaDocument } from "../security/security.schema";
+import { RefreshToken, RefreshTokensBlocked, RefreshTokensMetaDocument } from "../security/security.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class AuthRepository {
-  constructor(protected usersRepository : UsersRepository, @InjectModel('refresh token meta') private refreshTokensMetaModel: Model<RefreshTokensMetaDocument>) {}
+  constructor(protected usersRepository : UsersRepository,
+              @InjectModel('refresh token meta') private refreshTokensMetaModel: Model<RefreshTokensMetaDocument>,
+              @InjectModel('refresh token blocked') private refreshTokensBlocked : Model <RefreshTokensBlocked>) {}
   //AUTH
 
   async authRequest(loginOrEmail: string, password: string) : Promise <boolean> {
@@ -37,7 +39,7 @@ export class AuthRepository {
 
   async checkRefreshToken(refreshToken : string) : Promise <boolean> {
     //find by loginOrEmail
-    const status : RefreshToken | null =  await this.refreshTokensMetaModel.findOne({refreshToken : refreshToken})
+    const status : RefreshToken | null =  await this.refreshTokensBlocked.findOne({refreshToken : refreshToken})
     if (status) {
       return true
     } else {
@@ -49,7 +51,7 @@ export class AuthRepository {
 
   async addRefreshTokenToBlackList(refreshToken : string) : Promise <boolean> {
     //find by loginOrEmail
-    await this.refreshTokensMetaModel.insertMany({refreshToken : refreshToken})
+    await this.refreshTokensBlocked.insertMany({refreshToken : refreshToken})
     const status = await this.checkRefreshToken(refreshToken)
     if (status) {
       return true

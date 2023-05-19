@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 
 export type RefreshTokensMetaDocument = HydratedDocument<RefreshTokensMetaModel>
+export type RefreshTokensBlocked = HydratedDocument<RefreshToken>
 
 @Schema()
 
@@ -41,3 +42,4 @@ export class RefreshTokensMetaModel {
 }
 
 export const RefreshTokensMetaSchema = SchemaFactory.createForClass(RefreshTokensMetaModel)
+export const RefreshTokensBlocked = SchemaFactory.createForClass(RefreshToken)
