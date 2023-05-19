@@ -1,14 +1,15 @@
-import { Controller, Delete, Get, Req, UseGuards } from "@nestjs/common";
+import { Controller, Delete, Get, Param, Req, UseGuards } from "@nestjs/common";
 import { CheckForRefreshToken, CheckForSameUser } from "../auth.guard";
 import { SecurityService } from "./security.service";
 
-@Controller('posts')
-export class PostsController{
+@Controller('security/devices')
+export class SecurityController{
   constructor(protected securityService : SecurityService) {}
 
   @UseGuards(CheckForRefreshToken)
-  @Get()
+  @Get('/')
   async getSessions(@Req() req: any){
+    console.log('security ', req.cookies.refreshToken);
     return await this.securityService.getAllSessions(req.cookies.refreshToken)
   }
   @Delete()
@@ -17,8 +18,9 @@ export class PostsController{
   }
   @UseGuards(CheckForRefreshToken)
   @UseGuards(CheckForSameUser)
-  @Delete()
-  async deleteSession(@Req() req: any){
+  @Delete(':id')
+  async deleteSession(@Req() req: any,
+                      @Param('id') deviceId : string){
   return await this.securityService.deleteOneSession(req.cookies.refreshToken)
   }
 }

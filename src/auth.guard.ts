@@ -154,6 +154,8 @@ export class CheckForRefreshToken implements CanActivate {
     context: ExecutionContext
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
+    //CHECK FOR EXISTING REFRESH TOKEN
+    console.log('a');
     if(!req.cookies) throw new UnauthorizedException()
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) throw new UnauthorizedException();

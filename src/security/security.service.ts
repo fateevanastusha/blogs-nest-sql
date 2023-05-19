@@ -5,8 +5,8 @@ import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { Injectable } from "@nestjs/common";
 @Injectable()
 export class SecurityService {
-  constructor(protected securityRepository : SecurityRepository, protected jwtService : JwtService) {
-  }
+  constructor(protected securityRepository : SecurityRepository,
+              protected jwtService : JwtService) {}
   async getAllSessions(refreshToken : string) : Promise<RefreshTokensMetaModel[] | null> {
     const idList = await this.jwtService.getIdByRefreshToken(refreshToken)
     if(!idList) return null

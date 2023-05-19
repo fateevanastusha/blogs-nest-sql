@@ -14,7 +14,6 @@ import {
 import { BlogsService } from "./blogs.service";
 import { BlogDto, PostsBlogDto } from "./blogs.dto";
 import { PostsService } from "../posts/posts.service";
-import { PostsDto } from "../posts/posts.dto";
 import { BlogModel, PaginatedClass } from "./blogs.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { Response, Request } from "express";
