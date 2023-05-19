@@ -154,8 +154,6 @@ export class CheckForRefreshToken implements CanActivate {
     context: ExecutionContext
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    //CHECK FOR EXISTING REFRESH TOKEN
-    console.log('a');
     if(!req.cookies) throw new UnauthorizedException()
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) throw new UnauthorizedException();
@@ -305,5 +303,19 @@ export class CheckAttempts implements CanActivate {
     };
     await this.attemptsRepository.addAttempts(attempt);
     return true;
+  }
+}
+
+@Injectable()
+export class CheckDeviceId implements CanActivate {
+  constructor(protected securityRepository: SecurityRepository) {}
+  async canActivate(
+    context: ExecutionContext
+  ): Promise<boolean> {
+    const req = context.switchToHttp().getRequest();
+    const deviceId = req.params.id;
+    const session = await this.securityRepository.findSessionByDeviceId(deviceId)
+    if (!session) throw new NotFoundException()
+    return true
   }
 }
