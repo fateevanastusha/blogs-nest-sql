@@ -120,6 +120,7 @@ export class AuthController {
       return errorHandler(ErrorCodes.BadRequest)
     }
   }
+  @HttpCode(204)
   @UseGuards(CheckForRefreshToken)
   @Post('/logout')
   async logoutRequest(@Req() req: any){
