@@ -308,7 +308,8 @@ export class CheckAttempts implements CanActivate {
 
 @Injectable()
 export class CheckDeviceId implements CanActivate {
-  constructor(protected securityRepository: SecurityRepository) {}
+  constructor(protected securityRepository: SecurityRepository,
+              protected jwtService : JwtService) {}
   async canActivate(
     context: ExecutionContext
   ): Promise<boolean> {
@@ -316,6 +317,11 @@ export class CheckDeviceId implements CanActivate {
     const deviceId = req.params.id;
     const session = await this.securityRepository.findSessionByDeviceId(deviceId)
     if (!session) throw new NotFoundException()
+    if (!req.cookies.refreshToken) throw new UnauthorizedException()
+    const token = req.cookies.refreshToken
+    const userId = await this.jwtService.getIdByRefreshToken(token)
+    if (!userId) throw new UnauthorizedException()
+    if(userId.userId !== session.userId) throw new ForbiddenException()
     return true
   }
 }
