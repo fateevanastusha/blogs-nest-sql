@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, NotFoundException, Param, Req, UseGuards } from "@nestjs/common";
+import { Controller, Delete, Get, HttpCode, NotFoundException, Param, Req, UseGuards } from "@nestjs/common";
 import { CheckDeviceId, CheckForRefreshToken, CheckForSameUser } from "../auth.guard";
 import { SecurityService } from "./security.service";
 
@@ -11,6 +11,7 @@ export class SecurityController{
   async getSessions(@Req() req: any){
     return await this.securityService.getAllSessions(req.cookies.refreshToken)
   }
+  @HttpCode(204)
   @Delete()
   async deleteSessions(@Req() req: any){
     const status : boolean = await this.securityService.deleteAllSessions(req.cookies.refreshToken)
