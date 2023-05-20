@@ -86,7 +86,7 @@ export class CheckForExistingUser implements CanActivate {
     if (!auth) throw new UnauthorizedException(401)
     const [authType, token] = auth.split(' ')
     if (authType !== 'Bearer') throw new UnauthorizedException(401)
-    const userId = await this.jwtService.getUserByIdToken(token)
+    const userId = await this.jwtService.getUserIdByToken(token)
     if(!userId) throw new UnauthorizedException(401)
     const user = await this.userRepo.getUser(userId)
     if(!user) throw new UnauthorizedException(401)
@@ -108,7 +108,7 @@ export class CheckCommentForUser implements CanActivate {
     const req = context.switchToHttp().getRequest();
     if (!req.headers.authorization) throw new UnauthorizedException(401);
     const token: string = req.headers.authorization.split(" ")[1];
-    const userId = await this.jwtService.getUserByIdToken(token);
+    const userId = await this.jwtService.getUserIdByToken(token);
     if (!userId) throw new UnauthorizedException();
     const comment = await this.commentsService.getCommentByIdWithUser(req.params.id, userId);
     if (!comment) throw new NotFoundException();
@@ -134,7 +134,7 @@ export class CheckPostForUser implements CanActivate {
     const req = context.switchToHttp().getRequest();
     if (!req.headers.authorization) throw new UnauthorizedException(401);
     const token: string = req.headers.authorization.split(" ")[1];
-    const userId = await this.jwtService.getUserByIdToken(token);
+    const userId = await this.jwtService.getUserIdByToken(token);
     if (!userId) throw new UnauthorizedException();
     const post = await this.postService.getPost(req.params.id);
     if (!post) throw new NotFoundException();
@@ -154,17 +154,23 @@ export class CheckForRefreshToken implements CanActivate {
     context: ExecutionContext
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    if(!req.cookies) throw new UnauthorizedException()
+    //if(!req.cookies) throw new UnauthorizedException()
+    if(!req.cookies) throw new HttpException({},463)
     const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) throw new UnauthorizedException();
+    //if (!refreshToken) throw new UnauthorizedException();
+    if (!refreshToken) throw new HttpException({},464)
     const isTokenBlocked: boolean = await this.authRepository.checkRefreshToken(refreshToken);
-    if (isTokenBlocked) throw new UnauthorizedException();
+    //if (isTokenBlocked) throw new UnauthorizedException();
+    if (isTokenBlocked) throw new HttpException({},465)
     const tokenList = await this.jwtService.getIdByRefreshToken(refreshToken);
-    if (!tokenList) throw new UnauthorizedException();
+    //if (!tokenList) throw new UnauthorizedException();
+    if (!tokenList) throw new HttpException({},466)
     const session: RefreshTokensMetaModel | null = await this.securityRepository.findSessionByDeviceId(tokenList.deviceId);
-    if (!session) throw new UnauthorizedException();
+    //if (!session) throw new UnauthorizedException();
+    if (!session) throw new HttpException({},467)
     const userId = await this.jwtService.getIdByRefreshToken(refreshToken);
-    if (!userId) throw new UnauthorizedException();
+    //if (!userId) throw new UnauthorizedException();
+    if (!userId) throw new HttpException({},468)
     return true
   }
 }
@@ -183,30 +189,20 @@ export class CheckForSameUser implements CanActivate {
     const req = context.switchToHttp().getRequest();
     //CHECK FOR EXISTING REFRESH TOKEN
     const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) {
-      throw new UnauthorizedException(401);
-      return false;
-    }
+    //if (!refreshToken) throw new UnauthorizedException(401);
+    if (!refreshToken) throw new HttpException({},469)
     const isTokenBlocked: boolean = await this.authRepository.checkRefreshToken(refreshToken);
-    if (isTokenBlocked) {
-      throw new UnauthorizedException(401);
-      return false;
-    }
+    //if (isTokenBlocked) throw new UnauthorizedException(401);
+    if (isTokenBlocked) throw new HttpException({},470)
     const tokenList = await this.jwtService.getIdByRefreshToken(refreshToken);
-    if (!tokenList) {
-      throw new UnauthorizedException(401);
-      return false;
-    }
+    //if (!tokenList) throw new UnauthorizedException(401);
+    if (!tokenList) throw new HttpException({},471)
     const session: RefreshTokensMetaModel | null = await this.securityRepository.findSessionByDeviceId(tokenList.deviceId);
-    if (!session) {
-      throw new UnauthorizedException(401);
-      return false;
-    }
+    //if (!session) throw new UnauthorizedException(401);
+    if (!session) throw new HttpException({},472)
     const userId = await this.jwtService.getIdByRefreshToken(refreshToken);
-    if (!userId) {
-      throw new UnauthorizedException(401);
-      return false;
-    }
+    //if (!userId) throw new UnauthorizedException();
+    if (!userId) throw new HttpException({},473)
     return true;
   }
 }
@@ -317,10 +313,12 @@ export class CheckDeviceId implements CanActivate {
     const deviceId = req.params.id;
     const session = await this.securityRepository.findSessionByDeviceId(deviceId)
     if (!session) throw new NotFoundException()
-    if (!req.cookies.refreshToken) throw new UnauthorizedException()
+    //if (!req.cookies.refreshToken) throw new UnauthorizedException()
+    if (!req.cookies.refreshToken) throw new HttpException({},461)
     const token = req.cookies.refreshToken
     const userId = await this.jwtService.getIdByRefreshToken(token)
-    if (!userId) throw new UnauthorizedException()
+    //if (!userId) throw new UnauthorizedException()
+    if (!userId) new HttpException({},462)
     if(userId.userId !== session.userId) throw new ForbiddenException()
     return true
   }

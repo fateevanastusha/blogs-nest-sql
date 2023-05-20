@@ -32,7 +32,7 @@ export class PostsService {
     return await this.queryRepository.paginationForm(pageCount,total,paginatedItems,query)
   }
   async getPostsWithUser(query : QueryModelPosts, token : string) : Promise<PaginatedClass>{
-    const userId : string = await this.jwtService.getUserByIdToken(token)
+    const userId : string = await this.jwtService.getUserIdByToken(token)
     const total : number = (await this.postsRepository.getPosts()).length
     const pageCount = Math.ceil( total / query.pageSize)
     const items = await this.queryRepository.paginatorForPosts(query)
@@ -40,7 +40,7 @@ export class PostsService {
     return await this.queryRepository.paginationForm(pageCount,total,paginatedItems,query)
   }
   async getPostsByBlogId (query : QueryModelPosts, blogId: string, token : string) : Promise<PaginatedClass | null>{
-    const userId = await this.jwtService.getUserByIdToken(token)
+    const userId = await this.jwtService.getUserIdByToken(token)
     const blog : BlogModel | null = await this.blogsRepository.getBlog(blogId)
     if(!blog) return null
     let total : number = await this.postsRepository.countPostsByBlogId(blogId)
@@ -53,7 +53,7 @@ export class PostsService {
     let myStatus = 'None'
     if(header){
       const token = header.split(" ")[1];
-      const userId : string = await this.jwtService.getUserByIdToken(token)
+      const userId : string = await this.jwtService.getUserIdByToken(token)
       let findStatus = await this.likesRepository.findStatus(id, userId)
       if (!findStatus) {
         myStatus = "None";
@@ -118,7 +118,7 @@ export class PostsService {
       } else {
         token = 'null'
       }
-      let userId = await this.jwtService.getUserByIdToken(token)
+      let userId = await this.jwtService.getUserIdByToken(token)
       const foundComments = await this.commentsService.getAllCommentsByPostId(query, postId, userId)
       return foundComments
     }
@@ -129,7 +129,7 @@ export class PostsService {
       errorHandler(ErrorCodes.NotFound)
       return null
     } else {
-      let userId = await this.jwtService.getUserByIdToken(token)
+      let userId = await this.jwtService.getUserIdByToken(token)
       const createdComment = await this.commentsService.createComment(postId, userId, content)
       if (createdComment) {
         return createdComment
@@ -146,7 +146,7 @@ export class PostsService {
     if (!post) {
       return false
     }
-    let userId = await this.jwtService.getUserByIdToken(token)
+    let userId = await this.jwtService.getUserIdByToken(token)
     const status1 = await this.likesRepository.findStatus(postId, userId)
     const currentStatus = await this.likesHelper.requestType(status1)
     if (currentStatus === requestType) {

@@ -33,7 +33,6 @@ export class AuthController {
       let token: AccessToken = {
         accessToken: tokenList.accessToken
       }
-      console.log('refresh token', tokenList.refreshToken);
       res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: true, secure: true})
       res.send(token)
       return
@@ -143,7 +142,6 @@ export class AuthController {
       let token: AccessToken = {
         accessToken: tokenList.accessToken
       }
-      console.log(token);
       res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: true, secure: true})
       res.send(token)
     } else {

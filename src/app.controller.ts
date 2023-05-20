@@ -14,7 +14,8 @@ export class AppController {
               protected usersRepository : UsersRepository,
               protected securityRepository : SecurityRepository,
               protected likesRepository : LikesRepository,
-              protected commentsRepository : CommentsRepository) {}
+              protected commentsRepository : CommentsRepository,
+              ) {}
 
   @Delete('/testing/all-data')
   async deleteAllData(@Res() res : Response) {
@@ -35,5 +36,9 @@ export class AppController {
   @Get('/all-comments')
   async getAllComments(){
     return await this.commentsRepository.getAllComments()
+  }
+  @Get('/get-all-sessions')
+  async getAllSessions(){
+    return await this.securityRepository.getAll()
   }
 }

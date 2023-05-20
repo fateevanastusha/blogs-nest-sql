@@ -25,7 +25,7 @@ export class CommentsController {
       }
     } else {
       const token = req.headers.authorization!.split(" ")[1]
-      let userId : string = await this.jwtService.getUserByIdToken(token);
+      let userId : string = await this.jwtService.getUserIdByToken(token);
       const comment = await this.commentsService.getCommentByIdWithUser(req.params.id, userId);
       if (!comment) {
         return errorHandler(ErrorCodes.NotFound)
@@ -68,7 +68,7 @@ export class CommentsController {
                          @Body() requestType : LikesDto,
                          @Req() req: any){
     const token = req.headers.authorization!.split(" ")[1]
-    let userId : string = await this.jwtService.getUserByIdToken(token);
+    let userId : string = await this.jwtService.getUserIdByToken(token);
     const status : boolean = await this.commentsService.changeLikeStatus(requestType.likeStatus, commentId, userId)
     if (status){
       return

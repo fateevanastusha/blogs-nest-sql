@@ -17,7 +17,7 @@ export class JwtService {
       refreshToken : refreshToken
     }
   }
-  async getUserByIdToken (token : string) {
+  async getUserIdByToken (token : string) {
 
     try {
       const decoded : any = jwt.verify(token, settings.JWT_SECRET);
@@ -30,7 +30,6 @@ export class JwtService {
 
     try {
       const decoded : any = jwt.verify(token, settings.JWT_SECRET);
-      console.log(decoded)
       return {
         userId : decoded.userId,
         deviceId : decoded.deviceId
