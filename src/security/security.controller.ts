@@ -23,9 +23,8 @@ export class SecurityController{
   @UseGuards(CheckForRefreshToken)
   @UseGuards(CheckForSameUser)
   @Delete(':id')
-  async deleteSession(@Req() req: any,
-                      @Param('id') deviceId : string){
-    const status : boolean = await this.securityService.deleteOneSession(req.cookies.refreshToken);
+  async deleteSession(@Param('id') deviceId : string){
+    const status : boolean = await this.securityService.deleteOneSession(deviceId);
     if (!status) throw new NotFoundException();
     return;
   }
