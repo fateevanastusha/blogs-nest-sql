@@ -18,6 +18,7 @@ export class SecurityController{
     if (!status) throw new NotFoundException();
     return;
   }
+  @HttpCode(204)
   @UseGuards(CheckDeviceId)
   @UseGuards(CheckForRefreshToken)
   @UseGuards(CheckForSameUser)
