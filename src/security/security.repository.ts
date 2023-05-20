@@ -20,9 +20,8 @@ export class SecurityRepository {
     return result.deletedCount > 0
   }
   async deleteOneSessions(deviceId : string) : Promise<boolean> {
-    const result = await this.refreshTokensMetaModel
-      .deleteOne({deviceId : deviceId})
-    return result.deletedCount === 1
+    await this.refreshTokensMetaModel.deleteOne({deviceId : deviceId})
+    return true
   }
   async createNewSession(refreshTokensMeta : RefreshTokensMetaModel) : Promise<boolean> {
     await this.refreshTokensMetaModel
