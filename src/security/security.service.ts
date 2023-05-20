@@ -2,7 +2,7 @@ import { SecurityRepository } from "./security.repository";
 import { JwtService } from "../jwt.service";
 import { RefreshTokensMetaModel } from "./security.schema";
 import { ErrorCodes, errorHandler } from "../helpers/errors";
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable } from "@nestjs/common";
 @Injectable()
 export class SecurityService {
   constructor(protected securityRepository : SecurityRepository,
@@ -35,7 +35,8 @@ export class SecurityService {
   async deleteOneSession(deviceId : string) : Promise<boolean> {
     const status : boolean = await this.securityRepository.deleteOneSessions(deviceId)
     if(!status) {
-      errorHandler(ErrorCodes.NotAutorized)
+      //errorHandler(ErrorCodes.NotAutorized)
+      throw new HttpException({},473)
       return false
     }
     return true
