@@ -33,13 +33,7 @@ export class SecurityService {
 
   }
   async deleteOneSession(deviceId : string) : Promise<boolean> {
-    const status : boolean = await this.securityRepository.deleteOneSessions(deviceId)
-    if(!status) {
-      //errorHandler(ErrorCodes.NotAutorized)
-      throw new HttpException({},473)
-      return false
-    }
-    return true
+    return await this.securityRepository.deleteOneSessions(deviceId)
   }
   async checkForSameDevice(title : string, userId : string) : Promise<boolean> {
     const status : boolean = await this.securityRepository.checkSameDevice(title,userId)
