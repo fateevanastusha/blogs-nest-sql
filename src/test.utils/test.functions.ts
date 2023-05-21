@@ -15,23 +15,6 @@ import {
 } from "./test.strings";
 import { INestApplication } from "@nestjs/common";
 let app: INestApplication;
-export const blogCreator = async (
-  uri: string = blogsURI,
-  name: string = blogNameString,
-  description: string = blogDescriptionString,
-  websiteUrl: string = blogWebsiteUrlString,
-  authValue: string = "Basic YWRtaW46cXdlcnR5"
-) => {
-  return request(app)
-    .post(uri)
-    .send({
-      uri,
-      name,
-      description,
-      websiteUrl,
-    })
-    .set({Authorization : authValue});
-};
 
 export const postCreator = async (
   uri: string = postsURI,

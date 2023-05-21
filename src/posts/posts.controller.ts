@@ -83,7 +83,6 @@ export class PostsController{
     res.sendStatus(204)
     return
   }
-  //COMMENTS 2 REQ + LIKES 1 REQ
   @Get(':id/comments')
   async getComments(@Param('id') postId : string,
                     @Query('pageSize', new DefaultValuePipe(10)) pageSize : number,

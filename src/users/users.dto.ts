@@ -8,12 +8,10 @@ import {
 import { Transform, TransformFnParams } from "class-transformer";
 import { Schema } from "@nestjs/mongoose";
 import { UsersRepository } from "./users.repository";
-import { log } from "util";
 
 @ValidatorConstraint({ async: true })
 export class IsUserAlreadyExistConstraint implements ValidatorConstraintInterface {
   constructor(private userRepo: UsersRepository) {
-    console.log(this.userRepo);
   }
   async validate(loginOrEmail: string, args: ValidationArguments) {
     const user = await this.userRepo.returnUserByField(loginOrEmail)

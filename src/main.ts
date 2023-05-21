@@ -4,26 +4,20 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
 import { HttpExceptionFilter } from "./exception.filters";
 import { useContainer } from "class-validator";
+import { createApp } from "../test/create.app";
 var cookieParser = require('cookie-parser')
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
+  const appRaw = await NestFactory.create(AppModule);
   const config = new DocumentBuilder()
     .setTitle('blogs')
     .setDescription('')
     .setVersion('1.0')
     .addTag('blogs')
     .build();
+  const app = createApp(appRaw)
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
-  app.use(cookieParser())
-  app.useGlobalPipes(new ValidationPipe({
-    stopAtFirstError : true
-  }))
-  app.useGlobalFilters(new HttpExceptionFilter())
-  app.enableCors()
-  useContainer(app.select(AppModule), {fallbackOnErrors: true})
   await app.listen(3000);
 }
 bootstrap();

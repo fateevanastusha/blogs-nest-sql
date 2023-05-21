@@ -83,8 +83,6 @@ export class QueryRepository {
       {_id: 0, login: 'any login', userId: 1, createdAt: 1})
       .sort({createdAt: 'desc'})
       .limit(3)
-    console.log(id);
-    console.log(newestLikes);
     return Promise.all(newestLikes.map(async like => ({
       addedAt : like.createdAt,
       userId : like.userId,
@@ -95,14 +93,11 @@ export class QueryRepository {
   async commentsMapping(comments : CommentModel[], userId : string) {
     return Promise.all(
       comments.map(async (comment) => {
-
         let status = null;
-
         if (userId) {
           status = await this.likesRepository.findStatus(comment.id, userId);
           if (status) status = status.status
         }
-
         return {
           id: comment.id,
           content: comment.content,

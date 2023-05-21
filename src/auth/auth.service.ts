@@ -188,8 +188,7 @@ export class AuthService {
   //GET INFORMATION ABOUT CURRENT USER
   async getInformationAboutCurrentUser (accessToken : string) : Promise <UserModel | null> {
 
-    const token : string = accessToken
-    const getUser : UserModel | null = await this.getUserByToken(token)
+    const getUser : UserModel | null = await this.getUserByToken(accessToken)
 
     if (getUser) {
       return getUser
