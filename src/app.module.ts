@@ -46,7 +46,7 @@ import { SecurityController } from "./security/security.controller";
      MongooseModule.forFeature([{
         name : "blogs",
        schema : BlogSchema
-     },
+      },
        {
          name : "posts",
          schema : PostSchema
