@@ -7,13 +7,12 @@ import {
   Res,
   Body,
   HttpCode,
-  BadRequestException, UnauthorizedException
+  BadRequestException, UnauthorizedException, NotFoundException
 } from "@nestjs/common";
 import { CheckAttempts, CheckForRefreshToken, CheckForSameDevice } from "../auth.guard";
 import { AuthService } from "./auth.service";
 import { AccessToken, TokenList } from "../security/security.schema";
 import { UserModel } from "../users/users.schema";
-import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { UsersDto } from "../users/users.dto";
 import { EmailDto } from "./auth.dto";
 
@@ -35,7 +34,7 @@ export class AuthController {
       res.send(token)
       return
     } else {
-      errorHandler(ErrorCodes.NotAutorized)
+      throw new UnauthorizedException()
       return
     }
   }
@@ -61,7 +60,7 @@ export class AuthController {
       }
       return currentUser
     } else {
-      errorHandler(ErrorCodes.NotAutorized)
+      throw new UnauthorizedException()
       return
     }
   }
@@ -69,7 +68,7 @@ export class AuthController {
   async passwordRecoveryRequest(@Req() req: any){
     const status : boolean = await this.authService.passwordRecovery(req.body.email)
     if (status) return
-    errorHandler(ErrorCodes.BadRequest)
+    throw new BadRequestException()
     return
 
   }
@@ -79,7 +78,7 @@ export class AuthController {
     if(status) {
       return
     } else {
-      errorHandler(ErrorCodes.BadRequest)
+      throw new BadRequestException()
       return
     }
   }
@@ -90,7 +89,7 @@ export class AuthController {
     if (status) {
       return
     } else {
-      errorHandler(ErrorCodes.NotFound)
+      throw new NotFoundException()
       return
     }
   }
@@ -112,7 +111,7 @@ export class AuthController {
     if (status) {
       return
     } else {
-      return errorHandler(ErrorCodes.BadRequest)
+      throw new BadRequestException()
     }
   }
   @HttpCode(204)
@@ -123,7 +122,7 @@ export class AuthController {
     if (status) {
       return
     } else {
-      errorHandler(ErrorCodes.NotAutorized)
+      throw new UnauthorizedException()
       return
     }
   }
@@ -141,7 +140,7 @@ export class AuthController {
       res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: false, secure: false})
       res.send(token)
     } else {
-      errorHandler(ErrorCodes.NotAutorized)
+      throw new UnauthorizedException()
       return
     }
   }

@@ -1,8 +1,7 @@
 import { SecurityRepository } from "./security.repository";
 import { JwtService } from "../jwt.service";
 import { RefreshTokensMetaModel } from "./security.schema";
-import { ErrorCodes, errorHandler } from "../helpers/errors";
-import { HttpException, Injectable } from "@nestjs/common";
+import { HttpException, Injectable, NotFoundException } from "@nestjs/common";
 @Injectable()
 export class SecurityService {
   constructor(protected securityRepository : SecurityRepository,
@@ -13,7 +12,7 @@ export class SecurityService {
     const userId = idList.userId
     const sessions : RefreshTokensMetaModel[] | null = await this.securityRepository.getAllSessions(userId)
     if (!sessions) {
-      errorHandler(ErrorCodes.NotAutorized);
+      throw new NotFoundException();
       return null
     }
     return sessions
@@ -21,12 +20,12 @@ export class SecurityService {
   async deleteAllSessions(refreshToken : string) : Promise<boolean> {
     const idList = await this.jwtService.getIdByRefreshToken(refreshToken)
     if(!idList) {
-      errorHandler(ErrorCodes.NotAutorized)
+      throw new NotFoundException()
       return false
     }
     const status : boolean = await this.securityRepository.deleteAllSessions(idList.deviceId, idList.userId)
     if(!status) {
-      errorHandler(ErrorCodes.NotAutorized)
+      throw new NotFoundException()
       return false
     }
     return true
@@ -38,7 +37,7 @@ export class SecurityService {
   async checkForSameDevice(title : string, userId : string) : Promise<boolean> {
     const status : boolean = await this.securityRepository.checkSameDevice(title,userId)
     if(!status) {
-      errorHandler(ErrorCodes.NotAutorized)
+      throw new NotFoundException()
       return false
     }
     return true

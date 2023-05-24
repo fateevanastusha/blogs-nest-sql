@@ -1,9 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Put, Req, UseGuards } from "@nestjs/common";
 import { CommentsDto } from "./comments dto";
 import { CheckForExistingUser, CheckCommentForUser, CheckForSameUser } from "../auth.guard";
 import { CommentsService } from "./comments.service";
 import { CommentModel } from "./comments.schema";
-import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { JwtService } from "../jwt.service";
 import { LikesDto } from "../likes/likes.dto";
 
@@ -19,7 +18,7 @@ export class CommentsController {
     if (!token){
       const comment : CommentModel | null = await this.commentsService.getCommentById(req.params.id)
       if (!comment) {
-        return errorHandler(ErrorCodes.NotFound)
+        throw new NotFoundException()
       } else {
         return comment
       }
@@ -28,7 +27,7 @@ export class CommentsController {
       let userId : string = await this.jwtService.getUserIdByToken(token);
       const comment = await this.commentsService.getCommentByIdWithUser(req.params.id, userId);
       if (!comment) {
-        return errorHandler(ErrorCodes.NotFound)
+        throw new NotFoundException()
       } else {
         return comment
       }
@@ -43,7 +42,7 @@ export class CommentsController {
     if (status) {
       return
     } else {
-      return errorHandler(ErrorCodes.NotFound)
+      throw new NotFoundException()
     }
   }
   @HttpCode(204)
@@ -57,7 +56,7 @@ export class CommentsController {
     if (status) {
       return
     } else {
-      return errorHandler(ErrorCodes.NotFound)
+      throw new NotFoundException()
     }
   }
 
@@ -73,7 +72,7 @@ export class CommentsController {
     if (status){
       return
     } else {
-      return errorHandler(ErrorCodes.NotFound)
+      throw new NotFoundException()
     }
   }
 }

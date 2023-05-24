@@ -5,11 +5,10 @@ import { PostModel } from "./posts.schema";
 import { BlogModel, PaginatedClass } from "../blogs/blogs.schema";
 import { BlogsRepository } from "../blogs/blogs.repository";
 import { CommentsDto, PostsDto } from "./posts.dto";
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "../jwt.service";
 import { CommentsService } from "../comments/comments.service";
 import { CommentModel } from "../comments/comments.schema";
-import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { LikesRepository } from "../likes/likes.repository";
 import { LikesHelpers } from "../helpers/likes.helper";
 import { LikeViewModel } from "../likes/likes.schema";
@@ -109,7 +108,7 @@ export class PostsService {
   async getComments(query : QueryModelComments, header : string, postId : string) : Promise<PaginatedClass>{
     const foundPost = await this.getPost(postId)
     if (foundPost === null) {
-      errorHandler(ErrorCodes.NotFound)
+      throw new NotFoundException()
       return null
     } else {
       let token
@@ -126,7 +125,7 @@ export class PostsService {
   async createComment(postId : string, content : string, token : string) : Promise <CommentModel | null>{
     const foundPost : PostModel | null = await this.postsRepository.getPost(postId)
     if (foundPost === null) {
-      errorHandler(ErrorCodes.NotFound)
+      throw new NotFoundException()
       return null
     } else {
       let userId = await this.jwtService.getUserIdByToken(token)
@@ -134,7 +133,7 @@ export class PostsService {
       if (createdComment) {
         return createdComment
       } else {
-        errorHandler(ErrorCodes.NotAutorized)
+        throw new UnauthorizedException()
         return null
       }
     }

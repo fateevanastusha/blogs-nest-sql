@@ -1,9 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   DefaultValuePipe,
   Delete,
-  Get, HttpCode,
+  Get, HttpCode, NotFoundException,
   Param,
   Post,
   Put,
@@ -14,9 +15,8 @@ import {
 import { PostsService } from "./posts.service";
 import { CommentsDto, PostsDto } from "./posts.dto";
 import { PostModel } from "./posts.schema";
-import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { Request, Response } from "express";
-import { AuthGuard, CheckCommentForUser, CheckForExistingUser, CheckPostForUser } from "../auth.guard";
+import { AuthGuard, CheckForExistingUser, CheckPostForUser } from "../auth.guard";
 import { LikesDto } from "../likes/likes.dto";
 
 @Controller('posts')
@@ -50,7 +50,7 @@ export class PostsController{
   async getPost(@Param('id') postId : string,
                 @Req() req: Request){
     const post : PostModel | null =  await this.postsService.getPostWithUser(postId, req.headers.authorization)
-    if (!post) return errorHandler(ErrorCodes.NotFound)
+    if (!post) throw new NotFoundException()
     //mapping for likes
 
     return post
@@ -60,7 +60,7 @@ export class PostsController{
   async deletePost(@Param('id') postId : string,
                    @Res() res : Response){
     const status : boolean = await this.postsService.deletePost(postId)
-    if (!status) return errorHandler(ErrorCodes.NotFound)
+    if (!status) throw new NotFoundException()
     return res.sendStatus(204)
   }
   @UseGuards(AuthGuard)
@@ -68,7 +68,7 @@ export class PostsController{
   async createPost(
     @Body() post : PostsDto){
     const createdPost : PostModel | null = await this.postsService.createPost(post)
-    if (!createdPost) return errorHandler(ErrorCodes.BadRequest)
+    if (!createdPost) throw new BadRequestException()
     return createdPost
   }
   
@@ -79,7 +79,7 @@ export class PostsController{
     @Param('id') postId : string,
     @Res() res : Response){
     const status : boolean = await this.postsService.updatePost(post, postId)
-    if (!status) return errorHandler(ErrorCodes.NotFound)
+    if (!status) throw new NotFoundException()
     res.sendStatus(204)
     return
   }
@@ -113,7 +113,7 @@ export class PostsController{
                 @Req() req: any){
     const status : boolean = await this.postsService.changeLikeStatus(like.likeStatus, postId, req.headers.authorization)
     if (!status){
-      return errorHandler(ErrorCodes.NotFound)
+      throw new NotFoundException()
     }
     return
   }

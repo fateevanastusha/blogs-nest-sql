@@ -1,9 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   DefaultValuePipe,
   Delete,
-  Get,
+  Get, NotFoundException,
   Param,
   Post,
   Put,
@@ -14,7 +15,6 @@ import { BlogsService } from "./blogs.service";
 import { BlogDto, PostsBlogDto } from "./blogs.dto";
 import { PostsService } from "../posts/posts.service";
 import { BlogModel, PaginatedClass } from "./blogs.schema";
-import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { Response, Request } from "express";
 import { PostModel } from "../posts/posts.schema";
 import { AuthGuard } from "../auth.guard";
@@ -42,7 +42,7 @@ export class BlogsController{
   async getBlog(@Param('id') blogId : string
   ){
     const blog : BlogModel | null = await this.blogsService.getBlog(blogId)
-    if(!blog) return errorHandler(ErrorCodes.NotFound);
+    if(!blog) throw new NotFoundException()
     return blog
   }
   @UseGuards(AuthGuard)
@@ -50,7 +50,7 @@ export class BlogsController{
   async deleteBlog(@Param('id') blogId : string,
                    @Res() res : Response){
     const status : boolean = await this.blogsService.deleteBlog(blogId)
-    if (!status) return errorHandler(ErrorCodes.NotFound)
+    if (!status) throw new NotFoundException()
     res.sendStatus(204)
     return
   }
@@ -63,7 +63,7 @@ export class BlogsController{
     //  throw new BadRequestException({ message : ['bad kiskis'] })
     //}
     const createdBlog : BlogModel | null = await this.blogsService.createBlog(blog)
-    if (!createdBlog) return errorHandler(ErrorCodes.BadRequest)
+    if (!createdBlog) throw new BadRequestException()
     return createdBlog
   }
   @UseGuards(AuthGuard)
@@ -73,7 +73,7 @@ export class BlogsController{
     @Param('id') blogId : string,
     @Res() res : Response){
     const status : boolean = await this.blogsService.updateBlog(blog, blogId)
-    if(!status) return errorHandler(ErrorCodes.NotFound)
+    if(!status) throw new NotFoundException()
     res.sendStatus(204)
     return
   }
@@ -98,7 +98,7 @@ export class BlogsController{
     sortBy : sortBy,
     sortDirection : sortDirection
   }, blogId, token)
-    if (!posts) return errorHandler(ErrorCodes.NotFound)
+    if (!posts) throw new NotFoundException()
     return posts
   }
   @UseGuards(AuthGuard)
@@ -111,7 +111,7 @@ export class BlogsController{
     content: post.content,
     blogId: blogId
   })
-    if (!createdPost) return errorHandler(ErrorCodes.NotFound)
+    if (!createdPost) throw new NotFoundException()
     return createdPost
   }
 }

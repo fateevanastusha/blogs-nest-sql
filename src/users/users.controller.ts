@@ -4,7 +4,7 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
-  Injectable,
+  Injectable, NotFoundException,
   Param,
   Post,
   Query,
@@ -13,7 +13,6 @@ import {
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { UsersDto } from "./users.dto";
-import { ErrorCodes, errorHandler } from "../helpers/errors";
 import { UserModel } from "./users.schema";
 import { Response } from "express";
 import { AuthGuard } from "../auth.guard";
@@ -43,7 +42,7 @@ export class UsersController{
   @Delete(':id')
   async deleteUser(@Param('id') userId : string, @Res() res : Response){
     const status : boolean = await this.usersService.deleteUser(userId)
-    if (!status) return errorHandler(ErrorCodes.NotFound)
+    if (!status) throw new NotFoundException()
     return res.sendStatus(204)
   }
   @Post()
@@ -51,7 +50,7 @@ export class UsersController{
     @Body() user : UsersDto){
 
     const createdUser : UserModel | null = await this.usersService.createUser(user, (+new Date()).toString())
-    if (!createdUser) return errorHandler(ErrorCodes.BadRequest)
+    if (!createdUser) throw new NotFoundException()
     return createdUser
   }
 }
