@@ -30,7 +30,7 @@ export class AuthGuard implements CanActivate {
     if (request.headers.authorization == "Basic YWRtaW46cXdlcnR5") {
       return true;
     }
-    throw new UnauthorizedException(401);
+    throw new UnauthorizedException();
     return false;
   }
 }
@@ -45,13 +45,13 @@ export class CheckIfUserExist implements CanActivate {
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const auth = req.headers.authorization
-    if (!auth) throw new UnauthorizedException(401)
+    if (!auth) throw new UnauthorizedException()
     const [authType, token] = auth.split(' ')
-    if (authType !== 'Bearer') throw new UnauthorizedException(401)
+    if (authType !== 'Bearer') throw new UnauthorizedException()
     const userId = await this.jwtService.getUserIdByToken(token)
-    if(!userId) throw new UnauthorizedException(401)
+    if(!userId) throw new UnauthorizedException()
     const user = await this.userRepo.getUser(userId)
-    if(!user) throw new UnauthorizedException(401)
+    if(!user) throw new UnauthorizedException()
     req.user = user
     return true
   }
@@ -68,15 +68,15 @@ export class CommentCheckForSameUser implements CanActivate {
     context: ExecutionContext
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    if (!req.headers.authorization) throw new UnauthorizedException(401);
+    if (!req.headers.authorization) throw new UnauthorizedException();
     const auth = req.headers.authorization
-    if (!auth) throw new UnauthorizedException(401)
+    if (!auth) throw new UnauthorizedException()
     const [authType, token] = auth.split(' ')
-    if (authType !== 'Bearer') throw new UnauthorizedException(401)
+    if (authType !== 'Bearer') throw new UnauthorizedException()
     const userId = await this.jwtService.getUserIdByToken(token);
     if (!userId) throw new UnauthorizedException();
     const user = await this.userRepo.getUser(userId)
-    if(!user) throw new UnauthorizedException(401)
+    if(!user) throw new UnauthorizedException()
     const comment = await this.commentsService.getCommentByIdWithUser(req.params.id, userId);
     if (!comment) throw new NotFoundException();
     else if (comment.commentatorInfo.userId !== userId) throw new ForbiddenException();
@@ -168,7 +168,7 @@ export class CheckForSameDevice implements CanActivate {
     const title: string = req.headers["user-agent"] || "unknown";
     const user: UserModel | null = await this.authService.authFindUser(req.body.loginOrEmail);
     if (!user) {
-      throw new UnauthorizedException(401);
+      throw new UnauthorizedException();
       return false;
     }
     const userId: string = user.id;
