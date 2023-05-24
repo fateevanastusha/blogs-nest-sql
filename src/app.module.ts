@@ -20,7 +20,7 @@ import { CommentSchema } from "./comments/comments.schema";
 import { LikeSchema } from "./likes/likes.schema";
 import { CommentsController } from "./comments/comments.controller";
 import { SecurityRepository } from "./security/security.repository";
-import { RefreshTokensBlocked, RefreshTokensMetaModel, RefreshTokensMetaSchema } from "./security/security.schema";
+import { RefreshTokensBlocked, RefreshTokensMetaSchema } from "./security/security.schema";
 import { AttemptsSchema } from "./attempts/attempts.schema";
 import { AttemptsRepository } from "./attempts/attempts.repository";
 import { AuthRepository } from "./auth/auth.repository";
@@ -38,6 +38,28 @@ import { LocalStrategy } from "./auth/strategies/passport.strategy";
 import { BusinessService } from "./business.service";
 import { IsUserAlreadyExistConstraint } from "./users/users.dto";
 import { SecurityController } from "./security/security.controller";
+
+const repositories = [
+  UsersRepository,
+  SecurityRepository,
+  PostsRepository,
+  LikesRepository,
+  CommentsRepository,
+  AuthRepository,
+  AttemptsRepository,
+  BlogsRepository
+]
+const services = [
+  UsersService,
+  SecurityService,
+  PostsService,
+  CommentsService,
+  BlogsService,
+  AuthService,
+  BusinessService,
+  AppService,
+  JwtService
+]
 
 @Module({
   imports: [
@@ -81,7 +103,22 @@ import { SecurityController } from "./security/security.controller";
        }
      ])
   ],
-  controllers: [AppController, BlogsController, PostsController, UsersController, CommentsController, AppController, AuthController, SecurityController],
-  providers: [IsUserAlreadyExistConstraint, AppService, BlogsRepository, BlogsService, QueryRepository, PostsService, PostsRepository, UsersService, UsersRepository, SecurityRepository, AttemptsRepository, AuthRepository, CommentsService, CommentsRepository, LikesRepository, SecurityService, UsersRepository, LikesHelpers, JwtService, AuthService, AuthGuard, LocalStrategy, BusinessService],
+  controllers: [
+    AppController,
+    BlogsController,
+    PostsController,
+    UsersController,
+    CommentsController,
+    AppController,
+    AuthController,
+    SecurityController],
+  providers: [IsUserAlreadyExistConstraint,
+    ...repositories,
+    ...services,
+    QueryRepository,
+    LikesHelpers,
+    AuthGuard,
+    LocalStrategy,
+    ],
 })
 export class AppModule {}
