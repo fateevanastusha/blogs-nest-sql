@@ -116,22 +116,43 @@ export class CheckForSameUser implements CanActivate {
     protected authRepository: AuthRepository,
     protected securityRepository: SecurityRepository) {
   }
-
   async canActivate(
     context: ExecutionContext
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) throw new UnauthorizedException(401);
+    if (!refreshToken) throw new UnauthorizedException();
     const isTokenBlocked: boolean = await this.authRepository.checkRefreshToken(refreshToken);
-    if (isTokenBlocked) throw new UnauthorizedException(401);
+    if (isTokenBlocked) throw new UnauthorizedException();
     const tokenList = await this.jwtService.getIdByRefreshToken(refreshToken);
-    if (!tokenList) throw new UnauthorizedException(401);
+    if (!tokenList) throw new UnauthorizedException();
     const session: RefreshTokensMetaModel | null = await this.securityRepository.findSessionByDeviceId(tokenList.deviceId);
-    if (!session) throw new UnauthorizedException(401);
+    if (!session) throw new UnauthorizedException();
     const userId = await this.jwtService.getIdByRefreshToken(refreshToken);
     if (!userId) throw new UnauthorizedException();
-    return true;
+    if (!req.cookies.refreshToken) throw new UnauthorizedException()
+    if(userId.userId !== session.userId) throw new ForbiddenException()
+    return true
+
+  }
+}
+@Injectable()
+export class CheckDeviceId implements CanActivate {
+  constructor(protected securityRepository: SecurityRepository,
+              protected jwtService : JwtService) {}
+  async canActivate(
+    context: ExecutionContext
+  ): Promise<boolean> {
+    const req = context.switchToHttp().getRequest();
+    const deviceId = req.params.id;
+    const session = await this.securityRepository.findSessionByDeviceId(deviceId)
+    if (!session) throw new NotFoundException()
+    if (!req.cookies.refreshToken) throw new UnauthorizedException()
+    const token = req.cookies.refreshToken
+    const userId = await this.jwtService.getIdByRefreshToken(token)
+    if (!userId) throw new UnauthorizedException()
+    if(userId.userId !== session.userId) throw new ForbiddenException()
+    return true
   }
 }
 @Injectable()
@@ -182,24 +203,5 @@ export class CheckAttempts implements CanActivate {
     };
     await this.attemptsRepository.addAttempts(attempt);
     return true;
-  }
-}
-@Injectable()
-export class CheckDeviceId implements CanActivate {
-  constructor(protected securityRepository: SecurityRepository,
-              protected jwtService : JwtService) {}
-  async canActivate(
-    context: ExecutionContext
-  ): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
-    const deviceId = req.params.id;
-    const session = await this.securityRepository.findSessionByDeviceId(deviceId)
-    if (!session) throw new NotFoundException()
-    if (!req.cookies.refreshToken) throw new UnauthorizedException()
-    const token = req.cookies.refreshToken
-    const userId = await this.jwtService.getIdByRefreshToken(token)
-    if (!userId) throw new UnauthorizedException()
-    if(userId.userId !== session.userId) throw new ForbiddenException()
-    return true
   }
 }

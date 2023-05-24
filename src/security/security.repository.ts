@@ -65,7 +65,6 @@ export class SecurityRepository {
   async getAll() : Promise<RefreshTokensMetaModel[]>{
     return await this.refreshTokensMetaModel.find({}).lean()
   }
-  //DELETE ALL DATA
   async deleteAllData() {
     await this.refreshTokensMetaModel.deleteMany({});
     return [];

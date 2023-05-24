@@ -1,5 +1,5 @@
 import { Controller, Delete, Get, HttpCode, NotFoundException, Param, Req, UseGuards } from "@nestjs/common";
-import { CheckDeviceId, CheckForRefreshToken, CheckForSameUser } from "../auth.guard";
+import { CheckForRefreshToken, CheckForSameUser } from "../auth.guard";
 import { SecurityService } from "./security.service";
 
 @Controller('security/devices')
@@ -19,7 +19,6 @@ export class SecurityController{
     return;
   }
   @HttpCode(204)
-  @UseGuards(CheckDeviceId)
   @UseGuards(CheckForRefreshToken)
   @UseGuards(CheckForSameUser)
   @Delete(':id')
