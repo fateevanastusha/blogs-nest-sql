@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Put, Req, UseGuards } from "@nestjs/common";
 import { CommentsDto } from "./comments dto";
-import { CheckForExistingUser, CheckCommentForUser, CheckForSameUser } from "../auth.guard";
+import { CheckIfUserExist, CommentCheckForSameUser } from "../auth.guard";
 import { CommentsService } from "./comments.service";
 import { CommentModel } from "./comments.schema";
 import { JwtService } from "../jwt.service";
@@ -34,8 +34,7 @@ export class CommentsController {
     }
   }
   @HttpCode(204)
-  @UseGuards(CheckForExistingUser)
-  @UseGuards(CheckCommentForUser)
+  @UseGuards(CommentCheckForSameUser)
   @Delete(':id')
   async deleteComment(@Param('id') commentId : string){
     const status = await this.commentsService.deleteCommentById(commentId);
@@ -46,8 +45,7 @@ export class CommentsController {
     }
   }
   @HttpCode(204)
-  @UseGuards(CheckForExistingUser)
-  @UseGuards(CheckCommentForUser)
+  @UseGuards(CommentCheckForSameUser)
   @Put(':id')
   async updateComment(@Param('id') commentId : string,
                       @Body() comment : CommentsDto){
@@ -61,7 +59,7 @@ export class CommentsController {
   }
 
   @HttpCode(204)
-  @UseGuards(CheckForExistingUser)
+  @UseGuards(CheckIfUserExist)
   @Put(':id/like-status')
   async changeLikeStatus(@Param('id') commentId : string,
                          @Body() requestType : LikesDto,

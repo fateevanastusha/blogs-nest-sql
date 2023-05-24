@@ -16,7 +16,7 @@ import { PostsService } from "./posts.service";
 import { CommentsDto, PostsDto } from "./posts.dto";
 import { PostModel } from "./posts.schema";
 import { Request, Response } from "express";
-import { AuthGuard, CheckForExistingUser, CheckPostForUser } from "../auth.guard";
+import { AuthGuard, CheckIfUserExist } from "../auth.guard";
 import { LikesDto } from "../likes/likes.dto";
 
 @Controller('posts')
@@ -71,7 +71,6 @@ export class PostsController{
     if (!createdPost) throw new BadRequestException()
     return createdPost
   }
-  
   @UseGuards(AuthGuard)
   @Put(':id')
   async updatePost(
@@ -97,7 +96,7 @@ export class PostsController{
       sortDirection : sortDirection,
     }, req.headers.authorization, postId)
   }
-  @UseGuards(CheckForExistingUser)
+  @UseGuards(CheckIfUserExist)
   @Post(':id/comments')
   async postComment(@Param('id') postId : string,
                     @Body() comment : CommentsDto,
@@ -105,7 +104,7 @@ export class PostsController{
     const token = req.headers.authorization!.split(" ")[1]
     return await this.postsService.createComment(postId, comment.content, token)
   }
-  @UseGuards(CheckPostForUser)
+  @UseGuards(CheckIfUserExist)
   @HttpCode(204)
   @Put(':id/like-status')
   async setLike(@Param('id') postId : string,
