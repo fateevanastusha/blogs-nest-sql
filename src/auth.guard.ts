@@ -108,7 +108,6 @@ export class CheckForRefreshToken implements CanActivate {
     return true
   }
 }
-
 @Injectable()
 export class CheckForSameUser implements CanActivate {
   constructor(
@@ -180,7 +179,6 @@ export class CheckForSameDevice implements CanActivate {
     return true;
   }
 }
-
 @Injectable()
 export class CheckAttempts implements CanActivate {
   constructor(
