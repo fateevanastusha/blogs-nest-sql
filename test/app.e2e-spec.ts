@@ -59,6 +59,7 @@ describe('AppController (e2e)', () => {
   let token2 : any = null
   let createResponseBlog : any = null
   let createResponseBlog2 : any = null
+  let createResponseUser : any = null
   let res = null
 
   //create user to test blogs
@@ -504,16 +505,28 @@ describe('AppController (e2e)', () => {
     })
   })
 
-  it ('SUCCESSFULLY CREATE NEW BLOG', async () => {
+
+  it ('CREATE BLOG AND BING IT TO DELETE USER DEPENDENCY ', async () => {
     createResponseBlog = await request(server)
       .post('/blogger/blogs')
       .send({
-        "name": "Nastya",
-        "description": "about me",
-        "websiteUrl": "http://www.nastyastar.com"
+        "name": "ADMIN BLOG",
+        "description": "ADMIN BLOG",
+        "websiteUrl": "http://www.adminblog.com"
       })
       .set("Authorization", "bearer " +  token.body.accessToken)
       .expect(201)
+    await request(server)
+      .put('/blogs/' + 'WRONGID' + '/bind-with-user/' + createResponseUser.body.id)
+      .set("Authorization", "bearer " +  token.body.accessToken)
+      .expect(400)
+    await request(server)
+      .put('/blogs/' + createResponseBlog.body.id + '/bind-with-user/' + createResponseUser.body.id)
+      .expect(401)
+    await request(server)
+      .put('/blogs/' + createResponseBlog.body.id + '/bind-with-user/' + createResponseUser.body.id)
+      .set("Authorization", "bearer " +  token.body.accessToken)
+      .expect(204)
   })
 
   //GET CREATED BLOG
@@ -523,9 +536,9 @@ describe('AppController (e2e)', () => {
       .get( "/blogger/blogs/" + createResponseBlog.body.id)
     expect(blog.body).toStrictEqual({
       "id": expect.any(String),
-      "name": "Nastya",
-      "description": "about me",
-      "websiteUrl": "http://www.nastyastar.com",
+      "name": "ADMIN BLOG",
+      "description": "ADMIN BLOG",
+      "websiteUrl": "http://www.adminblog.com",
       "createdAt" : expect.any(String),
       "isMembership" : false
     })
@@ -825,8 +838,6 @@ describe('AppController (e2e)', () => {
       .delete('/testing/all-data')
       .expect(204)
   })
-
-  let createResponseUser : any = null
 
   it ('SUCCESSFULLY CREATE NEW USER', async  () => {
     createResponseUser = await request(server)
