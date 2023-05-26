@@ -10,7 +10,7 @@ export class BloggersRepository {
     return this.blogsModel.countDocuments({name: {$regex: searchNameTerm, $options : 'i'}})
   }
   async getBlog(id : string) : Promise<BlogModel | null>{
-    return this.blogsModel.findOne({id: id}, {_id: 0, __v: 0})
+    return this.blogsModel.findOne({id: id}, {_id: 0, __v: 0, blogOwnerInfo : 0})
   }
   async deleteBlog(id : string) : Promise<boolean>{
     const status = await this.blogsModel.deleteOne({id : id})
