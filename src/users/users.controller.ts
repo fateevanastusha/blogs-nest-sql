@@ -16,12 +16,14 @@ import { UsersDto } from "./users.dto";
 import { UserModel } from "./users.schema";
 import { Response } from "express";
 import { AuthGuard } from "../auth.guard";
+import { QueryRepository } from "../helpers/query.repository";
 
 @Injectable()
 @UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController{
-  constructor(protected usersService : UsersService) {}
+  constructor(protected usersService : UsersService,
+              protected queryRepository : QueryRepository) {}
   @Get()
   async getUsers(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,

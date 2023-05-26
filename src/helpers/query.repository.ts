@@ -6,7 +6,7 @@ import { PostDocument, PostModel } from "../posts/posts.schema";
 import { UserModel } from "../users/users.schema";
 import { CommentDocument, CommentModel } from "../comments/comments.schema";
 import { LikesRepository } from "../likes/likes.repository";
-import { LikeDocument, LikeModel, LikeViewModel } from "../likes/likes.schema";
+import { LikeDocument, LikeViewModel } from "../likes/likes.schema";
 import { UsersRepository } from "../users/users.repository";
 
 export class QueryRepository {
