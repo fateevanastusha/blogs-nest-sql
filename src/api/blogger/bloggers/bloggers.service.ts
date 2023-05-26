@@ -1,6 +1,6 @@
 import { QueryModelBlogs } from "../../../helpers/helpers.schema";
-import { Injectable } from "@nestjs/common";
-import { BlogModel, PaginatedClass } from "../../public/blogs/blogs.schema";
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { BlogModel, BlogViewModel, PaginatedClass } from "../../public/blogs/blogs.schema";
 import { BloggersRepository } from "./bloggers.repository";
 import { QueryRepository } from "../../../helpers/query.repository";
 import { BlogDto } from "../../public/blogs/blogs.dto";
@@ -13,16 +13,18 @@ export class BloggersService {
               protected queryRepository : QueryRepository,
               protected jwtService : JwtService,
               protected usersRepository : UsersRepository) {}
-  async getBlogs(query : QueryModelBlogs): Promise<PaginatedClass>{
-    const total = await this.blogsRepository.getBlogsCount(query.searchNameTerm)
+  async getBlogs(query : QueryModelBlogs, token : string): Promise<PaginatedClass>{
+    const userId = await this.jwtService.getUserIdByToken(token)
+    const total = await this.blogsRepository.getBlogsCount(query.searchNameTerm, userId)
     const pageCount = Math.ceil( total / +query.pageSize)
-    const items : BlogModel[] = await this.queryRepository.paginationForBlogs(query);
+    const items : BlogViewModel[] = await this.queryRepository.paginationForBlogs(query, userId);
     return await this.queryRepository.paginationForm(pageCount, total, items, query)
   }
-  async getBlog(id: string) : Promise<BlogModel | null>{
-    return await this.blogsRepository.getBlog(id)
-  }
-  async deleteBlog(id: string) : Promise<boolean>{
+  async deleteBlog(id: string, token : string) : Promise<boolean>{
+    const userId = await this.jwtService.getUserIdByToken(token)
+    const blogForUpdate : BlogModel | null = await this.blogsRepository.getBlog(id)
+    if (!blogForUpdate) throw new NotFoundException();
+    if (blogForUpdate.blogOwnerInfo.userId !== userId) throw new ForbiddenException()
     return await this.blogsRepository.deleteBlog(id)
   }
   async createBlog(blog: BlogDto, token : string) : Promise<BlogModel | null>{
@@ -34,7 +36,7 @@ export class BloggersService {
       description: blog.description,
       websiteUrl: blog.websiteUrl,
       createdAt: new Date().toISOString(),
-      isMembership: false,
+      isMembership: true,
       blogOwnerInfo : {
         userId: userId,
         userLogin: user.login
@@ -42,7 +44,11 @@ export class BloggersService {
     }
     return await this.blogsRepository.createBlog(newBlog);
   }
-  async updateBlog(blog : BlogDto, id: string) : Promise <boolean>{
+  async updateBlog(blog : BlogDto, id: string, token : string) : Promise <boolean>{
+    const userId = await this.jwtService.getUserIdByToken(token)
+    const blogForUpdate : BlogModel | null = await this.blogsRepository.getBlog(id)
+    if (!blogForUpdate) throw new NotFoundException();
+    if (blogForUpdate.blogOwnerInfo.userId !== userId) throw new ForbiddenException()
     return await this.blogsRepository.updateBlog(blog, id)
   }
   async deleteAllData(){

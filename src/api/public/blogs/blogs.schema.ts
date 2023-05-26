@@ -33,6 +33,22 @@ export class BlogModel {
 }
 
 @Schema()
+export class BlogViewModel {
+  @Prop({required : true})
+  name : string
+  @Prop({required: true})
+  description : string
+  @Prop({required: true})
+  websiteUrl : string
+  @Prop({required: true})
+  id : string
+  @Prop({required : true})
+  createdAt : string
+  @Prop({required: true})
+  isMembership : boolean
+}
+
+@Schema()
 export class PaginatedClass {
   @Prop({required : true})
   pagesCount : number
@@ -47,7 +63,7 @@ export class PaginatedClass {
   totalCount : number
 
   @Prop({required : true})
-  items : BlogModel[] | PostModel[] | UserModel[]
+  items : BlogModel[] | PostModel[] | UserModel[] | BlogViewModel[]
 
 }
 

@@ -4,7 +4,7 @@ import {
   Controller,
   DefaultValuePipe,
   Delete,
-  Get, NotFoundException,
+  Get, HttpCode, NotFoundException,
   Param,
   Post,
   Put,
@@ -23,21 +23,23 @@ import { PostsDto } from "../../public/posts/posts.dto";
 @Controller('blogger/blogs')
 export class BloggersController {
   constructor(protected bloggersService : BloggersService,
-              protected postsService : PostsService
-  ) {}
+              protected postsService : PostsService) {}
+  @UseGuards(CheckIfUserExist)
   @Get()
   async getBlogs(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
                  @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
                  @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
-                 @Query('searchNameTerm', new DefaultValuePipe('')) searchNameTerm : string){
+                 @Query('searchNameTerm', new DefaultValuePipe('')) searchNameTerm : string,
+                 @Req() req: Request){
+    const token = req.headers.authorization!.split(" ")[1]
     return await this.bloggersService.getBlogs({
       pageSize : pageSize,
       pageNumber : pageNumber,
       sortBy : sortBy,
       sortDirection : sortDirection,
       searchNameTerm : searchNameTerm
-    })
+    }, token)
   }
   @UseGuards(CheckIfUserExist)
   @Post()
@@ -61,17 +63,19 @@ export class BloggersController {
     if (!createdPost) throw new NotFoundException()
     return createdPost
   }
-  @UseGuards(AuthGuard)
+  @HttpCode(204)
+  @UseGuards(CheckIfUserExist)
   @Put(':id')
   async updateBlog(
     @Body() blog : BlogDto,
     @Param('id') blogId : string,
-    @Res() res : Response){
-    const status : boolean = await this.bloggersService.updateBlog(blog, blogId)
-    if(!status) throw new NotFoundException()
-    res.sendStatus(204)
-    return
+    @Req() req: Request){
+    const token = req.headers.authorization!.split(" ")[1]
+    const status : boolean = await this.bloggersService.updateBlog(blog, blogId, token);
+    if(!status) throw new NotFoundException();
+    return;
   }
+  @HttpCode(204)
   @Put(':id/posts')
   async updatePost(
     @Body() post : PostsDto,
@@ -79,15 +83,14 @@ export class BloggersController {
     @Res() res : Response){
     const status : boolean = await this.postsService.updatePost(post, postId)
     if (!status) throw new NotFoundException()
-    res.sendStatus(204)
     return
   }
+  @HttpCode(204)
   @Delete(':id')
   async deleteBlog(@Param('id') blogId : string,
-                   @Res() res : Response){
-    const status : boolean = await this.bloggersService.deleteBlog(blogId)
-    if (!status) throw new NotFoundException()
-    res.sendStatus(204)
+                   @Req() req: Request){
+    const token = req.headers.authorization!.split(" ")[1]
+    await this.bloggersService.deleteBlog(blogId, token)
     return
   }
   @Delete(':id/posts')
