@@ -4,7 +4,7 @@ import { QueryRepository } from "../helpers/query.repository";
 import { PostModel } from "./posts.schema";
 import { BlogModel, PaginatedClass } from "../blogs/blogs.schema";
 import { BlogsRepository } from "../blogs/blogs.repository";
-import { CommentsDto, PostsDto } from "./posts.dto";
+import { PostsDto } from "./posts.dto";
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "../jwt.service";
 import { CommentsService } from "../comments/comments.service";

@@ -1,4 +1,4 @@
-import { transport } from "./node.mailer.utils";
+import { transport } from "./mail/node.mailer.utils";
 
 export class BusinessService {
   async sendConfirmationCode (email : string, confirmationCode : string) : Promise<string> {

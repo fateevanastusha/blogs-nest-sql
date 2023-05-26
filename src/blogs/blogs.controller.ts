@@ -19,7 +19,7 @@ import { Response, Request } from "express";
 import { PostModel } from "../posts/posts.schema";
 import { AuthGuard } from "../auth.guard";
 
-@Controller('blogs')
+@Controller('blogger/blogs')
 export class BlogsController{
   constructor(protected blogsService : BlogsService,
               protected postsService : PostsService

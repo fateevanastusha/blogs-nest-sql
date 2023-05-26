@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from '../app.module';
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
-import { HttpExceptionFilter } from "./exception.filters";
+import { HttpExceptionFilter } from "../exception.filters";
 import { useContainer } from "class-validator";
-import { createApp } from "../test/create.app";
+import { createApp } from "../../test/create.app";
 var cookieParser = require('cookie-parser')
 
 async function bootstrap() {
