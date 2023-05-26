@@ -58,10 +58,6 @@ export class BlogsController{
   @Post()
   async createBlog(
     @Body() blog : BlogDto){
-    //how make the error
-    //if(11 > 10){
-    //  throw new BadRequestException({ message : ['bad kiskis'] })
-    //}
     const createdBlog : BlogModel | null = await this.blogsService.createBlog(blog)
     if (!createdBlog) throw new BadRequestException()
     return createdBlog
@@ -105,13 +101,13 @@ export class BlogsController{
   @Post(':id/posts')
   async createPost(@Param('id') blogId : string,
                    @Body() post : PostsBlogDto){
-  const createdPost : PostModel | null = await this.postsService.createPost({
-    title: post.title,
-    shortDescription: post.shortDescription,
-    content: post.content,
-    blogId: blogId
-  })
-    if (!createdPost) throw new NotFoundException()
-    return createdPost
+    const createdPost : PostModel | null = await this.postsService.createPost({
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: blogId
+    })
+      if (!createdPost) throw new NotFoundException()
+      return createdPost
   }
 }

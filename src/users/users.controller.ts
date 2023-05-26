@@ -22,8 +22,7 @@ import { QueryRepository } from "../helpers/query.repository";
 @UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController{
-  constructor(protected usersService : UsersService,
-              protected queryRepository : QueryRepository) {}
+  constructor(protected usersService : UsersService) {}
   @Get()
   async getUsers(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,

@@ -45,7 +45,7 @@ describe('AppController (e2e)', () => {
   })
   //CHECK FOR EMPTY BLOG DATA BASE
   it ('GET EMPTY BLOG DATA BASE', async  () => {
-    const res = await request(server).get('/blogs')
+    const res = await request(server).get('/blogger/blogs')
     expect(res.body).toStrictEqual({
       pagesCount: 0,
       page: 1,
@@ -55,19 +55,75 @@ describe('AppController (e2e)', () => {
     })
   })
 
+  let token : any = null
+  let token2 : any = null
   let createResponseBlog : any = null
+  let createResponseBlog2 : any = null
+  let res = null
+
+  //create user to test blogs
+
+  it ('SUCCESSFULLY CREATE NEW USER', async  () => {
+    createResponseUser = await request(server)
+      .post('/users')
+      .send({
+        login : "admin",
+        password : "qwerty",
+        email: "admin@gmail.com"
+      })
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(201)
+  })
+
+  it('SUCCESSFULLY AUTH', async () => {
+    token = await request(server)
+      .post('/auth/login')
+      .send(
+        {
+          loginOrEmail : "admin",
+          password : "qwerty"
+        }
+      )
+      .expect(200)
+
+  })
+
+  it ('SUCCESSFULLY CREATE NEW USER', async  () => {
+    createResponseUser = await request(server)
+      .post('/users')
+      .send({
+        login : "admin2",
+        password : "qwerty",
+        email: "admin@gmail.com"
+      })
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(201)
+  })
+
+  it('SUCCESSFULLY AUTH', async () => {
+    token2 = await request(server)
+      .post('/auth/login')
+      .send(
+        {
+          loginOrEmail : "admin2",
+          password : "qwerty"
+        }
+      )
+      .expect(200)
+
+  })
 
   //CREATE NEW BLOG
 
   it ('SUCCESSFULLY CREATE NEW BLOG', async () => {
     createResponseBlog = await request(server)
-      .post('/blogs')
+      .post('/blogger/blogs')
       .send({
         "name": "Nastya",
         "description": "about me",
         "websiteUrl": "http://www.nastyastar.com"
       })
-      .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+      .set("Authorization", "bearer " +  token.body.accessToken)
       .expect(201)
   })
 
@@ -75,7 +131,7 @@ describe('AppController (e2e)', () => {
 
   it ('GET SUCCESSFULLY CREATED BLOG', async  () => {
     const blog = await request(server)
-      .get( "/blogs/" + createResponseBlog.body.id)
+      .get( "/blogger/blogs/" + createResponseBlog.body.id)
     expect(blog.body).toStrictEqual({
       "id": expect.any(String),
       "name": "Nastya",
@@ -90,16 +146,16 @@ describe('AppController (e2e)', () => {
 
   it ('SUCCESSFULLY UPDATE CREATED BLOG', async  () => {
     request(server)
-      .put( "/blogs/" + createResponseBlog.body.id)
+      .put( "/blogger/blogs/" + createResponseBlog.body.id)
       .send({
         name : "Not Nastya",
         description : "Not about me",
         websiteUrl : "http://www.nastyakoshka.com",
       })
-      .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+      .set("Authorization", "bearer " +  token.body.accessToken)
       .expect(200)
     const blog = await request(server)
-      .get( "/blogs/" + createResponseBlog.body.id)
+      .get( "/blogger/blogs/" + createResponseBlog.body.id)
       .expect(200)
     expect(blog.body).toStrictEqual({
       "id": createResponseBlog.body.id,
@@ -115,13 +171,13 @@ describe('AppController (e2e)', () => {
 
   it('SUCCESSFULLY CREATE NEW POST BY BLOG ID', async () => {
     await request(server)
-      .post('/blogs/' + createResponseBlog.body.id + '/posts')
+      .post('/blogger/blogs/' + createResponseBlog.body.id + '/posts')
       .send({
         "title": "Black Sea",
         "shortDescription": "about sea",
         "content": "black sea is hot"
       })
-      .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+      .set("Authorization", "bearer " +  token.body.accessToken)
       .expect(201)
   })
 
@@ -129,7 +185,7 @@ describe('AppController (e2e)', () => {
 
   it ('GET POSTS BY BLOG ID WITH PAGINATION', async  () => {
     const posts = await request(server)
-      .get('/blogs/' + createResponseBlog.body.id + '/posts')
+      .get('/blogger/blogs/' + createResponseBlog.body.id + '/posts')
     expect(posts.body).toStrictEqual( {
       pagesCount: 1,
       page: 1,
@@ -159,7 +215,7 @@ describe('AppController (e2e)', () => {
 
   it ('UNSUCCESSFULLY DELETE CREATED BLOG', async  () => {
     await request(server)
-      .delete( "/blogs/" + createResponseBlog.body.id)
+      .delete( "/blogger/blogs/" + createResponseBlog.body.id)
       .expect(401)
   })
 
@@ -167,17 +223,24 @@ describe('AppController (e2e)', () => {
 
   it ('UNSUCCESSFULLY DELETE NOT EXISTING BLOG', async  () => {
     await request(server)
-      .delete( "/blogs/gslgl1323gd")
-      .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+      .delete( "/blogger/blogs/gslgl1323gd")
+      .set("Authorization", "bearer " +  token.body.accessToken)
       .expect(404)
+  })
+
+  it ('UNSUCCESSFULLY DELETE CREATED BLOG WITH ANOTHER USER', async  () => {
+    await request(server)
+      .delete( "/blogger/blogs/" + createResponseBlog.body.id)
+      .set("Authorization", "bearer " +  token2.body.accessToken)
+      .expect(403)
   })
 
   //SUCCESSFULLY DELETE CREATED BLOG
 
   it ('SUCCESSFULLY DELETE CREATED BLOG', async  () => {
     await request(server)
-      .delete( "/blogs/" + createResponseBlog.body.id)
-      .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+      .delete( "/blogger/blogs/" + createResponseBlog.body.id)
+      .set("Authorization", "bearer " +  token.body.accessToken)
       .expect(204)
   })
 
@@ -185,49 +248,49 @@ describe('AppController (e2e)', () => {
 
   it("SUCCESSFULLY CREATE 5 BLOGS", async () => {
       await request(server)
-        .post('/blogs')
+        .post('/blogger/blogs')
         .send({
           "name": blogFilterString01,
           "description": blogDescriptionString,
           "websiteUrl": blogWebsiteUrlString
         })
-        .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+        .set("Authorization", "bearer " +  token.body.accessToken)
         .expect(201)
       await request(server)
-        .post('/blogs')
+        .post('/blogger/blogs')
         .send({
           "name": blogFilterString02,
           "description": blogDescriptionString,
           "websiteUrl": blogWebsiteUrlString
         })
-        .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+        .set("Authorization", "bearer " +  token.body.accessToken)
         .expect(201)
       await request(server)
-        .post('/blogs')
+        .post('/blogger/blogs')
         .send({
           "name": blogFilterString03,
           "description": blogDescriptionString,
           "websiteUrl": blogWebsiteUrlString
         })
-        .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+        .set("Authorization", "bearer " +  token.body.accessToken)
         .expect(201)
       await request(server)
-        .post('/blogs')
+        .post('/blogger/blogs')
         .send({
           "name": blogFilterString04,
           "description": blogDescriptionString,
           "websiteUrl": blogWebsiteUrlString
         })
-        .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+        .set("Authorization", "bearer " +  token.body.accessToken)
         .expect(201)
       let lastBlogResponse = await request(server)
-        .post('/blogs')
+        .post('/blogger/blogs')
         .send({
           "name": blogFilterString05,
           "description": blogDescriptionString,
           "websiteUrl": blogWebsiteUrlString
         })
-        .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+        .set("Authorization", "bearer " +  token.body.accessToken)
         .expect(201)
     expect(lastBlogResponse.status).toBe(201);
   })
@@ -236,7 +299,7 @@ describe('AppController (e2e)', () => {
 
   it ("CHECK BLOGS FOR PAGINATION WITH SEARCH NAME TERM", async () => {
     const blog = await request(server)
-      .get( "/blogs?searchNameTerm=Citronner")
+      .get( "/blogger/blogs?searchNameTerm=Citronner")
     expect(blog.body.items[0].name).toEqual("Citronner")
   })
 
@@ -244,7 +307,8 @@ describe('AppController (e2e)', () => {
 
   it ("CHECK BLOGS FOR PAGINATION WITH SORT BY NAME", async () => {
     createResponseBlog = await request(server)
-      .get( "/blogs?sortBy=name&sortDirection=asc&pageSize=5&searchNameTerm=ana")
+      .get( "/blogger/blogs?sortBy=name&sortDirection=asc&pageSize=5&searchNameTerm=ana")
+      .set("Authorization", "bearer " +  token.body.accessToken)
     expect(createResponseBlog.body).toStrictEqual({
       pagesCount: 1,
       page: 1,
@@ -279,15 +343,121 @@ describe('AppController (e2e)', () => {
     })
   })
 
+  it ("CHECK FOR NOT BLOGS", async () => {
+    createResponseBlog = await request(server)
+      .get( "/blogger/blogs")
+      .set("Authorization", "bearer " +  token2.body.accessToken)
+    expect(createResponseBlog.body).toStrictEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 0,
+      items: []
+    })
+  })
+
+  it ('SUCCESSFULLY CREATE NEW BLOG', async () => {
+    createResponseBlog = await request(server)
+      .post('/blogger/blogs')
+      .send({
+        "name": "TEST2",
+        "description": "TEST2",
+        "websiteUrl": "http://www.test2.com"
+      })
+      .set("Authorization", "bearer " +  token2.body.accessToken)
+      .expect(201)
+  })
+
+  //GET CREATED BLOG
+
+  it ('GET SUCCESSFULLY CREATED BLOG', async  () => {
+    const blog = await request(server)
+      .get( "/blogger/blogs/" + createResponseBlog2.body.id)
+    expect(blog.body).toStrictEqual({
+      "id": expect.any(String),
+      "name": "TEST2",
+      "description": "TEST2",
+      "websiteUrl": "http://www.test2.com",
+      "createdAt" : expect.any(String),
+      "isMembership" : false
+    })
+  })
+
+  it ("CHECK FOR BLOGS", async () => {
+    createResponseBlog = await request(server)
+      .get( "/blogger/blogs")
+      .set("Authorization", "bearer " +  token2.body.accessToken)
+    expect(createResponseBlog.body).toStrictEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 1,
+      items: [{
+        "id": expect.any(String),
+        "name": "TEST2",
+        "description": "TEST2",
+        "websiteUrl": "http://www.test2.com",
+        "createdAt" : expect.any(String),
+        "isMembership" : false
+      }]
+    })
+  })
+
+  it ("CHECK BLOGS FOR PAGINATION WITH SORT BY NAME", async () => {
+    createResponseBlog = await request(server)
+      .get( "/blogger/blogs")
+      .set("Authorization", "bearer " +  token.body.accessToken)
+    expect(createResponseBlog.body).toStrictEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 4,
+      items: [
+        {
+          "id": expect.any(String),
+          "name" : "Ananas",
+          "description" : expect.any(String),
+          "websiteUrl" : expect.any(String),
+          "createdAt" : expect.any(String),
+          "isMembership" : false
+        },
+        {
+          "id": expect.any(String),
+          "name" : "Banana",
+          "description" : expect.any(String),
+          "websiteUrl" : expect.any(String),
+          "createdAt" : expect.any(String),
+          "isMembership" : false
+        },
+        {
+          "id": expect.any(String),
+          "name" : "Danam",
+          "description" : expect.any(String),
+          "websiteUrl" : expect.any(String),
+          "createdAt" : expect.any(String),
+          "isMembership" : false
+        },
+        {
+          "id": expect.any(String),
+          "name": "TEST2",
+          "description": "TEST2",
+          "websiteUrl": "http://www.test2.com",
+          "createdAt" : expect.any(String),
+          "isMembership" : false
+        }
+      ]
+    })
+  })
+
   it ('SUCCESSFULLY UPDATE CREATED BLOGS', async  () => {
     request(server)
-      .put( "/blogs/" + createResponseBlog.body.items[0].id)
+      .put( "/blogger/blogs/" + createResponseBlog.body.items[0].id)
       .send({
         "name" : "Ananastasia",
         "description" : 'Updated string',
         "websiteUrl" : 'Updated url',
       })
-      .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+      .set("Authorization", "bearer " +  token.body.accessToken)
       .expect(200)
     request(server)
       .put( "/blogs/" + createResponseBlog.body.items[1].id)
@@ -296,10 +466,10 @@ describe('AppController (e2e)', () => {
         "description" : 'Updated string',
         "websiteUrl" : 'Updated url',
       })
-      .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+      .set("Authorization", "bearer " +  token.body.accessToken)
       .expect(200)
     createResponseBlog = await request(server)
-      .get( "/blogs?sortBy=name&sortDirection=asc&pageSize=5&searchNameTerm=ana")
+      .get( "/blogger/blogs?sortBy=name&sortDirection=asc&pageSize=5&searchNameTerm=ana")
     expect(createResponseBlog.body).toStrictEqual({
       pagesCount: 1,
       page: 1,
@@ -334,6 +504,33 @@ describe('AppController (e2e)', () => {
     })
   })
 
+  it ('SUCCESSFULLY CREATE NEW BLOG', async () => {
+    createResponseBlog = await request(server)
+      .post('/blogger/blogs')
+      .send({
+        "name": "Nastya",
+        "description": "about me",
+        "websiteUrl": "http://www.nastyastar.com"
+      })
+      .set("Authorization", "bearer " +  token.body.accessToken)
+      .expect(201)
+  })
+
+  //GET CREATED BLOG
+
+  it ('GET SUCCESSFULLY CREATED BLOG', async  () => {
+    const blog = await request(server)
+      .get( "/blogger/blogs/" + createResponseBlog.body.id)
+    expect(blog.body).toStrictEqual({
+      "id": expect.any(String),
+      "name": "Nastya",
+      "description": "about me",
+      "websiteUrl": "http://www.nastyastar.com",
+      "createdAt" : expect.any(String),
+      "isMembership" : false
+    })
+  })
+
   it('DELETE ALL DATA TO CHECK POSTS', async () => {
     await request(server)
       .delete('/testing/all-data')
@@ -355,7 +552,7 @@ describe('AppController (e2e)', () => {
 
   it ('SUCCESSFULLY CREATE NEW BLOG', async () => {
     blogId = await request(server)
-      .post('/blogs')
+      .post('/blogger/blogs')
       .send({
         "name": "Nastya",
         "description": "about me",
@@ -670,7 +867,7 @@ describe('AppController (e2e)', () => {
 
   it ('SUCCESSFULLY CREATE NEW BLOG', async () => {
     createResponseBlog = await request(server)
-      .post('/blogs')
+      .post('/blogger/blogs')
       .send({
         "name": "Nastya",
         "description": "about me",
@@ -684,7 +881,7 @@ describe('AppController (e2e)', () => {
 
   it ('GET SUCCESSFULLY CREATED BLOG', async  () => {
     const blog = await request(server)
-      .get( "/blogs/" + createResponseBlog.body.id)
+      .get( "/blogger/blogs/" + createResponseBlog.body.id)
     expect(blog.body).toEqual({
       "id": expect.any(String),
       "name": "Nastya",
@@ -730,7 +927,6 @@ describe('AppController (e2e)', () => {
     })
   })
 
-  let token : any = null
 
   //SUCCESSFULLY AUTH
 
@@ -746,8 +942,6 @@ describe('AppController (e2e)', () => {
       .expect(200)
 
   })
-
-  let res = null
 
   //set dislike to post and check dislike
 
@@ -1256,7 +1450,7 @@ describe('AppController (e2e)', () => {
 
   it ('SUCCESSFULLY CREATE NEW BLOG', async () => {
     createResponseBlog = await request(server)
-      .post('/blogs')
+      .post('/blogger/blogs')
       .send({
         "name": "Nastya",
         "description": "about me",
@@ -1270,7 +1464,7 @@ describe('AppController (e2e)', () => {
 
   it ('GET SUCCESSFULLY CREATED BLOG', async  () => {
     const blog = await request(server)
-      .get( "/blogs/" + createResponseBlog.body.id)
+      .get( "/blogger/blogs/" + createResponseBlog.body.id)
     expect(blog.body).toStrictEqual({
       "id": expect.any(String),
       "name": "Nastya",
