@@ -9,11 +9,11 @@ import {
   HttpCode,
   BadRequestException, UnauthorizedException, NotFoundException
 } from "@nestjs/common";
-import { CheckAttempts, CheckForRefreshToken, CheckForSameDevice } from "../auth.guard";
+import { CheckAttempts, CheckForRefreshToken, CheckForSameDevice } from "../../../auth.guard";
 import { AuthService } from "./auth.service";
 import { AccessToken, TokenList } from "../security/security.schema";
-import { UserModel } from "../users/users.schema";
-import { UsersDto } from "../users/users.dto";
+import { UserModel } from "../../superadmin/users/users.schema";
+import { UsersDto } from "../../superadmin/users/users.dto";
 import { EmailDto } from "./auth.dto";
 
 @UseGuards(CheckAttempts)

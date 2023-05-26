@@ -8,27 +8,27 @@ import {
   Res,
   UseGuards
 } from "@nestjs/common";
-import { BlogsRepository } from "./blogs/blogs.repository";
-import { PostsRepository } from "./posts/posts.repository";
-import { UsersRepository } from "./users/users.repository";
+import { BloggersRepository } from "./api/blogger/bloggers/bloggers.repository";
+import { PostsRepository } from "./api/public/posts/posts.repository";
+import { UsersRepository } from "./api/superadmin/users/users.repository";
 import { Response} from "express";
-import { SecurityRepository } from "./security/security.repository";
+import { SecurityRepository } from "./api/public/security/security.repository";
 import { LikesRepository } from "./likes/likes.repository";
-import { CommentsRepository } from "./comments/comments.repository";
+import { CommentsRepository } from "./api/public/comments/comments.repository";
 import { AuthGuard } from "./auth.guard";
-import { BlogDto } from "./blogs/blogs.dto";
-import { BlogModel } from "./blogs/blogs.schema";
-import { BlogsService } from "./blogs/blogs.service";
+import { BlogDto } from "./api/public/blogs/blogs.dto";
+import { BlogModel } from "./api/public/blogs/blogs.schema";
+import { BloggersService } from "./api/blogger/bloggers/bloggers.service";
 
 @Controller()
 export class AppController {
-  constructor(protected blogsRepository : BlogsRepository,
+  constructor(protected blogsRepository : BloggersRepository,
               protected postsRepository : PostsRepository,
               protected usersRepository : UsersRepository,
               protected securityRepository : SecurityRepository,
               protected likesRepository : LikesRepository,
               protected commentsRepository : CommentsRepository,
-              protected blogsService : BlogsService
+              protected blogsService : BloggersService
               ) {}
 
   @Delete('/testing/all-data')
@@ -56,7 +56,7 @@ export class AppController {
     return await this.securityRepository.getAll()
   }
   @UseGuards(AuthGuard)
-  @Post('/blogs')
+  @Post('/bloggers')
   async createBlog(
     @Body() blog : BlogDto){
     const createdBlog : BlogModel | null = await this.blogsService.createBlog(blog)

@@ -1,22 +1,22 @@
 import { PostsRepository } from "./posts.repository";
-import { QueryModelComments, QueryModelPosts } from "../helpers/helpers.schema";
-import { QueryRepository } from "../helpers/query.repository";
+import { QueryModelComments, QueryModelPosts } from "../../../helpers/helpers.schema";
+import { QueryRepository } from "../../../helpers/query.repository";
 import { PostModel } from "./posts.schema";
 import { BlogModel, PaginatedClass } from "../blogs/blogs.schema";
-import { BlogsRepository } from "../blogs/blogs.repository";
+import { BloggersRepository } from "../../blogger/bloggers/bloggers.repository";
 import { PostsDto } from "./posts.dto";
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "../jwt.service";
+import { JwtService } from "../../../jwt.service";
 import { CommentsService } from "../comments/comments.service";
 import { CommentModel } from "../comments/comments.schema";
-import { LikesRepository } from "../likes/likes.repository";
-import { LikesHelpers } from "../helpers/likes.helper";
-import { LikeViewModel } from "../likes/likes.schema";
+import { LikesRepository } from "../../../likes/likes.repository";
+import { LikesHelpers } from "../../../helpers/likes.helper";
+import { LikeViewModel } from "../../../likes/likes.schema";
 
 @Injectable()
 export class PostsService {
   constructor(protected postsRepository : PostsRepository,
-              protected blogsRepository : BlogsRepository,
+              protected blogsRepository : BloggersRepository,
               protected queryRepository : QueryRepository,
               protected jwtService : JwtService,
               protected commentsService : CommentsService,

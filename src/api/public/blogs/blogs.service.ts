@@ -1,8 +1,8 @@
-import { QueryModelBlogs } from "../helpers/helpers.schema";
+import { QueryModelBlogs } from "../../../helpers/helpers.schema";
 import { Injectable } from "@nestjs/common";
 import { BlogModel, PaginatedClass } from "./blogs.schema";
 import { BlogsRepository } from "./blogs.repository";
-import { QueryRepository } from "../helpers/query.repository";
+import { QueryRepository } from "../../../helpers/query.repository";
 import { BlogDto } from "./blogs.dto";
 @Injectable()
 export class BlogsService {

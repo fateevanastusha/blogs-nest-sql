@@ -1,10 +1,10 @@
-import { BlogModel, BlogDocument } from "./blogs.schema";
+import { BlogModel, BlogDocument } from "../../public/blogs/blogs.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { BlogDto } from "./blogs.dto";
+import { BlogDto } from "../../public/blogs/blogs.dto";
 
-export class BlogsRepository{
-  constructor(@InjectModel('blogs') private blogsModel: Model<BlogDocument> ) {
+export class BloggersRepository {
+  constructor(@InjectModel('bloggers') private blogsModel: Model<BlogDocument> ) {
   }
   async getBlogsCount(searchNameTerm: string): Promise<number>{
     return this.blogsModel.countDocuments({name: {$regex: searchNameTerm, $options : 'i'}})

@@ -16,8 +16,8 @@ import { PostsService } from "./posts.service";
 import { CommentsDto, PostsDto } from "./posts.dto";
 import { PostModel } from "./posts.schema";
 import { Request, Response } from "express";
-import { AuthGuard, CheckIfUserExist } from "../auth.guard";
-import { LikesDto } from "../likes/likes.dto";
+import { AuthGuard, CheckIfUserExist } from "../../../auth.guard";
+import { LikesDto } from "../../../likes/likes.dto";
 
 @Controller('posts')
 export class PostsController{

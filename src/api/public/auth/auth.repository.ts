@@ -1,5 +1,5 @@
-import { UserModel } from "../users/users.schema";
-import { UsersRepository } from "../users/users.repository";
+import { UserModel } from "../../superadmin/users/users.schema";
+import { UsersRepository } from "../../superadmin/users/users.repository";
 import * as bcrypt from 'bcrypt';
 import { RefreshToken, RefreshTokensBlocked, RefreshTokensMetaDocument } from "../security/security.schema";
 import { InjectModel } from "@nestjs/mongoose";

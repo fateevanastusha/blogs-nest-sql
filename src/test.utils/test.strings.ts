@@ -1,6 +1,6 @@
 export const accountURI = "/auth/me";
 export const loginURI = "/auth/login";
-export const blogsURI = "/blogs/";
+export const blogsURI = "/bloggers/";
 export const postsURI = "/posts/";
 export const usersURI = "/users/";
 export const commentsURI = "/comments/";

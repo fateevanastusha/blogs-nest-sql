@@ -1,9 +1,18 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
-import { PostModel } from "../posts/posts.schema";
-import { UserModel } from "../users/users.schema";
+import { PostModel } from "../../public/posts/posts.schema";
+import { UserModel } from "../../superadmin/users/users.schema";
 
 export type BlogDocument = HydratedDocument<BlogModel>
+
+@Schema()
+export class BlogOwnerClass {
+  @Prop({required : true})
+  userId: string
+  @Prop({required : true})
+  userLogin: string
+}
+
 
 @Schema()
 export class BlogModel {
@@ -19,6 +28,8 @@ export class BlogModel {
   createdAt : string
   @Prop({required: true})
   isMembership : boolean
+  @Prop({required: true})
+  blogOwnerInfo: BlogOwnerClass
 }
 
 @Schema()

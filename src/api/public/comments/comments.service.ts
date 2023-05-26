@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { CommentsRepository } from "./comments.repository";
-import { LikesRepository } from "../likes/likes.repository";
-import { UserModel } from "../users/users.schema";
+import { LikesRepository } from "../../../likes/likes.repository";
+import { UserModel } from "../../superadmin/users/users.schema";
 import { CommentModel } from "./comments.schema";
-import { QueryCommentsUsers } from "../helpers/helpers.schema";
-import { QueryRepository } from "../helpers/query.repository";
+import { QueryCommentsUsers } from "../../../helpers/helpers.schema";
+import { QueryRepository } from "../../../helpers/query.repository";
 import { PaginatedClass } from "../blogs/blogs.schema";
-import { LikesHelpers } from "../helpers/likes.helper";
-import { UsersService } from "../users/users.service";
+import { LikesHelpers } from "../../../helpers/likes.helper";
+import { UsersService } from "../../superadmin/users/users.service";
 
 @Injectable()
 export class CommentsService {

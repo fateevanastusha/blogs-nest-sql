@@ -1,5 +1,5 @@
 import { SecurityRepository } from "./security.repository";
-import { JwtService } from "../jwt.service";
+import { JwtService } from "../../../jwt.service";
 import { RefreshTokensMetaModel } from "./security.schema";
 import { Injectable, NotFoundException } from "@nestjs/common";
 @Injectable()

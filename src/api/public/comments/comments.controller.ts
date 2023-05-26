@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Put, Req, UseGuards } from "@nestjs/common";
 import { CommentsDto } from "./comments dto";
-import { CheckIfUserExist, CommentCheckForSameUser } from "../auth.guard";
+import { CheckIfUserExist, CommentCheckForSameUser } from "../../../auth.guard";
 import { CommentsService } from "./comments.service";
 import { CommentModel } from "./comments.schema";
-import { JwtService } from "../jwt.service";
-import { LikesDto } from "../likes/likes.dto";
+import { JwtService } from "../../../jwt.service";
+import { LikesDto } from "../../../likes/likes.dto";
 
 @Controller('comments')
 export class CommentsController {

@@ -1,16 +1,16 @@
-import { BlogModel, PaginatedClass, BlogDocument } from "../blogs/blogs.schema";
+import { BlogModel, PaginatedClass, BlogDocument } from "../api/public/blogs/blogs.schema";
 import { QueryCommentsUsers, QueryModelBlogs, QueryModelPosts, QueryModelUsers } from "./helpers.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { PostDocument, PostModel } from "../posts/posts.schema";
-import { UserModel } from "../users/users.schema";
-import { CommentDocument, CommentModel } from "../comments/comments.schema";
+import { PostDocument, PostModel } from "../api/public/posts/posts.schema";
+import { UserModel } from "../api/superadmin/users/users.schema";
+import { CommentDocument, CommentModel } from "../api/public/comments/comments.schema";
 import { LikesRepository } from "../likes/likes.repository";
 import { LikeDocument, LikeViewModel } from "../likes/likes.schema";
-import { UsersRepository } from "../users/users.repository";
+import { UsersRepository } from "../api/superadmin/users/users.repository";
 
 export class QueryRepository {
-  constructor(@InjectModel('blogs') private blogsModel: Model<BlogDocument>,
+  constructor(@InjectModel('bloggers') private blogsModel: Model<BlogDocument>,
               @InjectModel('posts') private postsModel: Model<PostDocument>,
               @InjectModel('users') private usersModel: Model<UserModel>,
               @InjectModel('comments') private commentsModel : Model<CommentDocument>,

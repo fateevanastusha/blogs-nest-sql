@@ -4,7 +4,8 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
-  Injectable, NotFoundException,
+  Injectable,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -15,8 +16,7 @@ import { UsersService } from "./users.service";
 import { UsersDto } from "./users.dto";
 import { UserModel } from "./users.schema";
 import { Response } from "express";
-import { AuthGuard } from "../auth.guard";
-import { QueryRepository } from "../helpers/query.repository";
+import { AuthGuard } from "../../../auth.guard";
 
 @Injectable()
 @UseGuards(AuthGuard)

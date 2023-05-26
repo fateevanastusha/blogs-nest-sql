@@ -1,8 +1,8 @@
 import { UsersRepository } from "./users.repository";
 import { UserModel } from "./users.schema";
-import { QueryRepository } from "../helpers/query.repository";
-import { QueryModelUsers } from "../helpers/helpers.schema";
-import { PaginatedClass } from "../blogs/blogs.schema";
+import { QueryRepository } from "../../../helpers/query.repository";
+import { QueryModelUsers } from "../../../helpers/helpers.schema";
+import { PaginatedClass } from "../../public/blogs/blogs.schema";
 import { UsersDto } from "./users.dto";
 import * as bcrypt from 'bcrypt';
 import { Injectable } from "@nestjs/common";

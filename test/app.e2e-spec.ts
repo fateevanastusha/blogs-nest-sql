@@ -19,7 +19,7 @@ import {
   postFilterString05,
 } from "../src/test.utils/test.strings";
 import { createApp } from "./create.app";
-import { MailBoxImap } from "./imap.service";
+import { MailBoxImap } from "./imap/imap.service";
 
 describe('AppController (e2e)', () => {
   jest.setTimeout(3 * 60 * 1000)
@@ -62,7 +62,7 @@ describe('AppController (e2e)', () => {
   let createResponseUser : any = null
   let res = null
 
-  //create user to test blogs
+  //create user to test bloggers
 
   it ('SUCCESSFULLY CREATE NEW USER', async  () => {
     createResponseUser = await request(server)

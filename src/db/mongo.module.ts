@@ -3,9 +3,9 @@ import { MongooseModule } from "@nestjs/mongoose";
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb+srv://admin:SUPERKEY@cluster0.leufa1s.mongodb.net/blogs-nest', {dbName: 'blogs-nest'}),
+    MongooseModule.forRoot('mongodb+srv://admin:SUPERKEY@cluster0.leufa1s.mongodb.net/bloggers-nest', {dbName: 'bloggers-nest'}),
     // MongooseModule.forFeature([{
-    //   name : "blogs",
+    //   name : "bloggers",
     //   schema : BlogSchema
     // }
     // ])

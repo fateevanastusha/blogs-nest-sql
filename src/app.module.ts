@@ -2,42 +2,42 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {MongooseModule} from "@nestjs/mongoose";
-import { BlogSchema } from "./blogs/blogs.schema";
-import { BlogsController } from "./blogs/blogs.controller";
-import { BlogsRepository } from "./blogs/blogs.repository";
-import { BlogsService } from "./blogs/blogs.service";
+import { BloggersController } from "./api/blogger/bloggers/bloggers.controller";
+import { BloggersRepository } from "./api/blogger/bloggers/bloggers.repository";
+import { BloggersService } from "./api/blogger/bloggers/bloggers.service";
 import { QueryRepository } from "./helpers/query.repository";
 import { MongoModule } from "./db/mongo.module";
-import { PostsService } from "./posts/posts.service";
-import { PostsRepository } from "./posts/posts.repository";
-import { UsersService } from "./users/users.service";
-import { UsersRepository } from "./users/users.repository";
-import { PostsController } from "./posts/posts.controller";
-import { UsersController } from "./users/users.controller";
-import { PostSchema } from "./posts/posts.schema";
-import { UserSchema } from "./users/users.schema";
-import { CommentSchema } from "./comments/comments.schema";
+import { PostsService } from "./api/public/posts/posts.service";
+import { PostsRepository } from "./api/public/posts/posts.repository";
+import { UsersService } from "./api/superadmin/users/users.service";
+import { UsersRepository } from "./api/superadmin/users/users.repository";
+import { PostsController } from "./api/public/posts/posts.controller";
+import { UsersController } from "./api/superadmin/users/users.controller";
+import { PostSchema } from "./api/public/posts/posts.schema";
+import { UserSchema } from "./api/superadmin/users/users.schema";
+import { CommentSchema } from "./api/public/comments/comments.schema";
 import { LikeSchema } from "./likes/likes.schema";
-import { CommentsController } from "./comments/comments.controller";
-import { SecurityRepository } from "./security/security.repository";
-import { RefreshTokensBlocked, RefreshTokensMetaSchema } from "./security/security.schema";
+import { CommentsController } from "./api/public/comments/comments.controller";
+import { SecurityRepository } from "./api/public/security/security.repository";
+import { RefreshTokensBlocked, RefreshTokensMetaSchema } from "./api/public/security/security.schema";
 import { AttemptsSchema } from "./attempts/attempts.schema";
 import { AttemptsRepository } from "./attempts/attempts.repository";
-import { AuthRepository } from "./auth/auth.repository";
-import { AuthController } from "./auth/auth.controller";
-import { CommentsService } from "./comments/comments.service";
-import { CommentsRepository } from "./comments/comments.repository";
+import { AuthRepository } from "./api/public/auth/auth.repository";
+import { AuthController } from "./api/public/auth/auth.controller";
+import { CommentsService } from "./api/public/comments/comments.service";
+import { CommentsRepository } from "./api/public/comments/comments.repository";
 import { LikesRepository } from "./likes/likes.repository";
-import { SecurityService } from "./security/security.service";
+import { SecurityService } from "./api/public/security/security.service";
 import { LikesHelpers } from "./helpers/likes.helper";
 import { JwtService } from "./jwt.service";
-import { AuthService } from "./auth/auth.service";
+import { AuthService } from "./api/public/auth/auth.service";
 import { AuthGuard } from "./auth.guard";
 import { PassportModule } from '@nestjs/passport'
-import { LocalStrategy } from "./auth/strategies/passport.strategy";
+import { LocalStrategy } from "./api/public/auth/strategies/passport.strategy";
 import { BusinessService } from "./business.service";
-import { IsUserAlreadyExistConstraint } from "./users/users.dto";
-import { SecurityController } from "./security/security.controller";
+import { IsUserAlreadyExistConstraint } from "./api/superadmin/users/users.dto";
+import { SecurityController } from "./api/public/security/security.controller";
+import { BlogSchema } from "./api/public/blogs/blogs.schema";
 
 const repositories = [
   UsersRepository,
@@ -47,14 +47,14 @@ const repositories = [
   CommentsRepository,
   AuthRepository,
   AttemptsRepository,
-  BlogsRepository
+  BloggersRepository
 ]
 const services = [
   UsersService,
   SecurityService,
   PostsService,
   CommentsService,
-  BlogsService,
+  BloggersService,
   AuthService,
   BusinessService,
   AppService,
@@ -66,7 +66,7 @@ const services = [
      PassportModule,
      MongoModule,
      MongooseModule.forFeature([{
-        name : "blogs",
+        name : "bloggers",
        schema : BlogSchema
       },
        {
@@ -105,7 +105,7 @@ const services = [
   ],
   controllers: [
     AppController,
-    BlogsController,
+    BloggersController,
     PostsController,
     UsersController,
     CommentsController,

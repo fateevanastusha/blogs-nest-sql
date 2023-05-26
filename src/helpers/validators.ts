@@ -1,8 +1,8 @@
 import { ValidationArguments, ValidatorConstraintInterface } from "class-validator";
-import { BlogsRepository } from "../blogs/blogs.repository";
+import { BloggersRepository } from "../api/blogger/bloggers/bloggers.repository";
 
 export class BlogExists implements ValidatorConstraintInterface {
-  constructor(protected blogsRepository : BlogsRepository) { }
+  constructor(protected blogsRepository : BloggersRepository) { }
 
   async validate(id : string) {
     const blog = this.blogsRepository.getBlog(id)

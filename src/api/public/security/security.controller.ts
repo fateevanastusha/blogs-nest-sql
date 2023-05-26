@@ -1,5 +1,5 @@
 import { Controller, Delete, Get, HttpCode, NotFoundException, Param, Req, UseGuards } from "@nestjs/common";
-import { CheckForRefreshToken, CheckForSameUser } from "../auth.guard";
+import { CheckForRefreshToken, CheckForSameUser } from "../../../auth.guard";
 import { SecurityService } from "./security.service";
 
 @Controller('security/devices')

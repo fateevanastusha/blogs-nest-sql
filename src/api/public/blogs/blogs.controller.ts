@@ -1,25 +1,19 @@
 import {
-  BadRequestException,
-  Body,
   Controller,
   DefaultValuePipe,
   Delete,
   Get, NotFoundException,
   Param,
-  Post,
-  Put,
   Query, Req,
   Res, UseGuards
 } from "@nestjs/common";
 import { BlogsService } from "./blogs.service";
-import { BlogDto, PostsBlogDto } from "./blogs.dto";
-import { PostsService } from "../posts/posts.service";
+import { PostsService } from "../../public/posts/posts.service";
 import { BlogModel, PaginatedClass } from "./blogs.schema";
 import { Response, Request } from "express";
-import { PostModel } from "../posts/posts.schema";
-import { AuthGuard } from "../auth.guard";
+import { AuthGuard } from "../../../auth.guard";
 
-@Controller('blogger/blogs')
+@Controller('blogs')
 export class BlogsController{
   constructor(protected blogsService : BlogsService,
               protected postsService : PostsService
@@ -54,25 +48,6 @@ export class BlogsController{
     res.sendStatus(204)
     return
   }
-  @UseGuards(AuthGuard)
-  @Post()
-  async createBlog(
-    @Body() blog : BlogDto){
-    const createdBlog : BlogModel | null = await this.blogsService.createBlog(blog)
-    if (!createdBlog) throw new BadRequestException()
-    return createdBlog
-  }
-  @UseGuards(AuthGuard)
-  @Put(':id')
-  async updateBlog(
-    @Body() blog : BlogDto,
-    @Param('id') blogId : string,
-    @Res() res : Response){
-    const status : boolean = await this.blogsService.updateBlog(blog, blogId)
-    if(!status) throw new NotFoundException()
-    res.sendStatus(204)
-    return
-  }
   @Get(':id/posts')
   async getPosts(@Param('id') blogId : string,
                  @Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
@@ -97,17 +72,5 @@ export class BlogsController{
     if (!posts) throw new NotFoundException()
     return posts
   }
-  @UseGuards(AuthGuard)
-  @Post(':id/posts')
-  async createPost(@Param('id') blogId : string,
-                   @Body() post : PostsBlogDto){
-    const createdPost : PostModel | null = await this.postsService.createPost({
-      title: post.title,
-      shortDescription: post.shortDescription,
-      content: post.content,
-      blogId: blogId
-    })
-      if (!createdPost) throw new NotFoundException()
-      return createdPost
-  }
+
 }

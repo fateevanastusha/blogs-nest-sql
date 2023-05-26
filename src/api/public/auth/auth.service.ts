@@ -1,12 +1,12 @@
 import { AuthRepository } from "./auth.repository";
-import { UsersService } from "../users/users.service";
-import { UsersRepository } from "../users/users.repository";
-import { JwtService } from "../jwt.service";
+import { UsersService } from "../../superadmin/users/users.service";
+import { UsersRepository } from "../../superadmin/users/users.repository";
+import { JwtService } from "../../../jwt.service";
 import { AccessToken, RefreshToken, RefreshTokensMetaModel, TokenList } from "../security/security.schema";
 import { SecurityRepository } from "../security/security.repository";
-import { UserModel } from "../users/users.schema";
-import { BusinessService } from "../business.service";
-import { UsersDto } from "../users/users.dto";
+import { UserModel } from "../../superadmin/users/users.schema";
+import { BusinessService } from "../../../business.service";
+import { UsersDto } from "../../superadmin/users/users.dto";
 import { BadRequestException, Injectable } from "@nestjs/common";
 @Injectable()
 export class AuthService {
