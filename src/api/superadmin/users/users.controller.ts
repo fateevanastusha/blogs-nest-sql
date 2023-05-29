@@ -4,23 +4,21 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
-  Injectable,
+  HttpCode,
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
-  Res,
   UseGuards
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
-import { UsersDto } from "./users.dto";
+import { BanUserDto, UsersDto } from "./users.dto";
 import { UserModel } from "./users.schema";
-import { Response } from "express";
 import { AuthGuard } from "../../../auth.guard";
 
-@Injectable()
 @UseGuards(AuthGuard)
-@Controller('users')
+@Controller('api/sa/users')
 export class UsersController{
   constructor(protected usersService : UsersService) {}
   @Get()
@@ -40,18 +38,25 @@ export class UsersController{
       searchEmailTerm : searchEmailTerm
     })
   }
-  @Delete(':id')
-  async deleteUser(@Param('id') userId : string, @Res() res : Response){
-    const status : boolean = await this.usersService.deleteUser(userId)
-    if (!status) throw new NotFoundException()
-    return res.sendStatus(204)
-  }
   @Post()
-  async createUser(
-    @Body() user : UsersDto){
-
+  async createUser(@Body() user : UsersDto){
     const createdUser : UserModel | null = await this.usersService.createUser(user, (+new Date()).toString())
     if (!createdUser) throw new NotFoundException()
     return createdUser
+  }
+  @HttpCode(204)
+  @Put('/:id/ban')
+  async banUser(@Param('id') userId : string,
+                @Body() banInfo : BanUserDto){
+    const status : boolean = await this.usersService.banUser(userId, banInfo)
+    if(!status) throw new NotFoundException()
+    return
+  }
+  @HttpCode(204)
+  @Delete(':id')
+  async deleteUser(@Param('id') userId : string){
+    const status : boolean = await this.usersService.deleteUser(userId)
+    if (!status) throw new NotFoundException()
+    return
   }
 }

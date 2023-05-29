@@ -1,4 +1,4 @@
-import { BlogModel, BlogDocument } from "./blogs.schema";
+import { BlogDocument, BlogModel } from "./blogs.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { BlogDto } from "./blogs.dto";

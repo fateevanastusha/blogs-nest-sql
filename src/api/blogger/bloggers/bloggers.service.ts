@@ -17,7 +17,7 @@ export class BloggersService {
     const userId = await this.jwtService.getUserIdByToken(token)
     const total = await this.blogsRepository.getBlogsCount(query.searchNameTerm, userId)
     const pageCount = Math.ceil( total / +query.pageSize)
-    const items : BlogViewModel[] = await this.queryRepository.paginationForBlogs(query, userId);
+    const items : BlogViewModel[] = await this.queryRepository.paginationForBlogsWithUser(query, userId);
     return await this.queryRepository.paginationForm(pageCount, total, items, query)
   }
   async deleteBlog(id: string, token : string) : Promise<boolean>{

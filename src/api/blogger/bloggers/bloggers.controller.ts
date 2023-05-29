@@ -4,12 +4,16 @@ import {
   Controller,
   DefaultValuePipe,
   Delete,
-  Get, HttpCode, NotFoundException,
+  Get,
+  HttpCode,
+  NotFoundException,
   Param,
   Post,
   Put,
-  Query, Req,
-  Res, UseGuards
+  Query,
+  Req,
+  Res,
+  UseGuards
 } from "@nestjs/common";
 import { BloggersService } from "./bloggers.service";
 import { BlogDto, PostsBlogDto } from "../../public/blogs/blogs.dto";
@@ -17,7 +21,7 @@ import { PostsService } from "../../public/posts/posts.service";
 import { BlogModel } from "../../public/blogs/blogs.schema";
 import { Response, Request } from "express";
 import { PostModel } from "../../public/posts/posts.schema";
-import { AuthGuard, CheckIfUserExist } from "../../../auth.guard";
+import { CheckIfUserExist } from "../../../auth.guard";
 import { PostsDto } from "../../public/posts/posts.dto";
 
 @Controller('blogger/blogs')

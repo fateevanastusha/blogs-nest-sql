@@ -3,7 +3,7 @@ import { QueryCommentsUsers, QueryModelBlogs, QueryModelPosts, QueryModelUsers }
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { PostDocument, PostModel } from "../api/public/posts/posts.schema";
-import { UserModel } from "../api/superadmin/users/users.schema";
+import { UserModel, UserViewModel } from "../api/superadmin/users/users.schema";
 import { CommentDocument, CommentModel } from "../api/public/comments/comments.schema";
 import { LikesRepository } from "../likes/likes.repository";
 import { LikeDocument, LikeViewModel } from "../likes/likes.schema";
@@ -18,7 +18,16 @@ export class QueryRepository {
               protected likesRepository : LikesRepository,
               protected usersRepository : UsersRepository) {
   }
-  async paginationForBlogs(query : QueryModelBlogs, userId : string) : Promise <BlogModel[]> {
+  async paginationForBlogs(query : QueryModelBlogs) : Promise <BlogModel[]> {
+    const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
+    return this.blogsModel
+      .find({name: {$regex: query.searchNameTerm, $options: 'i'}}, {_id: 0, __v: 0})
+      .sort({[query.sortBy]: query.sortDirection})
+      .skip(skipSize)
+      .limit(+query.pageSize)
+      .lean()
+  }
+  async paginationForBlogsWithUser(query : QueryModelBlogs, userId : string) : Promise <BlogModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.blogsModel
       .find({name: {$regex: query.searchNameTerm, $options: 'i'}, blogOwnerInfo : {userId : userId}}, {_id: 0, __v: 0, blogOwnerInfo : 0})
@@ -54,7 +63,7 @@ export class QueryRepository {
       .limit(+query.pageSize)
       .lean()
   }
-  async paginationForUsers(query: QueryModelUsers): Promise<UserModel[]> {
+  async paginationForUsers(query: QueryModelUsers): Promise<UserViewModel[]> {
     const skipSize: number = query.pageSize * (query.pageNumber - 1)
     return this.usersModel
       .find({
@@ -68,7 +77,7 @@ export class QueryRepository {
       .limit(query.pageSize)
       .lean()
   }
-  async paginationForm(pageCount: number, total: number, items: BlogModel[] | PostModel[] | UserModel[] | CommentModel[] | BlogViewModel[] | any, query : QueryModelBlogs): Promise<PaginatedClass> {
+  async paginationForm(pageCount: number, total: number, items: BlogModel[] | PostModel[] | UserViewModel[] | CommentModel[] | BlogViewModel[] | any, query : QueryModelBlogs): Promise<PaginatedClass> {
     return  {
       pagesCount: pageCount,
       page: +query.pageNumber,

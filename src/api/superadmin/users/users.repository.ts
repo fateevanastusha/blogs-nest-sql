@@ -2,6 +2,8 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { UserDocument, UserModel } from "./users.schema";
 import { Injectable } from "@nestjs/common";
+import { BanUserDto } from "./users.dto";
+import { RefreshToken } from "../../public/security/security.schema";
 
 @Injectable()
 export class UsersRepository {
@@ -90,6 +92,18 @@ export class UsersRepository {
     const result = await this.usersModel.updateOne({confirmedCode: code}, {$set :
         {
           password: password
+        }
+    })
+    return result.matchedCount === 1
+  }
+  async banUser(userId : string, banInfo : BanUserDto, banDate : string) : Promise<boolean>{
+    const result = await this.usersModel.updateOne({userId: userId}, {$set :
+        {
+          banInfo : {
+            isBanned : banInfo.isBanned,
+            banDate : banDate,
+            banReason : banInfo.banReason
+          }
         }
     })
     return result.matchedCount === 1

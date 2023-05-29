@@ -6,7 +6,7 @@ import { UserModel } from "../../superadmin/users/users.schema";
 export type BlogDocument = HydratedDocument<BlogModel>
 
 @Schema()
-export class BlogOwnerClass {
+export class BlogOwnerModel {
   @Prop({required : true})
   userId: string
   @Prop({required : true})
@@ -29,7 +29,7 @@ export class BlogModel {
   @Prop({required: true})
   isMembership : boolean
   @Prop({required: true})
-  blogOwnerInfo: BlogOwnerClass
+  blogOwnerInfo: BlogOwnerModel
 }
 
 @Schema()

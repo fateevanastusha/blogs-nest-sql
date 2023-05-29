@@ -11,7 +11,7 @@ export class BlogsService {
   async getBlogs(query : QueryModelBlogs): Promise<PaginatedClass>{
     const total = await this.blogsRepository.getBlogsCount(query.searchNameTerm)
     const pageCount = Math.ceil( total / +query.pageSize)
-    const items : BlogModel[] = await this.queryRepository.paginationForBlogs(query);
+    const items : BlogModel[] = await this.queryRepository.paginationForBlogsWithUser(query);
     return await this.queryRepository.paginationForm(pageCount, total, items, query)
   }
   async getBlog(id: string) : Promise<BlogModel | null>{

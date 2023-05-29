@@ -47,3 +47,12 @@ export class UsersDto {
   @Transform(({ value }: TransformFnParams) => value?.trim())
   email: string;
 }
+
+@Schema()
+export class BanUserDto {
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  isBanned : boolean
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @Length(20, 1000)
+  banReason : string
+}
