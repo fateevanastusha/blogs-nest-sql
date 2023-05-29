@@ -18,7 +18,7 @@ import { UserModel } from "./users.schema";
 import { AuthGuard } from "../../../auth.guard";
 
 @UseGuards(AuthGuard)
-@Controller('api/sa/users')
+@Controller('sa/users')
 export class UsersController{
   constructor(protected usersService : UsersService) {}
   @Get()
@@ -48,6 +48,7 @@ export class UsersController{
   @Put('/:id/ban')
   async banUser(@Param('id') userId : string,
                 @Body() banInfo : BanUserDto){
+    console.log('ban user controller')
     const status : boolean = await this.usersService.banUser(userId, banInfo)
     if(!status) throw new NotFoundException()
     return

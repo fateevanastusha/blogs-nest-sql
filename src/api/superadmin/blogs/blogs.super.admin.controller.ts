@@ -7,13 +7,13 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
-import { BlogsService } from "./blogs.service";
+import { BlogsSuperAdminService } from "./blogs.super.admin.service";
 import { AuthGuard } from "../../../auth.guard";
 
 @UseGuards(AuthGuard)
 @Controller('sa/blogs')
-export class BlogsController{
-  constructor(protected blogsService : BlogsService,) {}
+export class BlogsSuperAdminController {
+  constructor(protected blogsService : BlogsSuperAdminService,) {}
   @Get()
   async getBlogs(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,

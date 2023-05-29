@@ -38,6 +38,12 @@ import { BusinessService } from "./business.service";
 import { IsUserAlreadyExistConstraint } from "./api/superadmin/users/users.dto";
 import { SecurityController } from "./api/public/security/security.controller";
 import { BlogSchema } from "./api/public/blogs/blogs.schema";
+import { BlogsController } from "./api/public/blogs/blogs.controller";
+import { BlogsSuperAdminController } from "./api/superadmin/blogs/blogs.super.admin.controller";
+import { BlogsSuperAdminRepository } from "./api/superadmin/blogs/blogs.super.admin.repository";
+import { BlogsRepository } from "./api/public/blogs/blogs.repository";
+import { BlogsService } from "./api/public/blogs/blogs.service";
+import { BlogsSuperAdminService } from "./api/superadmin/blogs/blogs.super.admin.service";
 
 const repositories = [
   UsersRepository,
@@ -47,7 +53,9 @@ const repositories = [
   CommentsRepository,
   AuthRepository,
   AttemptsRepository,
-  BloggersRepository
+  BloggersRepository,
+  BlogsRepository,
+  BlogsSuperAdminRepository,
 ]
 const services = [
   UsersService,
@@ -55,6 +63,8 @@ const services = [
   PostsService,
   CommentsService,
   BloggersService,
+  BlogsService,
+  BlogsSuperAdminService,
   AuthService,
   BusinessService,
   AppService,
@@ -106,6 +116,8 @@ const services = [
   controllers: [
     AppController,
     BloggersController,
+    BlogsController,
+    BlogsSuperAdminController,
     PostsController,
     UsersController,
     CommentsController,

@@ -2,7 +2,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { BlogDocument, BlogModel, BlogOwnerModel } from "../../public/blogs/blogs.schema";
 
-export class BlogsRepository{
+export class BlogsSuperAdminRepository {
   constructor(@InjectModel('bloggers') private blogsModel: Model<BlogDocument> ) {
   }
   async getBlogsCount(searchNameTerm: string): Promise<number>{

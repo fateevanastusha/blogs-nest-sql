@@ -3,7 +3,6 @@ import { Model } from "mongoose";
 import { UserDocument, UserModel } from "./users.schema";
 import { Injectable } from "@nestjs/common";
 import { BanUserDto } from "./users.dto";
-import { RefreshToken } from "../../public/security/security.schema";
 
 @Injectable()
 export class UsersRepository {
@@ -36,10 +35,10 @@ export class UsersRepository {
     return user
   }
   async createUser(newUser : UserModel) : Promise <UserModel | null> {
-    await this.usersModel.insertMany([newUser])
-    const updatedUser = await this.getUserWithId(newUser.id)
-    if (updatedUser) {
-      return updatedUser
+    await this.usersModel.insertMany(newUser)
+    const createdUser = await this.getUserWithId(newUser.id)
+    if (createdUser) {
+      return createdUser
     }
     return null
   }

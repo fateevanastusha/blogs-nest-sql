@@ -55,33 +55,6 @@ export class PostsController{
 
     return post
   }
-  @UseGuards(AuthGuard)
-  @Delete(':id')
-  async deletePost(@Param('id') postId : string,
-                   @Res() res : Response){
-    const status : boolean = await this.postsService.deletePost(postId)
-    if (!status) throw new NotFoundException()
-    return res.sendStatus(204)
-  }
-  @UseGuards(AuthGuard)
-  @Post()
-  async createPost(
-    @Body() post : PostsDto){
-    const createdPost : PostModel | null = await this.postsService.createPost(post)
-    if (!createdPost) throw new BadRequestException()
-    return createdPost
-  }
-  @UseGuards(AuthGuard)
-  @Put(':id')
-  async updatePost(
-    @Body() post : PostsDto,
-    @Param('id') postId : string,
-    @Res() res : Response){
-    const status : boolean = await this.postsService.updatePost(post, postId)
-    if (!status) throw new NotFoundException()
-    res.sendStatus(204)
-    return
-  }
   @Get(':id/comments')
   async getComments(@Param('id') postId : string,
                     @Query('pageSize', new DefaultValuePipe(10)) pageSize : number,

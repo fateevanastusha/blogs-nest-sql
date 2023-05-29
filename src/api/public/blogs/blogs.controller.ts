@@ -1,17 +1,16 @@
 import {
   Controller,
   DefaultValuePipe,
-  Delete,
-  Get, NotFoundException,
+  Get,
+  NotFoundException,
   Param,
-  Query, Req,
-  Res, UseGuards
+  Query,
+  Req
 } from "@nestjs/common";
 import { BlogsService } from "./blogs.service";
 import { PostsService } from "../../public/posts/posts.service";
 import { BlogModel, PaginatedClass } from "./blogs.schema";
-import { Response, Request } from "express";
-import { AuthGuard } from "../../../auth.guard";
+import { Request } from "express";
 
 @Controller('blogs')
 export class BlogsController{
@@ -38,15 +37,6 @@ export class BlogsController{
     const blog : BlogModel | null = await this.blogsService.getBlog(blogId)
     if(!blog) throw new NotFoundException()
     return blog
-  }
-  @UseGuards(AuthGuard)
-  @Delete(':id')
-  async deleteBlog(@Param('id') blogId : string,
-                   @Res() res : Response){
-    const status : boolean = await this.blogsService.deleteBlog(blogId)
-    if (!status) throw new NotFoundException()
-    res.sendStatus(204)
-    return
   }
   @Get(':id/posts')
   async getPosts(@Param('id') blogId : string,

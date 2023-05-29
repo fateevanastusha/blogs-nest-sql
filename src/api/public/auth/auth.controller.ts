@@ -39,31 +39,6 @@ export class AuthController {
     }
   }
 
-  @Get('/me')
-  async getInformation(@Req() req: any){
-    const auth = req.headers.authorization
-    if (!auth) {
-      throw new UnauthorizedException()
-      return
-    }
-    const [authType, token] = auth.split(' ')
-    if (authType !== 'Bearer') {
-      throw new UnauthorizedException()
-      return
-    }
-    const user: UserModel | null = await this.authService.getInformationAboutCurrentUser(token)
-    if (user) {
-      const currentUser = {
-        email: user.email,
-        login : user.login,
-        userId : user.id
-      }
-      return currentUser
-    } else {
-      throw new UnauthorizedException()
-      return
-    }
-  }
   @Post('/password-recovery')
   async passwordRecoveryRequest(@Req() req: any){
     const status : boolean = await this.authService.passwordRecovery(req.body.email)
@@ -139,6 +114,31 @@ export class AuthController {
       }
       res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: false, secure: false})
       res.send(token)
+    } else {
+      throw new UnauthorizedException()
+      return
+    }
+  }
+  @Get('/me')
+  async getInformation(@Req() req: any){
+    const auth = req.headers.authorization
+    if (!auth) {
+      throw new UnauthorizedException()
+      return
+    }
+    const [authType, token] = auth.split(' ')
+    if (authType !== 'Bearer') {
+      throw new UnauthorizedException()
+      return
+    }
+    const user: UserModel | null = await this.authService.getInformationAboutCurrentUser(token)
+    if (user) {
+      const currentUser = {
+        email: user.email,
+        login : user.login,
+        userId : user.id
+      }
+      return currentUser
     } else {
       throw new UnauthorizedException()
       return

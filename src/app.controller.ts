@@ -55,12 +55,4 @@ export class AppController {
   async getAllSessions(){
     return await this.securityRepository.getAll()
   }
-  @UseGuards(AuthGuard)
-  @Post('/bloggers')
-  async createBlog(
-    @Body() blog : BlogDto){
-    const createdBlog : BlogModel | null = await this.blogsService.createBlog(blog)
-    if (!createdBlog) throw new BadRequestException()
-    return createdBlog
-  }
 }

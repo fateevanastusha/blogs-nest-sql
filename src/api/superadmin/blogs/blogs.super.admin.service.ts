@@ -1,14 +1,14 @@
 import { QueryModelBlogs } from "../../../helpers/helpers.schema";
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { BlogsRepository } from "./blogs.repository";
+import { BlogsSuperAdminRepository } from "./blogs.super.admin.repository";
 import { BlogModel, BlogOwnerModel, PaginatedClass } from "../../public/blogs/blogs.schema";
 import { UsersRepository } from "../users/users.repository";
 import { QueryRepository } from "../../../helpers/query.repository";
 import { UserModel } from "../users/users.schema";
 
 @Injectable()
-export class BlogsService {
-  constructor(protected blogsRepository : BlogsRepository, protected usersRepository : UsersRepository, protected queryRepository : QueryRepository) {
+export class BlogsSuperAdminService {
+  constructor(protected blogsRepository : BlogsSuperAdminRepository, protected usersRepository : UsersRepository, protected queryRepository : QueryRepository) {
   }
   async getBlogs(query : QueryModelBlogs): Promise<PaginatedClass>{
     const total = await this.blogsRepository.getBlogsCount(query.searchNameTerm)
