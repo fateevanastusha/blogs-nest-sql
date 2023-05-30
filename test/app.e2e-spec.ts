@@ -283,6 +283,149 @@ describe('AppController (e2e)', () => {
     })
   })
 
+  //CHECK BLOGGER
+
+  it('PUBLIC AND BLOGGER delete all data after SA', async () => {
+    //runDb()
+    await request(server)
+      .delete('/testing/all-data')
+      .set({ Authorization: "Basic YWRtaW46cXdlcnR5" })
+      .expect(204)
+  })
+
+  //starts with create user
+
+  it('AUTH PUBLIC test email sending', async () => {
+    //MAKE REQUEST REGISTRATION
+    const resp = await request(server)
+      .post('/auth/registration')
+      .send({
+        login : "nastya1",
+        email : "fateevanastushatest@yandex.ru",
+        password : "qwerty1"
+      })
+
+    await request(server)
+      .post('/auth/registration-email-resending')
+      .send({
+        email : "notexisting@gmail.com"
+      })
+      .expect(400)
+
+    await request(server)
+      .post('/auth/registration-email-resending')
+      .send({
+        email : "fateevanastushatest@yandex.ru"
+      })
+      .expect(204)
+
+    const sentMessage = await imapService.waitNewMessage(1)
+    const html: string | null = await imapService.getMessageHtml(sentMessage)
+    expect(html).toBeDefined()
+    const code : string = html!.split("?code=")[1].split("'")[0]
+
+    await request(server)
+      .post('/auth/registration-confirmation')
+      .send({
+        "code" : "not existing code"
+      })
+      .expect(400)
+
+    await request(server)
+      .post('/auth/registration-confirmation')
+      .send({
+        "code" : code
+      })
+      .expect(204)
+
+  });
+
+
+  it('AUTH PUBLIC registration with wrong data', async () => {
+    await request(server)
+      .post('/auth/registration')
+      .send({
+        login : "nastya1",
+        email : "fateevanastushatest@yandex.ru",
+        password : "qwerty1"
+      })
+      .expect(400)
+    await request(server)
+      .post('/auth/registration')
+      .send({
+        login : "",
+        email : "",
+        password : ""
+      })
+      .expect(400)
+
+
+  });
+
+  it ('AUTH PUBLIC test login in system', async  () => {
+    await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'fateevanastushatest@yandex.ru',
+        password : 'WRONG PASSWORD'
+      })
+      .expect(401)
+    await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'fateevanastushatest@yandex.ru',
+        password : 'qwerty1'
+      })
+      .expect(200)
+  })
+
+  it('PUBLIC AND BLOGGER delete all data', async () => {
+    //runDb()
+    await request(server)
+      .delete('/testing/all-data')
+      .set({ Authorization: "Basic YWRtaW46cXdlcnR5" })
+      .expect(204)
+  })
+
+  it ('AUTH PUBLIC create user', async  () => {
+    createResponseUser_1 = await request(server)
+      .post('/sa/users')
+      .send({
+        login : "nastya",
+        password : "qwerty",
+        email: "anastasiafateeva2406@gmail.com"
+      })
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(201)
+  })
+
+  it('AUTH PUBLIC auth with wrong data', async () => {
+    await request(server)
+      .post('/auth')
+      .send(
+        {
+          loginOrEmail : "nastya",
+          password : "WRONG PASSWORD"
+        }
+      )
+      .expect(404)
+
+  })
+
+  //check for bloggers
+
+  it ('SUCCESSFULLY CREATE NEW BLOG', async () => {
+    createResponseBlog_1 = await request(server)
+      .post('/blogger/blogs')
+      .send({
+        "name": "Nastya",
+        "description": "about me",
+        "websiteUrl": "http://www.nastyastar.com"
+      })
+      .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+      .expect(201)
+  })
+
   afterAll(async () => {
     await request(server)
       .delete('/testing/all-data')
