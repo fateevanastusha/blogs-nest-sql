@@ -1,5 +1,6 @@
 import {
-  IsEmail,
+  IsBoolean,
+  IsEmail, IsString,
   Length, registerDecorator,
   ValidationArguments, ValidationOptions,
   ValidatorConstraint,
@@ -50,9 +51,10 @@ export class UsersDto {
 
 @Schema()
 export class BanUserDto {
-  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @IsBoolean()
   isBanned : boolean
-  @Transform(({ value }: TransformFnParams) => value?.trim())
   @Length(20, 1000)
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @IsString()
   banReason : string
 }

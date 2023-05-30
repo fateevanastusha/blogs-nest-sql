@@ -1,6 +1,6 @@
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { UserDocument, UserModel } from "./users.schema";
+import { UserBanInfo, UserDocument, UserModel } from "./users.schema";
 import { Injectable } from "@nestjs/common";
 import { BanUserDto } from "./users.dto";
 
@@ -95,16 +95,12 @@ export class UsersRepository {
     })
     return result.matchedCount === 1
   }
-  async banUser(userId : string, banInfo : BanUserDto, banDate : string) : Promise<boolean>{
-    const result = await this.usersModel.updateOne({userId: userId}, {$set :
-        {
-          banInfo : {
-            isBanned : banInfo.isBanned,
-            banDate : banDate,
-            banReason : banInfo.banReason
-          }
-        }
-    })
+  async banUser(userId : string, banInfo : UserBanInfo) : Promise<boolean>{
+    const result = await this.usersModel.updateOne({id: userId}, {$set : { banInfo : {
+          isBanned : banInfo.isBanned,
+          banDate : banInfo.banDate,
+          banReason : banInfo.banReason
+        } } })
     return result.matchedCount === 1
   }
   async deleteUser(id: string) : Promise<boolean>{

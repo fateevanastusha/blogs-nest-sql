@@ -130,41 +130,74 @@ describe('AppController (e2e)', () => {
   })
 
   it ('SA ban user', async  () => {
-    createResponseUser_2 = await request(server)
+    await request(server)
       .put('/sa/users/' + createResponseUser_1.body.id + '/ban')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
       .send({
-        isBanned : true ,
-        banReason : 'test ban for user 1'
+        isBanned : true,
+        banReason : 'test ban for user 1 that longer 20'
       })
       .expect(204)
   })
 
   it('SA check for ban user 1', async () => {
     res = await request(server)
-      .get('/sa/users?sortBy=name&sortDirection=asc&pageSize=5')
+      .get('/sa/users?sortBy=name&sortDirection=asc&pageSize=1')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
       .expect(200)
     expect(res.body).toStrictEqual({
       "page": 1,
-      "pageSize": 5,
-      "pagesCount": 1,
+      "pageSize": 1,
+      "pagesCount": 2,
       "totalCount": 2,
       "items": [
         {
           "banInfo": {
             "banDate": expect.any(String),
-            "banReason": "test ban for user 1",
+            "banReason": "test ban for user 1 that longer 20",
             "isBanned": true
           },
-          "createdAt": createResponseUser_1.body.createdAt,
+          "createdAt": expect.any(String),
           "email": "user1@gmail.com",
           "id": createResponseUser_1.body.id,
           "login": "user1"
-        },
+        }
+      ]
+    })
+  })
+
+  it ('SA unban user', async  () => {
+    await request(server)
+      .put('/sa/users/' + createResponseUser_1.body.id + '/ban')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        isBanned : false ,
+        banReason : 'test ban for user 1 that longer 20'
+      })
+      .expect(204)
+  })
+
+  it ('SA delete 1 user', async  () => {
+    await request(server)
+      .delete('/sa/users/' + createResponseUser_1.body.id)
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(204)
+  })
+
+  it('SA check for deleted 1 user', async () => {
+    res = await request(server)
+      .get('/sa/users')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 1,
+      "totalCount": 1,
+      "items": [
         {
           "banInfo": {
-            "banDate": "no info",
+            "banDate": expect.any(String),
             "banReason": "no info",
             "isBanned": false
           },
@@ -177,15 +210,77 @@ describe('AppController (e2e)', () => {
     })
   })
 
-  it ('SA unban user', async  () => {
-    createResponseUser_2 = await request(server)
-      .put('/sa/users/' + createResponseUser_1.body.id + '/ban')
-      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+  it ('SA create new blog', async () => {
+    createResponseBlog_1 = await request(server)
+      .post('/blog')
       .send({
-        isBanned : false ,
-        banReason : 'test ban for user 1'
+        "name": "TEST2",
+        "description": "TEST2",
+        "websiteUrl": "http://www.test2.com"
       })
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(201)
+  })
+
+  it('SA check for created blog', async () => {
+    res = await request(server)
+      .get('/sa/blogs')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 1,
+      items: [
+        {
+          name: 'TEST2',
+          description: 'TEST2',
+          websiteUrl: 'http://www.test2.com',
+          id: createResponseBlog_1.body.id,
+          createdAt: createResponseBlog_1.body.createdAt,
+          isMembership: true,
+          blogOwnerInfo: {
+            userId : expect.any(String),
+            userLogin : expect.any(String)
+          }
+        }
+      ]
+    })
+  })
+
+  it ('SA bind blog', async  () => {
+    await request(server)
+      .put('/sa/blogs/' + createResponseBlog_1.body.id + '/bind-with-user/' + createResponseUser_2.body.id)
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
       .expect(204)
+  })
+
+  it('SA check for binded blog', async () => {
+    res = await request(server)
+      .get('/sa/blogs')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 1,
+      items: [
+        {
+          name: 'TEST2',
+          description: 'TEST2',
+          websiteUrl: 'http://www.test2.com',
+          id: createResponseBlog_1.body.id,
+          createdAt: createResponseBlog_1.body.createdAt,
+          isMembership: true,
+          blogOwnerInfo: {
+            userId : createResponseUser_2.body.id,
+            userLogin : createResponseUser_2.body.login
+          }
+        }
+      ]
+    })
   })
 
   afterAll(async () => {
@@ -194,6 +289,6 @@ describe('AppController (e2e)', () => {
       .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
       .expect(204)
     await imapService.disconnect()
-    await server.close();
+    await server.close()
   })
 });

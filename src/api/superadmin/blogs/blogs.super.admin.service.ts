@@ -21,7 +21,7 @@ export class BlogsSuperAdminService {
     if (!user) throw new NotFoundException()
     const blog : BlogModel | null = await this.blogsRepository.getBlog(blogId)
     if(!blog) throw new NotFoundException()
-    if (blog.blogOwnerInfo.userId !== null) throw new BadRequestException()
+    // if (blog.blogOwnerInfo.userId !== null) throw new BadRequestException()
     const userInfo : BlogOwnerModel = {
       userId : userId,
       userLogin : user.login

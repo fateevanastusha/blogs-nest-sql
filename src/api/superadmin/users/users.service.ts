@@ -1,11 +1,11 @@
 import { UsersRepository } from "./users.repository";
-import { UserModel, UserViewModel } from "./users.schema";
+import { UserBanInfo, UserModel, UserViewModel } from "./users.schema";
 import { QueryRepository } from "../../../helpers/query.repository";
 import { QueryModelUsers } from "../../../helpers/helpers.schema";
 import { PaginatedClass } from "../../public/blogs/blogs.schema";
 import { BanUserDto, UsersDto } from "./users.dto";
 import * as bcrypt from 'bcrypt';
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 
 @Injectable()
 export class UsersService {
@@ -46,8 +46,14 @@ export class UsersService {
     return await this.usersRepository.deleteUser(id)
   }
   async banUser(userId : string, banInfo : BanUserDto) : Promise<boolean> {
-    const banDate = new Date().toISOString()
-    return await this.usersRepository.banUser(userId, banInfo, banDate)
+    const user = await this.usersRepository.getUser(userId)
+    if(!user) throw new NotFoundException()
+    const banInformation : UserBanInfo = {
+      banDate : new Date().toISOString(),
+      banReason : banInfo.banReason,
+      isBanned : banInfo.isBanned
+    }
+    return await this.usersRepository.banUser(userId, banInformation )
   }
   async deleteAllData(){
     await this.usersRepository.deleteAllData()

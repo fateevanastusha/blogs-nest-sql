@@ -15,7 +15,7 @@ import { Response} from "express";
 import { SecurityRepository } from "./api/public/security/security.repository";
 import { LikesRepository } from "./likes/likes.repository";
 import { CommentsRepository } from "./api/public/comments/comments.repository";
-import { AuthGuard } from "./auth.guard";
+import { AuthGuard, CheckIfUserExist } from "./auth.guard";
 import { BlogDto } from "./api/public/blogs/blogs.dto";
 import { BlogModel } from "./api/public/blogs/blogs.schema";
 import { BloggersService } from "./api/blogger/bloggers/bloggers.service";
@@ -42,17 +42,26 @@ export class AppController {
     res.sendStatus(204)
     return;
   }
-
   @Get('/likes')
   async getAllLikes(){
     return await this.likesRepository.getAllLikes()
   }
-  @Get('/all-comments')
-  async getAllComments(){
-    return await this.commentsRepository.getAllComments()
-  }
-  @Get('/get-all-sessions')
-  async getAllSessions(){
-    return await this.securityRepository.getAll()
+  @Post('/blog')
+  async createBlog(@Body() blog : BlogDto){
+    const newBlog : BlogModel = {
+      id: (+new Date()).toString(),
+      name: blog.name,
+      description: blog.description,
+      websiteUrl: blog.websiteUrl,
+      createdAt: new Date().toISOString(),
+      isMembership: true,
+      blogOwnerInfo : {
+        userId: 'userId',
+        userLogin: 'userLogin'
+      }
+    }
+    const createdBlog : BlogModel | null = await this.blogsRepository.createBlog(newBlog)
+    if(!createdBlog) throw new BadRequestException()
+    return createdBlog
   }
 }

@@ -1,7 +1,7 @@
 import {
   Controller,
   DefaultValuePipe,
-  Get, NotFoundException,
+  Get, HttpCode, NotFoundException,
   Param,
   Put,
   Query,
@@ -9,6 +9,7 @@ import {
 } from "@nestjs/common";
 import { BlogsSuperAdminService } from "./blogs.super.admin.service";
 import { AuthGuard } from "../../../auth.guard";
+import { log } from "util";
 
 @UseGuards(AuthGuard)
 @Controller('sa/blogs')
@@ -28,11 +29,10 @@ export class BlogsSuperAdminController {
       searchNameTerm : searchNameTerm
     })
   }
+  @HttpCode(204)
   @Put(':id/bind-with-user/:userId')
-  async bindBlogWithUser(
-    @Param('id') blogId : string,
-    @Param('userId') userId : string){
-    const status : boolean = await this.blogsService.bindBlog(blogId, userId)
+  async bindBlogWithUser(@Param() params){
+    const status : boolean = await this.blogsService.bindBlog(params.id, params.userId)
     if (!status) throw new NotFoundException()
     return
   }

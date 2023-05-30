@@ -48,7 +48,6 @@ export class UsersController{
   @Put('/:id/ban')
   async banUser(@Param('id') userId : string,
                 @Body() banInfo : BanUserDto){
-    console.log('ban user controller')
     const status : boolean = await this.usersService.banUser(userId, banInfo)
     if(!status) throw new NotFoundException()
     return
