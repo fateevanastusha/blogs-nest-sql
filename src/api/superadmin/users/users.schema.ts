@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
-import { IsOptional } from "class-validator";
 
 export type UserDocument = HydratedDocument<UserModel>
 
@@ -8,9 +7,9 @@ export type UserDocument = HydratedDocument<UserModel>
 export class UserBanInfo {
   @Prop({required : true})
   isBanned : boolean
-  @Prop({required : true})
+  @Prop({type : String})
   banDate : string
-  @Prop({required : true})
+  @Prop({type : String})
   banReason : string
 }
 

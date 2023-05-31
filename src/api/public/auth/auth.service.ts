@@ -28,6 +28,7 @@ export class AuthService {
     //CHECK FOR USER
     const user : UserModel | null = await this.authFindUser(loginOrEmail);
     if (!user) return null;
+    if(!user.banInfo.isBanned) return null
     //CREATE DEVICE ID
     const deviceId : string = (+new Date()).toString();
     //GET USER ID

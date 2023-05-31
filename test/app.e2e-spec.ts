@@ -106,8 +106,8 @@ describe('AppController (e2e)', () => {
       "items": [
         {
           "banInfo": {
-            "banDate": "no info",
-            "banReason": "no info",
+            "banDate": null,
+            "banReason": null,
             "isBanned": false
           },
           "createdAt": createResponseUser_1.body.createdAt,
@@ -117,8 +117,8 @@ describe('AppController (e2e)', () => {
         },
         {
           "banInfo": {
-            "banDate": "no info",
-            "banReason": "no info",
+            "banDate": null,
+            "banReason": null,
             "isBanned": false
           },
           "createdAt": createResponseUser_2.body.createdAt,
@@ -198,8 +198,8 @@ describe('AppController (e2e)', () => {
       "items": [
         {
           "banInfo": {
-            "banDate": expect.any(String),
-            "banReason": "no info",
+            "banDate": null,
+            "banReason": null,
             "isBanned": false
           },
           "createdAt": createResponseUser_2.body.createdAt,

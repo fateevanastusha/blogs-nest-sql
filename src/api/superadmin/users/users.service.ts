@@ -32,8 +32,8 @@ export class UsersService {
       confirmedCode: confirmedCode,
       banInfo : {
         isBanned : false,
-        banReason : 'no info',
-        banDate : 'no info'
+        banReason : null,
+        banDate : null
       }
     }
     return await this.usersRepository.createUser(newUser)
