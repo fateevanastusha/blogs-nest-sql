@@ -26,6 +26,7 @@ export class AuthController {
   async loginRequest(@Req() req: any, @Res() res: any){
     const title = req.headers["user-agent"] || "unknown"
     const tokenList: TokenList | null = await this.authService.authRequest(req.body.password, req.ip, req.body.loginOrEmail, title)
+    console.log('ACCESS TOKEN IN AUTH CONTROLLER ' + tokenList.accessToken);
     if (tokenList) {
       let token: AccessToken = {
         accessToken: tokenList.accessToken

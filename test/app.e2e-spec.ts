@@ -36,7 +36,8 @@ describe('AppController (e2e)', () => {
   let createResponseBlog_2 : any = null
   let createResponseUser_1 : any = null
   let createResponseUser_2 : any = null
-  let res = null
+  let res : any = null
+  let token : any = null
 
   //SA testing
 
@@ -296,15 +297,32 @@ describe('AppController (e2e)', () => {
   //starts with create user
 
   it('AUTH PUBLIC test email sending', async () => {
-    //MAKE REQUEST REGISTRATION
-    const resp = await request(server)
+    //registration check
+    await request(server)
       .post('/auth/registration')
       .send({
         login : "nastya1",
         email : "fateevanastushatest@yandex.ru",
         password : "qwerty1"
       })
-
+      .expect(204)
+    await request(server)
+      .post('/auth/registration')
+      .send({
+        login : "",
+        email : "",
+        password : ""
+      })
+      .expect(400)
+    await request(server)
+      .post('/auth/registration')
+      .send({
+        login : "nastya1",
+        email : "fateevanastushatest@yandex.ru",
+        password : "qwerty1"
+      })
+      .expect(400)
+    //registration email resending
     await request(server)
       .post('/auth/registration-email-resending')
       .send({
@@ -323,46 +341,58 @@ describe('AppController (e2e)', () => {
     const html: string | null = await imapService.getMessageHtml(sentMessage)
     expect(html).toBeDefined()
     const code : string = html!.split("?code=")[1].split("'")[0]
-
+    //confirmation check
     await request(server)
       .post('/auth/registration-confirmation')
       .send({
         "code" : "not existing code"
       })
       .expect(400)
-
     await request(server)
       .post('/auth/registration-confirmation')
       .send({
         "code" : code
       })
       .expect(204)
-
   });
 
+  //test change password
 
-  it('AUTH PUBLIC registration with wrong data', async () => {
+  it('AUTH PUBLIC test change password', async () => {
     await request(server)
-      .post('/auth/registration')
+      .post('/auth/password-recovery')
       .send({
-        login : "nastya1",
+        email : "fateevanastushatest@yandex.r",
+      })
+      .expect(400)
+    await request(server)
+      .post('/auth/password-recovery')
+      .send({
         email : "fateevanastushatest@yandex.ru",
-        password : "qwerty1"
       })
-      .expect(400)
+      .expect(201)
+
+    const sentMessage = await imapService.waitNewMessage(1)
+    const html: string | null = await imapService.getMessageHtml(sentMessage)
+    expect(html).toBeDefined()
+    const code : string = html!.split("?code=")[1].split("'")[0]
+
     await request(server)
-      .post('/auth/registration')
+      .post('/auth/password-new')
       .send({
-        login : "",
-        email : "",
-        password : ""
+        "newPassword": "qwerty11",
+        "recoveryCode": 'WRONG CODE'
       })
       .expect(400)
 
+    await request(server)
+      .post('/auth/password-new')
+      .send({
+        "newPassword": "qwerty11",
+        "recoveryCode": code
+      })
+      .expect(204)
 
-  });
-
-  it ('AUTH PUBLIC test login in system', async  () => {
     await request(server)
       .post('/auth/login')
       .send({
@@ -370,51 +400,35 @@ describe('AppController (e2e)', () => {
         password : 'WRONG PASSWORD'
       })
       .expect(401)
-    await request(server)
+
+    token = await request(server)
       .post('/auth/login')
       .send({
         loginOrEmail : 'fateevanastushatest@yandex.ru',
-        password : 'qwerty1'
+        password : 'qwerty11'
       })
       .expect(200)
-  })
+    expect(token.body).toBeDefined()
+  });
 
-  it('PUBLIC AND BLOGGER delete all data', async () => {
-    //runDb()
+  it('AUTH PUBLIC check me and refresh token request', async () => {
     await request(server)
-      .delete('/testing/all-data')
-      .set({ Authorization: "Basic YWRtaW46cXdlcnR5" })
-      .expect(204)
-  })
-
-  it ('AUTH PUBLIC create user', async  () => {
-    createResponseUser_1 = await request(server)
-      .post('/sa/users')
-      .send({
-        login : "nastya",
-        password : "qwerty",
-        email: "anastasiafateeva2406@gmail.com"
-      })
-      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
-      .expect(201)
-  })
-
-  it('AUTH PUBLIC auth with wrong data', async () => {
-    await request(server)
-      .post('/auth')
-      .send(
-        {
-          loginOrEmail : "nastya",
-          password : "WRONG PASSWORD"
-        }
-      )
-      .expect(404)
-
+      .get('/auth/me')
+      .expect(401)
+    res = await request(server)
+      .get('/auth/me')
+      .auth(token.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      email : 'anastasia',
+      login : 'nastya1',
+      userId : expect.any(String)
+    })
   })
 
   //check for bloggers
 
-  it ('SUCCESSFULLY CREATE NEW BLOG', async () => {
+  it ('BLOGGER create new blog', async () => {
     createResponseBlog_1 = await request(server)
       .post('/blogger/blogs')
       .send({
@@ -422,7 +436,7 @@ describe('AppController (e2e)', () => {
         "description": "about me",
         "websiteUrl": "http://www.nastyastar.com"
       })
-      .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
+      .auth(token.accessToken, {type : 'bearer'})
       .expect(201)
   })
 
