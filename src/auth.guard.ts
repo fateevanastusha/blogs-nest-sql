@@ -52,7 +52,7 @@ export class CheckIfUserExist implements CanActivate {
     if(!userId) throw new UnauthorizedException()
     const user = await this.userRepo.getUser(userId)
     if(!user) throw new UnauthorizedException()
-    req.user = user
+    if (user.banInfo.isBanned === true) throw new UnauthorizedException()
     return true
   }
 }
