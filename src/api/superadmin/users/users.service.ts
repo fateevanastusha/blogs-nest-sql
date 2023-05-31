@@ -24,9 +24,6 @@ export class UsersService {
     const hash = bcrypt.hashSync(password, 10, )
     return await this.usersRepository.changeUserPassword(code, hash)
   }
-  async deleteUser(id: string) : Promise<boolean>{
-    return await this.usersRepository.deleteUser(id)
-  }
   async banUser(userId : string, banInfo : BanUserDto) : Promise<boolean> {
     const user = await this.usersRepository.getUser(userId)
     if(!user) throw new NotFoundException()

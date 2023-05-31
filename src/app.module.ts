@@ -46,6 +46,7 @@ import { BlogsService } from "./api/public/blogs/blogs.service";
 import { BlogsSuperAdminService } from "./api/superadmin/blogs/blogs.super.admin.service";
 import { CqrsModule } from "@nestjs/cqrs";
 import { CreateUserUseCase } from "./api/use-cases/users/users-create-user-use-case";
+import { DeleteUserUseCase } from "./api/use-cases/users/users-delete-user-use-case";
 
 const repositories = [
   UsersRepository,
@@ -74,7 +75,8 @@ const services = [
 ]
 
 const useCases = [
-  CreateUserUseCase
+  CreateUserUseCase,
+  DeleteUserUseCase
 ]
 
 @Module({

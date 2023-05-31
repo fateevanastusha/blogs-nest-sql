@@ -23,11 +23,14 @@ import { Response, Request } from "express";
 import { PostModel } from "../../public/posts/posts.schema";
 import { CheckIfUserExist } from "../../../auth.guard";
 import { PostsDto } from "../../public/posts/posts.dto";
+import { CommandBus } from "@nestjs/cqrs";
+import { CreateBlogBlogsCommand } from "../../use-cases/blogs/blogs-create-blog-use-case";
 
 @Controller('blogger/blogs')
 export class BloggersController {
   constructor(protected bloggersService : BloggersService,
-              protected postsService : PostsService) {}
+              protected postsService : PostsService,
+              protected commandBus : CommandBus) {}
   @UseGuards(CheckIfUserExist)
   @Get()
   async getBlogs(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
@@ -51,7 +54,9 @@ export class BloggersController {
     @Body() blog : BlogDto,
     @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    const createdBlog : BlogModel | null = await this.bloggersService.createBlog(blog, token)
+    const createdBlog : BlogModel | null = await this.commandBus.execute(
+      new CreateBlogBlogsCommand(blog, token)
+    )
     if (!createdBlog) throw new BadRequestException()
     return createdBlog
   }
