@@ -21,7 +21,7 @@ export class UsersRepository {
   }
   async getUserWithId(id : string) : Promise <UserModel | null> {
     return this.usersModel
-      .findOne({id: id}, {_id: 0, password : 0,  isConfirmed: 0, confirmedCode : 0, __v: 0})
+      .findOne({id: id}, {_id: 0, password : 0,  isConfirmed: 0, confirmedCode : 0, __v: 0, banInfo : {_id : 0} })
 
   }
   async returnUserByField(field : string) : Promise <UserModel | null> {
