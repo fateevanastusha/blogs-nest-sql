@@ -14,6 +14,7 @@ export class BusinessService {
     return confirmationCode
   }
   async sendRecoveryCode (email : string, confirmationCode : string) : Promise<string> {
+    console.log('SENDING OF CONFIRMATION CODE')
     await transport.sendMail({
       from: "Blogs And Videos API", // sender address
       to: email, // list of receivers

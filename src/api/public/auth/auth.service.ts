@@ -132,33 +132,13 @@ export class AuthService {
   async updateConfirmationCode (confirmationCode : string, email : string) : Promise <boolean> {
     return this.usersRepository.changeConfirmationCode(confirmationCode,email)
   }
-  async registrationUser (user: UsersDto) : Promise <boolean> {
-    let confirmationCode : string = (+new Date()).toString()
-    const newUser : UserModel | null = await this.usersService.createUser(user, confirmationCode)
-    if (!newUser) {
-      return false
-    }
-    await this.businessService.sendConfirmationCode(user.email, confirmationCode)
-    return true
-  }
   async passwordRecovery (email : string) : Promise <boolean> {
-
     let confirmationCode : string = (+new Date()).toString()
-
-    //UPDATE CONFIRMATION CODE
-
     const status = await this.updateConfirmationCode(confirmationCode, email)
-    if (!status) {
-      return false
-    }
-    //SEND EMAIL
-
+    if (!status) return false
     await this.businessService.sendRecoveryCode(email, confirmationCode)
     return true
-
   }
-
-  //EMAIL RESENDING
 
   async emailResending (email : string) : Promise <boolean> {
     //check email

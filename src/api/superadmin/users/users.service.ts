@@ -20,24 +20,6 @@ export class UsersService {
   async getUser(id : string) : Promise<UserModel | null>{
     return this.usersRepository.getUser(id)
   }
-  async createUser(user : UsersDto, confirmedCode : string ) : Promise<UserModel | null>{
-    const hash = bcrypt.hashSync(user.password, 10, )
-    const newUser : UserModel =  {
-      id: (+new Date()).toString(),
-      login: user.login,
-      email: user.email,
-      password : hash,
-      createdAt: new Date().toISOString(),
-      isConfirmed: false,
-      confirmedCode: confirmedCode,
-      banInfo : {
-        isBanned : false,
-        banReason : null,
-        banDate : null
-      }
-    }
-    return await this.usersRepository.createUser(newUser)
-  }
   async changeUserPassword(code : string, password : string) : Promise<boolean>{
     const hash = bcrypt.hashSync(password, 10, )
     return await this.usersRepository.changeUserPassword(code, hash)
@@ -48,10 +30,14 @@ export class UsersService {
   async banUser(userId : string, banInfo : BanUserDto) : Promise<boolean> {
     const user = await this.usersRepository.getUser(userId)
     if(!user) throw new NotFoundException()
-    const banInformation : UserBanInfo = {
-      banDate : new Date().toISOString(),
-      banReason : banInfo.banReason,
-      isBanned : banInfo.isBanned
+    let banInformation : UserBanInfo = {
+      banDate: new Date().toISOString(),
+      banReason: banInfo.banReason,
+      isBanned: banInfo.isBanned
+    }
+    if(!banInfo.isBanned) {
+      banInformation.banReason = null
+      banInformation.banDate = null
     }
     return await this.usersRepository.banUser(userId, banInformation )
   }

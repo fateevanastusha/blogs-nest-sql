@@ -16,11 +16,14 @@ import { UsersService } from "./users.service";
 import { BanUserDto, UsersDto } from "./users.dto";
 import { UserModel } from "./users.schema";
 import { AuthGuard } from "../../../auth.guard";
+import { CommandBus } from "@nestjs/cqrs";
+import { CreateUserUsersCommand } from "../../use-cases/users/users-create-user-use-case";
 
 @UseGuards(AuthGuard)
 @Controller('sa/users')
 export class UsersController{
-  constructor(protected usersService : UsersService) {}
+  constructor(protected usersService : UsersService,
+              protected commandBus : CommandBus) {}
   @Get()
   async getUsers(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
@@ -40,9 +43,9 @@ export class UsersController{
   }
   @Post()
   async createUser(@Body() user : UsersDto){
-    const createdUser : UserModel | null = await this.usersService.createUser(user, (+new Date()).toString())
-    if (!createdUser) throw new NotFoundException()
-    return createdUser
+    return await this.commandBus.execute(
+      new CreateUserUsersCommand(user)
+    )
   }
   @HttpCode(204)
   @Put('/:id/ban')

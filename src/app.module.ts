@@ -44,6 +44,8 @@ import { BlogsSuperAdminRepository } from "./api/superadmin/blogs/blogs.super.ad
 import { BlogsRepository } from "./api/public/blogs/blogs.repository";
 import { BlogsService } from "./api/public/blogs/blogs.service";
 import { BlogsSuperAdminService } from "./api/superadmin/blogs/blogs.super.admin.service";
+import { CqrsModule } from "@nestjs/cqrs";
+import { CreateUserUseCase } from "./api/use-cases/users/users-create-user-use-case";
 
 const repositories = [
   UsersRepository,
@@ -71,8 +73,13 @@ const services = [
   JwtService
 ]
 
+const useCases = [
+  CreateUserUseCase
+]
+
 @Module({
   imports: [
+    CqrsModule,
      PassportModule,
      MongoModule,
      MongooseModule.forFeature([{
@@ -127,6 +134,7 @@ const services = [
   providers: [IsUserAlreadyExistConstraint,
     ...repositories,
     ...services,
+    ...useCases,
     QueryRepository,
     LikesHelpers,
     AuthGuard,

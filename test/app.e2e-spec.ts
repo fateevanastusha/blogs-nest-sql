@@ -139,9 +139,6 @@ describe('AppController (e2e)', () => {
         banReason : 'test ban for user 1 that longer 20'
       })
       .expect(204)
-  })
-
-  it('SA check for ban user 1', async () => {
     res = await request(server)
       .get('/sa/users?sortBy=name&sortDirection=asc&pageSize=1')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
@@ -165,9 +162,6 @@ describe('AppController (e2e)', () => {
         }
       ]
     })
-  })
-
-  it ('SA unban user', async  () => {
     await request(server)
       .put('/sa/users/' + createResponseUser_1.body.id + '/ban')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
@@ -176,6 +170,29 @@ describe('AppController (e2e)', () => {
         banReason : 'test ban for user 1 that longer 20'
       })
       .expect(204)
+    res = await request(server)
+      .get('/sa/users?sortBy=name&sortDirection=asc&pageSize=1')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "page": 1,
+      "pageSize": 1,
+      "pagesCount": 2,
+      "totalCount": 2,
+      "items": [
+        {
+          "banInfo": {
+            "banDate": null,
+            "banReason": null,
+            "isBanned": false
+          },
+          "createdAt": expect.any(String),
+          "email": "user1@gmail.com",
+          "id": createResponseUser_1.body.id,
+          "login": "user1"
+        }
+      ]
+    })
   })
 
   it ('SA delete 1 user', async  () => {

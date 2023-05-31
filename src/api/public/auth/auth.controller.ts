@@ -15,11 +15,14 @@ import { AccessToken, TokenList } from "../security/security.schema";
 import { UserModel } from "../../superadmin/users/users.schema";
 import { UsersDto } from "../../superadmin/users/users.dto";
 import { EmailDto } from "./auth.dto";
+import { CreateUserUsersCommand } from "../../use-cases/users/users-create-user-use-case";
+import { CommandBus } from "@nestjs/cqrs";
 
 @UseGuards(CheckAttempts)
 @Controller('auth')
 export class AuthController {
-  constructor(protected authService : AuthService){}
+  constructor(protected authService : AuthService,
+              protected commandBus : CommandBus){}
   @HttpCode(200)
   @UseGuards(CheckForSameDevice)
   @Post('/login')
@@ -44,7 +47,6 @@ export class AuthController {
     const status : boolean = await this.authService.passwordRecovery(req.body.email)
     if (status) return
     throw new BadRequestException()
-    return
 
   }
   @Post('/new-password')
@@ -60,13 +62,9 @@ export class AuthController {
   @HttpCode(204)
   @Post('/registration')
   async registrationRequest(@Body() user: UsersDto){
-    const status: boolean = await this.authService.registrationUser(user);
-    if (status) {
-      return
-    } else {
-      throw new NotFoundException()
-      return
-    }
+    return await this.commandBus.execute(
+      new CreateUserUsersCommand(user)
+    )
   }
   @HttpCode(204)
   @Post('/registration-confirmation')
