@@ -3,7 +3,9 @@ import { HydratedDocument } from "mongoose";
 
 export type UserDocument = HydratedDocument<UserModel>
 
-@Schema()
+@Schema({
+  _id : false
+})
 export class UserBanInfo {
   @Prop({required : true})
   isBanned : boolean

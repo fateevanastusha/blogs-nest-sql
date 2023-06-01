@@ -33,7 +33,7 @@ export class AuthController {
       let token: AccessToken = {
         accessToken: tokenList.accessToken
       }
-      res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: true, secure: true})
+      res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: false, secure: false})
       res.send(token)
       return
     } else {
@@ -46,9 +46,11 @@ export class AuthController {
   async passwordRecoveryRequest(@Req() req: any){
     const status : boolean = await this.authService.passwordRecovery(req.body.email)
     if (status) return
-    throw new BadRequestException()
-
+    else {
+      throw new BadRequestException();
+    }
   }
+  @HttpCode(204)
   @Post('/new-password')
   async newRecoveryRequest(@Req() req: any){
     const status : boolean = await this.authService.changePasswordWithCode(req.body.recoveryCode, req.body.newPassword)
@@ -72,7 +74,6 @@ export class AuthController {
     const status = await this.authService.checkForConfirmationCode(req.body.code)
     if (!status) {
       throw new BadRequestException({ message : ['code is wrong'] })
-      return
     } else {
       return
     }

@@ -2,8 +2,6 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { UserBanInfo, UserDocument, UserModel } from "./users.schema";
 import { Injectable } from "@nestjs/common";
-import { BanUserDto } from "./users.dto";
-
 @Injectable()
 export class UsersRepository {
   constructor(@InjectModel('users') private usersModel: Model<UserDocument> ) {
@@ -16,13 +14,12 @@ export class UsersRepository {
       ]
     })
   }
-  async getUser (id : string) : Promise<UserModel | null>{
+  async getFullUser (id : string) : Promise<UserModel | null>{
     return this.usersModel.findOne({id: id}, {_id: 0, __v: 0})
   }
   async getUserWithId(id : string) : Promise <UserModel | null> {
     return this.usersModel
-      .findOne({id: id}, {_id: 0, password : 0,  isConfirmed: 0, confirmedCode : 0, __v: 0, banInfo : {_id : 0} })
-
+      .findOne({id: id}, {_id: 0, password : 0,  isConfirmed: 0, confirmedCode : 0, __v: 0, banInfo : { _id: 0}})
   }
   async returnUserByField(field : string) : Promise <UserModel | null> {
     const user = await this.usersModel
@@ -34,7 +31,7 @@ export class UsersRepository {
       .findOne({email : email},{_id: 0, __v: 0})
     return user
   }
-  async createUser(newUser : UserModel) : Promise <UserModel | null> {
+  async createUser(newUser : UserModel): Promise <UserModel | null> {
     await this.usersModel.insertMany(newUser)
     const createdUser = await this.getUserWithId(newUser.id)
     if (createdUser) {
@@ -52,9 +49,6 @@ export class UsersRepository {
     const user = await this.usersModel.findOne({confirmedCode : confirmedCode})
     return user !== null
   }
-
-  //CHANGE CONFIRMATION STATUS
-
   async changeConfirmedStatus (confirmedCode : string) : Promise<boolean> {
     const status = await this.usersModel.updateOne(
       {confirmedCode : confirmedCode},
@@ -65,8 +59,6 @@ export class UsersRepository {
     return status.matchedCount === 1
   }
 
-  //CHANGE CONFIRMATION CODE
-
   async changeConfirmationCode (confirmationCode : string, email : string) : Promise <boolean> {
     const status = await this.usersModel.updateOne(
       {email : email},
@@ -76,8 +68,6 @@ export class UsersRepository {
       })
     return status.matchedCount === 1
   }
-
-  //CHECK FOR CONFIRMED ACCOUNT
 
   async checkForConfirmedAccountByEmailOrCode (emailOrCode : string) : Promise <boolean> {
     const user = await this.usersModel.findOne({$or: [{email: emailOrCode}, {confirmedCode: emailOrCode}]})

@@ -1,25 +1,36 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication } from "@nestjs/common";
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { createApp } from "./create.app";
-import { MailBoxImap } from "./imap/imap.service";
+import { BusinessService } from "../src/business.service";
+import { UsersRepository } from "../src/api/superadmin/users/users.repository";
 
 describe('AppController (e2e)', () => {
   jest.setTimeout(3 * 60 * 1000)
+  let service;
   let appRaw: INestApplication;
   let server;
-  const imapService = new MailBoxImap()
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
-    }).compile();
+    }).overrideProvider(BusinessService)
+      .useValue({
+        sendConfirmationCode (email : string, confirmationCode : string){
+        return Promise.resolve(confirmationCode)
+        },
+        sendRecoveryCode (email : string, confirmationCode : string){
+          return Promise.resolve(confirmationCode)
+        },
+      })
+      .compile();
     appRaw = moduleFixture.createNestApplication();
     let app = createApp(appRaw)
-    await imapService.connectToMail()
     await app.init();
     server = await app.getHttpServer()
+    service = app.get<UsersRepository>(UsersRepository)
   });
+
   beforeAll(async () => {
     //runDb()
     await request(server)
@@ -37,7 +48,6 @@ describe('AppController (e2e)', () => {
   let createResponseUser_1 : any = null
   let createResponseUser_2 : any = null
   let res : any = null
-  let token : any = null
 
   //SA testing
 
@@ -79,6 +89,17 @@ describe('AppController (e2e)', () => {
         email: 'user1@gmail.com'
       })
       .expect(201)
+    expect(createResponseUser_1.body).toStrictEqual({
+      "banInfo": {
+        "banDate": null,
+        "banReason": null,
+        "isBanned": false
+      },
+      "createdAt": expect.any(String),
+      "email": "user1@gmail.com",
+      "id": expect.any(String),
+      "login": "user1"
+    })
   })
 
   it ('SA create 2 user', async  () => {
@@ -310,11 +331,41 @@ describe('AppController (e2e)', () => {
       .set({ Authorization: "Basic YWRtaW46cXdlcnR5" })
       .expect(204)
   })
+  //try to auth with banned user
+
+  it ('AUTH PUBLIC login with banned user', async () => {
+    //create user
+    await request(server)
+      .post('/auth/registration')
+      .send({
+        login : "userforban",
+        email : "userforban@yandex.ru",
+        password : "1234567"
+      })
+      .expect(204)
+    //ban user
+    let userId = (await service.returnUserByField('userforban')).id
+    await request(server)
+      .put('/sa/users/' + userId + '/ban')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        isBanned : true,
+        banReason : 'test ban for user 1 that longer 20'
+      })
+      .expect(204)
+    await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'userforban@yandex.ru',
+        password : '1234567'
+      })
+      .expect(401)
+
+  })
 
   //starts with create user
-
+  let user
   it('AUTH PUBLIC test email sending', async () => {
-    //registration check
     await request(server)
       .post('/auth/registration')
       .send({
@@ -354,10 +405,6 @@ describe('AppController (e2e)', () => {
       })
       .expect(204)
 
-    const sentMessage = await imapService.waitNewMessage(1)
-    const html: string | null = await imapService.getMessageHtml(sentMessage)
-    expect(html).toBeDefined()
-    const code : string = html!.split("?code=")[1].split("'")[0]
     //confirmation check
     await request(server)
       .post('/auth/registration-confirmation')
@@ -365,15 +412,14 @@ describe('AppController (e2e)', () => {
         "code" : "not existing code"
       })
       .expect(400)
+    user = await service.returnUserByField('nastya1')
     await request(server)
       .post('/auth/registration-confirmation')
       .send({
-        "code" : code
+        "code" : user.confirmedCode
       })
       .expect(204)
   });
-
-  //test change password
 
   it('AUTH PUBLIC test change password', async () => {
     await request(server)
@@ -389,24 +435,19 @@ describe('AppController (e2e)', () => {
       })
       .expect(201)
 
-    const sentMessage = await imapService.waitNewMessage(1)
-    const html: string | null = await imapService.getMessageHtml(sentMessage)
-    expect(html).toBeDefined()
-    const code : string = html!.split("?code=")[1].split("'")[0]
-
     await request(server)
-      .post('/auth/password-new')
+      .post('/auth/new-password')
       .send({
         "newPassword": "qwerty11",
         "recoveryCode": 'WRONG CODE'
       })
       .expect(400)
-
+    let new_user = await service.returnUserByField('nastya1')
     await request(server)
-      .post('/auth/password-new')
+      .post('/auth/new-password')
       .send({
         "newPassword": "qwerty11",
-        "recoveryCode": code
+        "recoveryCode": new_user.confirmedCode
       })
       .expect(204)
 
@@ -418,51 +459,184 @@ describe('AppController (e2e)', () => {
       })
       .expect(401)
 
-    token = await request(server)
+    token_1 = await request(server)
       .post('/auth/login')
       .send({
         loginOrEmail : 'fateevanastushatest@yandex.ru',
         password : 'qwerty11'
       })
       .expect(200)
-    expect(token.body).toBeDefined()
-  });
+    expect(token_1.body).toBeDefined()
 
+  });
   it('AUTH PUBLIC check me and refresh token request', async () => {
     await request(server)
       .get('/auth/me')
       .expect(401)
     res = await request(server)
       .get('/auth/me')
-      .auth(token.accessToken, {type : 'bearer'})
+      .auth(token_1.body.accessToken, {type : 'bearer'})
       .expect(200)
     expect(res.body).toStrictEqual({
-      email : 'anastasia',
+      email : 'fateevanastushatest@yandex.ru',
       login : 'nastya1',
       userId : expect.any(String)
     })
   })
+  //create second user
 
+  it('AUTH PUBLIC create second user for check blogs', async () => {
+    await request(server)
+      .post('/auth/registration')
+      .send({
+        login : "alina28",
+        email : "alina23tikhomirova@yandex.ru",
+        password : "qwerty"
+      })
+      .expect(204)
+    token_2 = await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'alina28',
+        password : 'qwerty'
+      })
+      .expect(200)
+    expect(token_2.body).toBeDefined()
+  })
   //check for bloggers
 
   it ('BLOGGER create new blog', async () => {
     createResponseBlog_1 = await request(server)
       .post('/blogger/blogs')
       .send({
-        "name": "Nastya",
+        "name": "1bloguser1",
         "description": "about me",
         "websiteUrl": "http://www.nastyastar.com"
       })
-      .auth(token.accessToken, {type : 'bearer'})
+      .auth(token_1.body.accessToken, {type : 'bearer'})
       .expect(201)
+    await request(server)
+      .post('/blogger/blogs')
+      .send({
+        "name": "2bloguser1",
+        "description": "about me",
+        "websiteUrl": "http://www.nastyastar.com"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    createResponseBlog_2 = await request(server)
+      .post('/blogger/blogs')
+      .send({
+        "name": "2bloguser2",
+        "description": "about me",
+        "websiteUrl": "http://www.nastyastar.com"
+      })
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    res = await request(server)
+      .get('/blogger/blogs')
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 0,
+      "totalCount": 0,
+      "items": [{
+        "createdAt": expect.any(String),
+        "description": "about me",
+        "id": expect.any(String),
+        "isMembership": true,
+        "name": "2bloguser1",
+        "websiteUrl": "http://www.nastyastar.com"
+      },
+        {
+          "createdAt": expect.any(String),
+          "description": "about me",
+          "id": expect.any(String),
+          "isMembership": true,
+          "name": "1bloguser1",
+          "websiteUrl": "http://www.nastyastar.com"
+        }]
+    })
+    await request(server)
+      .put('/blogger/blogs/' + createResponseBlog_1.body.id )
+      .send({
+        "name": "updatedname",
+        "description": "about me",
+        "websiteUrl": "http://www.nastyastar.com"
+      })
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(403)
+    res = await request(server)
+      .get('/blogger/blogs')
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 0,
+      "totalCount": 0,
+      "items": [{
+        "createdAt": expect.any(String),
+        "description": "about me",
+        "id": expect.any(String),
+        "isMembership": true,
+        "name": "2bloguser1",
+        "websiteUrl": "http://www.nastyastar.com"
+      },
+        {
+          "createdAt": expect.any(String),
+          "description": "about me",
+          "id": expect.any(String),
+          "isMembership": true,
+          "name": "1bloguser1",
+          "websiteUrl": "http://www.nastyastar.com"
+        }]
+    })
+    await request(server)
+      .put('/blogger/blogs/' + createResponseBlog_1.body.id )
+      .send({
+        "name": "updatedname",
+        "description": "about me",
+        "websiteUrl": "http://www.nastyastar.com"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    res = await request(server)
+      .get('/blogger/blogs')
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 0,
+      "totalCount": 0,
+      "items": [{
+        "createdAt": expect.any(String),
+        "description": "about me",
+        "id": expect.any(String),
+        "isMembership": true,
+        "name": "2bloguser1",
+        "websiteUrl": "http://www.nastyastar.com"
+      },
+        {
+          "createdAt": expect.any(String),
+          "description": "about me",
+          "id": expect.any(String),
+          "isMembership": true,
+          "name": "updatedname",
+          "websiteUrl": "http://www.nastyastar.com"
+        }]
+    })
   })
+
 
   afterAll(async () => {
     await request(server)
       .delete('/testing/all-data')
       .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
       .expect(204)
-    await imapService.disconnect()
     await server.close()
   })
 });

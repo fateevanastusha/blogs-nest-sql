@@ -6,7 +6,6 @@ import { AccessToken, RefreshToken, RefreshTokensMetaModel, TokenList } from "..
 import { SecurityRepository } from "../security/security.repository";
 import { UserModel } from "../../superadmin/users/users.schema";
 import { BusinessService } from "../../../business.service";
-import { UsersDto } from "../../superadmin/users/users.dto";
 import { BadRequestException, Injectable } from "@nestjs/common";
 @Injectable()
 export class AuthService {
@@ -26,9 +25,10 @@ export class AuthService {
     const status : boolean = await this.authRepository.authRequest(loginOrEmail, password)
     if (!status) return null
     //CHECK FOR USER
-    const user : UserModel | null = await this.authFindUser(loginOrEmail);
+    const user : UserModel | null = await this.usersRepository.returnUserByField(loginOrEmail);
     if (!user) return null;
-    if(!user.banInfo.isBanned) return null
+    const isBanned = user.banInfo.isBanned
+    if(isBanned === true) return null
     //CREATE DEVICE ID
     const deviceId : string = (+new Date()).toString();
     //GET USER ID
@@ -100,27 +100,18 @@ export class AuthService {
     return user
   }
 
-  //FIND USER BY LOGIN OR EMAIL
-
   async authFindUser (loginOrEmail : string) : Promise<UserModel | null> {
     return await this.usersRepository.returnUserByField(
       loginOrEmail
     )
   }
   async checkForConfirmationCode (confirmationCode : string) : Promise <boolean>  {
-    //check for existing confirmation code
     const statusOfCode : boolean = await this.usersRepository.checkForConfirmationCode(confirmationCode)
-    if (!statusOfCode) {
-      throw new BadRequestException({ message : ['code is wrong'] })
-      return false
-    }
-    //check for not confirmed
+    if (!statusOfCode) throw new BadRequestException({ message : ['code is wrong'] })
     const statusOfConfirmed : boolean = await this.usersRepository.checkForConfirmedAccountByEmailOrCode(confirmationCode)
-    if (statusOfConfirmed) {
-      throw new BadRequestException({ message : ['code is confirmed'] })
-      return false
-    }
-    return await this.usersRepository.changeConfirmedStatus(confirmationCode)
+    if (statusOfConfirmed) throw new BadRequestException({ message : ['code is confirmed'] })
+    const status = await this.usersRepository.changeConfirmedStatus(confirmationCode)
+    return status
   }
 
   //CHANGE PASSWORD

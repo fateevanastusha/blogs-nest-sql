@@ -27,7 +27,7 @@ export class BloggersService {
   }
   async updateBlog(blog : BlogDto, id: string, token : string) : Promise <boolean>{
     const userId = await this.jwtService.getUserIdByToken(token)
-    const blogForUpdate : BlogModel | null = await this.blogsRepository.getBlog(id)
+    const blogForUpdate : BlogModel | null = await this.blogsRepository.getFullBlog(id)
     if (!blogForUpdate) throw new NotFoundException();
     if (blogForUpdate.blogOwnerInfo.userId !== userId) throw new ForbiddenException()
     return await this.blogsRepository.updateBlog(blog, id)

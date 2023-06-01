@@ -17,7 +17,7 @@ export class BlogsSuperAdminService {
     return await this.queryRepository.paginationForm(pageCount, total, items, query)
   }
   async bindBlog(blogId : string, userId : string) : Promise <boolean>{
-    const user : UserModel | null = await this.usersRepository.getUser(userId)
+    const user : UserModel | null = await this.usersRepository.getFullUser(userId)
     if (!user) throw new NotFoundException()
     const blog : BlogModel | null = await this.blogsRepository.getBlog(blogId)
     if(!blog) throw new NotFoundException()

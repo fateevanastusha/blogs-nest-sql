@@ -50,7 +50,7 @@ export class CheckIfUserExist implements CanActivate {
     if (authType !== 'Bearer') throw new UnauthorizedException()
     const userId = await this.jwtService.getUserIdByToken(token)
     if(!userId) throw new UnauthorizedException()
-    const user = await this.userRepo.getUser(userId)
+    const user = await this.userRepo.getFullUser(userId)
     if(!user) throw new UnauthorizedException()
     if (user.banInfo.isBanned === true) throw new UnauthorizedException()
     return true
@@ -75,7 +75,7 @@ export class CommentCheckForSameUser implements CanActivate {
     if (authType !== 'Bearer') throw new UnauthorizedException()
     const userId = await this.jwtService.getUserIdByToken(token);
     if (!userId) throw new UnauthorizedException();
-    const user = await this.userRepo.getUser(userId)
+    const user = await this.userRepo.getFullUser(userId)
     if(!user) throw new UnauthorizedException()
     const comment = await this.commentsService.getCommentByIdWithUser(req.params.id, userId);
     if (!comment) throw new NotFoundException();

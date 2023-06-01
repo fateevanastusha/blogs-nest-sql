@@ -27,10 +27,10 @@ export class QueryRepository {
       .limit(+query.pageSize)
       .lean()
   }
-  async paginationForBlogsWithUser(query : QueryModelBlogs, userId : string) : Promise <BlogModel[]> {
+  async paginationForBlogsWithUser(query : QueryModelBlogs, userId : string) : Promise <BlogViewModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.blogsModel
-      .find({name: {$regex: query.searchNameTerm, $options: 'i'}, blogOwnerInfo : {userId : userId}}, {_id: 0, __v: 0, blogOwnerInfo : 0})
+      .find({name: {$regex: query.searchNameTerm, $options: 'i'}, 'blogOwnerInfo.userId': userId}, {_id: 0, __v: 0, blogOwnerInfo : 0})
       .sort({[query.sortBy]: query.sortDirection})
       .skip(skipSize)
       .limit(+query.pageSize)

@@ -17,7 +17,7 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogBlogsCommand
   constructor(private jwtService : JwtService, private usersRepository : UsersRepository, private blogsRepository : BlogsRepository) {}
   async execute (command : CreateBlogBlogsCommand) : Promise<BlogModel | null>{
     const userId = await this.jwtService.getUserIdByToken(command.token)
-    const user = await this.usersRepository.getUser(userId)
+    const user = await this.usersRepository.getFullUser(userId)
     const newBlog : BlogModel = {
       id: (+new Date()).toString(),
       name: command.blog.name,
