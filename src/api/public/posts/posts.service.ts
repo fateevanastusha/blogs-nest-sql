@@ -108,7 +108,11 @@ export class PostsService {
     if (!createdPost) return null
     return createdPost;
   }
-  async updatePost(post : PostsDto, postId : string) : Promise <boolean>{
+  async updatePost(post : PostsDto, postId : string, token : string) : Promise <boolean>{
+    const userId : string = await this.jwtService.getUserIdByToken(token)
+    const blog : BlogModel = await this.blogsRepository.getFullBlog(post.blogId)
+    if (!blog) throw new NotFoundException()
+    if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException()
     return await this.postsRepository.updatePost(post,postId)
   }
   async getComments(query : QueryModelComments, header : string, postId : string) : Promise<PaginatedClass>{

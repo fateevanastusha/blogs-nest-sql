@@ -88,16 +88,19 @@ export class BloggersController {
     return;
   }
   @HttpCode(204)
+  @UseGuards(CheckIfUserExist)
   @Put(':blogId/posts/:postId')
   async updatePost(
     @Param('blogId') blogId : string,
     @Param('postId') postId : string,
-    @Body() post : PostsBlogDto){
+    @Body() post : PostsBlogDto,
+    @Req() req: Request){
+    const token = req.headers.authorization!.split(" ")[1]
     const status : boolean = await this.postsService.updatePost(
       { title : post.title,
         content : post.content,
         shortDescription : post.shortDescription,
-        blogId : blogId }, postId)
+        blogId : blogId }, postId, token)
     if (!status) throw new NotFoundException()
     return
   }

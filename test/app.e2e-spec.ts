@@ -770,6 +770,15 @@ describe('AppController (e2e)', () => {
         }
       ]
     })
+    res = await request(server)
+      .put('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts/' + createResponsePost_1.body.id)
+      .send({
+        "title": "updated2",
+        "shortDescription": "updated2",
+        "content": "updated2"
+      })
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(403)
   })
 
   it("PUBLIC LIKES check for likes", async () => {
