@@ -47,6 +47,8 @@ describe('AppController (e2e)', () => {
   let createResponseBlog_2 : any = null
   let createResponseUser_1 : any = null
   let createResponseUser_2 : any = null
+  let createResponseComment_1 : any = null
+  let createResponseComment_2 : any = null
   let res : any = null
 
   //SA testing
@@ -781,8 +783,138 @@ describe('AppController (e2e)', () => {
       .expect(403)
   })
 
-  it("PUBLIC LIKES check for likes", async () => {
+  it("PUBLIC COMMENTS check for likes", async () => {
+    createResponseComment_1 = await request(server)
+      .post('/posts/' + createResponsePost_1.body.id + '/comments')
+      .send({
+        content  : '1 comment content for posts 1'
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(201)
 
+    res = await request(server)
+      .get('/comments/' + createResponseComment_1.body.id)
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "commentatorInfo": {
+        "userId": expect.any(String),
+        "userLogin": "nastya1"
+      },
+      "content": "1 comment content for posts 1",
+      "createdAt": expect.any(String),
+      "id": createResponseComment_1.body.id,
+      "likesInfo": {
+        "dislikesCount": 0,
+        "likesCount": 0,
+        "myStatus": "None"
+      }
+    })
+    await request(server)
+      .post('/posts/' + createResponsePost_1.body.id + '/comments')
+      .send({
+        content  : '2 comment content for posts 1'
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    await request(server)
+      .post('/posts/' + createResponsePost_1.body.id + '/comments')
+      .send({
+        content  : '2 comment content for posts 1'
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    await request(server)
+      .post('/posts/' + createResponsePost_1.body.id + '/comments')
+      .send({
+        content  : '3 comment content for posts 1'
+      })
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    res = await request(server)
+      .get('/posts/' + createResponsePost_1.body.id + '/comments')
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "items": [
+        {
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "alina28"
+          },
+          "content": "3 comment content for posts 1",
+          "createdAt": expect.any(String),
+          "id": expect.any(String),
+          "likesInfo": {
+            "dislikesCount": 0,
+            "likesCount": 0,
+            "myStatus": "None"
+          }
+        },
+        {
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "content": "2 comment content for posts 1",
+          "createdAt": expect.any(String),
+          "id": expect.any(String),
+          "likesInfo": {
+            "dislikesCount": 0,
+            "likesCount": 0,
+            "myStatus": "None"
+          }
+        },
+        {
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "content": "2 comment content for posts 1",
+          "createdAt": expect.any(String),
+          "id": expect.any(String),
+          "likesInfo": {
+            "dislikesCount": 0,
+            "likesCount": 0,
+            "myStatus": "None"
+          }
+        },
+        {
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "content": "1 comment content for posts 1",
+          "createdAt": expect.any(String),
+          "id": expect.any(String),
+          "likesInfo": {
+            "dislikesCount": 0,
+            "likesCount": 0,
+            "myStatus": "None"
+          }
+        }
+      ],
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 1,
+      "totalCount": 4
+    })
+  });
+
+  it("BLOGGERS AND PUBLIC BLOGS AND POSTS check for deleting blogs and posts ", async () => {
+    await request(server)
+      .delete('/blogger/blogs/' + createResponsePost_1.body.id + '/posts')
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(403)
+    await request(server)
+      .get('/posts/' + createResponsePost_1.body.id)
+      .expect(200)
+    await request(server)
+      .delete('/blogger/blogs/' + createResponsePost_1.body.id + '/posts')
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    await request(server)
+      .get('/posts/' + createResponsePost_1.body.id)
+      .expect(404)
   });
 
 

@@ -5,7 +5,7 @@ import { PostModel } from "./posts.schema";
 import { BlogModel, PaginatedClass } from "../blogs/blogs.schema";
 import { BloggersRepository } from "../../blogger/bloggers/bloggers.repository";
 import { PostsDto } from "./posts.dto";
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ForbiddenException, Injectable, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "../../../jwt.service";
 import { CommentsService } from "../comments/comments.service";
 import { CommentModel } from "../comments/comments.schema";
@@ -81,6 +81,7 @@ export class PostsService {
     return post
   }
   async deletePost(id: string, token : string) : Promise<boolean> {
+    console.log('SERVICE');
     const post : PostModel = await this.postsRepository.getPost(id)
     if (!post) throw new NotFoundException()
     const userId : string = await this.jwtService.getUserIdByToken(token)
