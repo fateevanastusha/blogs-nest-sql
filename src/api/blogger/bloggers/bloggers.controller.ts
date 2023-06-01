@@ -60,15 +60,18 @@ export class BloggersController {
     if (!createdBlog) throw new BadRequestException()
     return createdBlog
   }
+  @UseGuards(CheckIfUserExist)
   @Post(':id/posts')
   async createPost(@Param('id') blogId : string,
-                   @Body() post : PostsBlogDto){
+                   @Body() post : PostsBlogDto,
+                   @Req() req: Request){
+    const token = req.headers.authorization!.split(" ")[1]
     const createdPost : PostModel | null = await this.postsService.createPost({
       title: post.title,
       shortDescription: post.shortDescription,
       content: post.content,
       blogId: blogId
-    })
+    }, token)
     if (!createdPost) throw new NotFoundException()
     return createdPost
   }
@@ -85,12 +88,16 @@ export class BloggersController {
     return;
   }
   @HttpCode(204)
-  @Put(':id/posts')
+  @Put(':blogId/posts/:postId')
   async updatePost(
-    @Body() post : PostsDto,
-    @Param('id') postId : string,
-    @Res() res : Response){
-    const status : boolean = await this.postsService.updatePost(post, postId)
+    @Param('blogId') blogId : string,
+    @Param('postId') postId : string,
+    @Body() post : PostsBlogDto){
+    const status : boolean = await this.postsService.updatePost(
+      { title : post.title,
+        content : post.content,
+        shortDescription : post.shortDescription,
+        blogId : blogId }, postId)
     if (!status) throw new NotFoundException()
     return
   }

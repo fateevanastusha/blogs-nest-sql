@@ -3,6 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { PostsDto } from "./posts.dto";
 import { Injectable } from "@nestjs/common";
+import { PostsBlogDto } from "../blogs/blogs.dto";
 
 @Injectable()
 export class PostsRepository {
@@ -27,8 +28,8 @@ export class PostsRepository {
     await this.postsModel.insertMany(newPost)
     return this.getPost(newPost.id)
   }
-  async updatePost(post : PostsDto, id : string) : Promise <boolean>{
-    const result = await this.postsModel.updateOne({id: id}, {$set : post
+  async updatePost(post : PostsDto, postId : string) : Promise <boolean>{
+    const result = await this.postsModel.updateOne({id: postId}, {$set : post
     })
     return result.matchedCount === 1
   }

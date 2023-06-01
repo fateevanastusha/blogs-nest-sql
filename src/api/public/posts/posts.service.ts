@@ -5,13 +5,16 @@ import { PostModel } from "./posts.schema";
 import { BlogModel, PaginatedClass } from "../blogs/blogs.schema";
 import { BloggersRepository } from "../../blogger/bloggers/bloggers.repository";
 import { PostsDto } from "./posts.dto";
-import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "../../../jwt.service";
 import { CommentsService } from "../comments/comments.service";
 import { CommentModel } from "../comments/comments.schema";
 import { LikesRepository } from "../../../likes/likes.repository";
 import { LikesHelpers } from "../../../helpers/likes.helper";
 import { LikeViewModel } from "../../../likes/likes.schema";
+import { UserModel } from "../../superadmin/users/users.schema";
+import { UsersRepository } from "../../superadmin/users/users.repository";
+import { PostsBlogDto } from "../blogs/blogs.dto";
 
 @Injectable()
 export class PostsService {
@@ -21,7 +24,8 @@ export class PostsService {
               protected jwtService : JwtService,
               protected commentsService : CommentsService,
               protected likesRepository : LikesRepository,
-              protected likesHelper : LikesHelpers) {
+              protected likesHelper : LikesHelpers,
+              protected usersRepository : UsersRepository) {
   }
   async getPosts(query : QueryModelPosts) : Promise<PaginatedClass>{
     const total : number = (await this.postsRepository.getPosts()).length
@@ -79,17 +83,19 @@ export class PostsService {
   async deletePost(id: string) : Promise<boolean> {
     return await this.postsRepository.deletePost(id)
   }
-  async createPost(post: PostsDto) : Promise <PostModel | null>{
-    const blog : BlogModel | null = await this.blogsRepository.getBlog(post.blogId)
+  async createPost(post: PostsDto, token : string) : Promise <PostModel | null>{
+    const blog : BlogModel | null = await this.blogsRepository.getFullBlog(post.blogId)
     if (!blog) return null
-    const blogName = blog.name
+    const userId : string = await this.jwtService.getUserIdByToken(token)
+    const user : UserModel | null = await this.usersRepository.getFullUser(userId)
+    if (user.id !== blog.blogOwnerInfo.userId) throw new ForbiddenException()
     const newPost : PostModel = {
       id: '' + (+(new Date())),
       title : post.title,
       shortDescription: post.shortDescription,
       content: post.content,
       blogId: post.blogId,
-      blogName: blogName,
+      blogName: blog.name,
       createdAt : new Date().toISOString(),
       extendedLikesInfo: {
         likesCount: 0,
@@ -102,8 +108,8 @@ export class PostsService {
     if (!createdPost) return null
     return createdPost;
   }
-  async updatePost(post : PostsDto, id : string) : Promise <boolean>{
-    return await this.postsRepository.updatePost(post,id)
+  async updatePost(post : PostsDto, postId : string) : Promise <boolean>{
+    return await this.postsRepository.updatePost(post,postId)
   }
   async getComments(query : QueryModelComments, header : string, postId : string) : Promise<PaginatedClass>{
     const foundPost = await this.getPost(postId)

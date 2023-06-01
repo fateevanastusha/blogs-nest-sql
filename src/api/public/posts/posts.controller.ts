@@ -1,22 +1,21 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   DefaultValuePipe,
-  Delete,
-  Get, HttpCode, NotFoundException,
+  Get,
+  HttpCode,
+  NotFoundException,
   Param,
   Post,
   Put,
   Query, Req,
-  Res,
   UseGuards
 } from "@nestjs/common";
 import { PostsService } from "./posts.service";
-import { CommentsDto, PostsDto } from "./posts.dto";
+import { CommentsDto } from "./posts.dto";
 import { PostModel } from "./posts.schema";
-import { Request, Response } from "express";
-import { AuthGuard, CheckIfUserExist } from "../../../auth.guard";
+import { Request } from "express";
+import { CheckIfUserExist } from "../../../auth.guard";
 import { LikesDto } from "../../../likes/likes.dto";
 
 @Controller('posts')

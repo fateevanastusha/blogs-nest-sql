@@ -505,7 +505,7 @@ describe('AppController (e2e)', () => {
   })
   //check for bloggers
 
-  it ('BLOGGER create new blog', async () => {
+  it ('BLOGGER test blogs', async () => {
     createResponseBlog_1 = await request(server)
       .post('/blogger/blogs')
       .send({
@@ -630,6 +630,151 @@ describe('AppController (e2e)', () => {
         }]
     })
   })
+  it('PUBLIC get all blogs', async () => {
+    res = await request(server)
+      .get('/blogs')
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 1,
+      "totalCount": 3,
+      "items": [
+        {
+          "blogOwnerInfo": {
+            "userId": expect.any(String),
+            "userLogin": "alina28"
+          },
+          "createdAt": expect.any(String),
+          "description": "about me",
+          "id": expect.any(String),
+          "isMembership": true,
+          "name": "2bloguser2",
+          "websiteUrl": "http://www.nastyastar.com"
+        },
+        {
+          "blogOwnerInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "createdAt": expect.any(String),
+          "description": "about me",
+          "id": expect.any(String),
+          "isMembership": true,
+          "name": "2bloguser1",
+          "websiteUrl": "http://www.nastyastar.com"
+        },
+        {
+          "blogOwnerInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "createdAt": expect.any(String),
+          "description": "about me",
+          "id": expect.any(String),
+          "isMembership": true,
+          "name": "updatedname",
+          "websiteUrl": "http://www.nastyastar.com"
+        }
+      ]
+    })
+  })
+
+  //test for posts
+
+  it ('BLOGGER test posts', async () => {
+    await request(server)
+      .post('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts')
+      .send({
+        "title": "string",
+        "shortDescription": "string",
+        "content": "string"
+      })
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(403)
+    createResponsePost_1 = await request(server)
+      .post('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts')
+      .send({
+        "title": "string",
+        "shortDescription": "string",
+        "content": "string"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    await request(server)
+      .post('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts')
+      .send({
+        "title": "string2",
+        "shortDescription": "string2",
+        "content": "string2"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    await request(server)
+      .post('/blogger/blogs/' + createResponseBlog_2.body.id + '/posts')
+      .send({
+        "title": "string3",
+        "shortDescription": "string3",
+        "content": "string3"
+      })
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    //update post
+    res = await request(server)
+      .put('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts/' + createResponsePost_1.body.id)
+      .send({
+        "title": "updated",
+        "shortDescription": "updated",
+        "content": "updated"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    res = await request(server)
+      .get('/blogs/' + createResponseBlog_1.body.id + '/posts')
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 1,
+      "totalCount": 2,
+      "items": [
+        {
+          "blogId": expect.any(String),
+          "blogName": "updatedname",
+          "content": "string2",
+          "createdAt": expect.any(String),
+          "extendedLikesInfo": {
+            "dislikesCount": 0,
+            "likesCount": 0,
+            "myStatus": "None",
+            "newestLikes": []
+          },
+          "id": expect.any(String),
+          "shortDescription": "string2",
+          "title": "string2"
+        },
+        {
+          "blogId": expect.any(String),
+          "blogName": "updatedname",
+          "content": "updated",
+          "createdAt": expect.any(String),
+          "extendedLikesInfo": {
+            "dislikesCount": 0,
+            "likesCount": 0,
+            "myStatus": "None",
+            "newestLikes": []
+          },
+          "id": expect.any(String),
+          "shortDescription": "updated",
+          "title": "updated"
+        }
+      ]
+    })
+  })
+
+  it("PUBLIC LIKES check for likes", async () => {
+
+  });
 
 
   afterAll(async () => {
