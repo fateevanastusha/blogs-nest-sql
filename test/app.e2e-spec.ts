@@ -41,6 +41,7 @@ describe('AppController (e2e)', () => {
 
   let token_1 : any = null
   let token_2 : any = null
+  let tokenOfBannedUser : any = null
   let createResponseBlog_1 : any = null
   let createResponsePost_1 : any = null
   let createResponsePost_2 : any = null
@@ -362,7 +363,13 @@ describe('AppController (e2e)', () => {
         password : '1234567'
       })
       .expect(401)
-
+    await request(server)
+      .put('/sa/users/' + userId + '/ban')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        isBanned : false,
+        banReason : 'test ban for user 1 that longer 20'
+      })
   })
 
   //starts with create user
@@ -899,6 +906,136 @@ describe('AppController (e2e)', () => {
       "totalCount": 4
     })
   });
+
+  it('timer ', async () => {
+    await new Promise((resolve) => setTimeout(resolve, 10000)); // Таймер на 10 секунд
+  });
+
+  it('COMMENTS PUBLIC check', async () => {
+    await request(server)
+      .post('/auth/registration')
+      .send({
+        login : "userthat",
+        email : "userd@yandex.ru",
+        password : "1234567"
+      })
+      .expect(204)
+    tokenOfBannedUser = await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'userd@yandex.ru',
+        password : '1234567'
+      })
+      .expect(200)
+    createResponseComment_1 = await request(server)
+      .post('/posts/' + createResponsePost_1.body.id + '/comments')
+      .send({
+        content  : 'comment of banned user that not available to see'
+      })
+      .auth(tokenOfBannedUser.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    //ban user
+    res = await request(server)
+      .get('/comments/' + createResponseComment_1.body.id)
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "commentatorInfo": {
+        "userId": expect.any(String),
+        "userLogin": "userthat"
+      },
+      "content": "comment of banned user that not available to see",
+      "createdAt": expect.any(String),
+      "id": expect.any(String),
+      "likesInfo": {
+        "dislikesCount": 0,
+        "likesCount": 0,
+        "myStatus": "None"
+      }
+    })
+    let userId = (await service.returnUserByField('userthat')).id
+    await request(server)
+      .put('/sa/users/' + userId + '/ban')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        isBanned : true,
+        banReason : 'test ban for user 1 that longer 20'
+      })
+      .expect(204)
+    res = await request(server)
+      .get('/sa/users/')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(200)
+    await request(server)
+      .get('/comments/' + createResponseComment_1)
+      .expect(404)
+    res = await request(server)
+      .get('/posts/' + createResponsePost_1.body.id + '/comments')
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "items": [
+        {
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "alina28"
+          },
+          "content": "3 comment content for posts 1",
+          "createdAt": expect.any(String),
+          "id": expect.any(String),
+          "likesInfo": {
+            "dislikesCount": 0,
+            "likesCount": 0,
+            "myStatus": "None"
+          }
+        },
+        {
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "content": "2 comment content for posts 1",
+          "createdAt": expect.any(String),
+          "id": expect.any(String),
+          "likesInfo": {
+            "dislikesCount": 0,
+            "likesCount": 0,
+            "myStatus": "None"
+          }
+        },
+        {
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "content": "2 comment content for posts 1",
+          "createdAt": expect.any(String),
+          "id": expect.any(String),
+          "likesInfo": {
+            "dislikesCount": 0,
+            "likesCount": 0,
+            "myStatus": "None"
+          }
+        },
+        {
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "content": "1 comment content for posts 1",
+          "createdAt": expect.any(String),
+          "id": expect.any(String),
+          "likesInfo": {
+            "dislikesCount": 0,
+            "likesCount": 0,
+            "myStatus": "None"
+          }
+        }
+      ],
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 1,
+      "totalCount": 4
+    })
+  })
 
   it("BLOGGERS AND PUBLIC BLOGS AND POSTS check for deleting blogs and posts ", async () => {
     await request(server)

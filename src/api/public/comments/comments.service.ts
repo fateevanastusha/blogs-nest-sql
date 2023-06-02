@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { CommentsRepository } from "./comments.repository";
 import { LikesRepository } from "../../../likes/likes.repository";
 import { UserModel } from "../../superadmin/users/users.schema";
@@ -8,6 +8,7 @@ import { QueryRepository } from "../../../helpers/query.repository";
 import { PaginatedClass } from "../blogs/blogs.schema";
 import { LikesHelpers } from "../../../helpers/likes.helper";
 import { UsersService } from "../../superadmin/users/users.service";
+import { UsersRepository } from "../../superadmin/users/users.repository";
 
 @Injectable()
 export class CommentsService {
@@ -15,11 +16,16 @@ export class CommentsService {
               protected likesRepository : LikesRepository,
               protected queryRepository : QueryRepository,
               protected likesHelper : LikesHelpers,
-              protected usersService : UsersService) {}
+              protected usersService : UsersService,
+              protected usersRepository : UsersRepository) {}
 
   async getCommentById (id : string) : Promise<CommentModel | null> {
     let comment : CommentModel | null = await this.commentsRepository.getCommentById(id)
-    if (!comment) return null
+    if (!comment) throw new NotFoundException()
+    const userId : string = comment.commentatorInfo.userId
+    const user : UserModel | null = await this.usersRepository.getFullUser(userId)
+    if (!user) throw new NotFoundException()
+    if (user.banInfo.isBanned === true) throw new NotFoundException()
     return comment
   }
 
@@ -27,6 +33,10 @@ export class CommentsService {
     const currentStatus = await this.likesHelper.requestType(await this.likesRepository.findStatus(id, userId))
     let comment : CommentModel | null = await this.commentsRepository.getCommentById(id)
     if (!comment) return null
+    const userCommentOwnerId : string = comment.commentatorInfo.userId
+    const user : UserModel | null = await this.usersRepository.getFullUser(userCommentOwnerId)
+    if (!user) throw new NotFoundException()
+    if (user.banInfo.isBanned === true) throw new NotFoundException()
     comment.likesInfo.myStatus = currentStatus
     return comment
   }
@@ -37,7 +47,7 @@ export class CommentsService {
     return await this.commentsRepository.updateCommentById(content, id)
   }
     async createComment(postId : string, userId: string, content : string) : Promise <CommentModel | null> {
-    const user : UserModel | null = await this.usersService.getUser(userId)
+    const user : UserModel | null = await this.usersRepository.getFullUser(userId)
     const comment : CommentModel = {
       id : (+new Date()).toString(),
       content : content,
@@ -56,10 +66,12 @@ export class CommentsService {
     return this.commentsRepository.createNewComment(comment);
   }
   async getAllCommentsByPostId(query : QueryCommentsUsers, postId: string, userId : string) : Promise<PaginatedClass> {
-    let total : number = await this.commentsRepository.countCommentsByPostId(postId)
+    const items : CommentModel[] = await this.queryRepository.paginatorForCommentsByPostId(query, postId)
+    const filteredItems : CommentModel[] = await this.queryRepository.filterCommentsOfBannedUser(items)
+    let allComments : number = await this.commentsRepository.countCommentsByPostId(postId)
+    let total = allComments - (items.length - filteredItems.length)
     const pageCount : number = Math.ceil( total / query.pageSize)
-    const items : CommentModel[] = await this.queryRepository.paginatorForCommentsByBlogId(query, postId);
-    let comments = await this.queryRepository.commentsMapping(items, userId)
+    let comments = await this.queryRepository.commentsMapping(filteredItems, userId)
     let paginatedComments = await this.queryRepository.paginationForm(pageCount, total, comments, query)
     return paginatedComments
   }

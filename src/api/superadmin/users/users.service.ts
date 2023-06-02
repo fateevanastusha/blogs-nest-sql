@@ -36,6 +36,7 @@ export class UsersService {
       banInformation.banReason = null
       banInformation.banDate = null
     }
+    //update comments
     return await this.usersRepository.banUser(userId, banInformation )
   }
   async deleteAllData(){

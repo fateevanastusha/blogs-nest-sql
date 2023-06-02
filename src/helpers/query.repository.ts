@@ -54,7 +54,7 @@ export class QueryRepository {
       .limit(+query.pageSize)
       .lean()
   }
-  async paginatorForCommentsByBlogId(query : QueryCommentsUsers, postId : string): Promise<CommentModel[]> {
+  async paginatorForCommentsByPostId(query : QueryCommentsUsers, postId : string): Promise<CommentModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.commentsModel
       .find({postId : postId}, {_id: 0, __v: 0})
@@ -98,7 +98,18 @@ export class QueryRepository {
       login : await this.usersRepository.getLoginById(like.userId)
     })))
   }
-
+  async filterCommentsOfBannedUser(comments : CommentModel[]) : Promise<CommentModel[]> {
+    let a = comments
+    let usersId = await Promise.all(a.map(async (item) => item.commentatorInfo.userId))
+    let listOfBanInfo = await Promise.all(
+      usersId.map(async (userId) => {
+        const user = await this.usersRepository.getFullUser(userId)
+        return user.banInfo.isBanned
+      })
+    )
+    const filteredComments = comments.filter((item, i) => !listOfBanInfo[i])
+    return filteredComments
+  }
   async commentsMapping(comments : CommentModel[], userId : string) {
     return Promise.all(
       comments.map(async (comment) => {

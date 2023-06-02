@@ -9,7 +9,7 @@ export class CommentsRepository {
   async getCommentById(id: string): Promise<CommentModel | null> {
     return await this.commentsModel.findOne(
       {id: id},
-      { _id: 0, __v: 0, postId: 0, commentatorInfo : {_id : 0}, likesInfo : {_id : 0}}
+      { _id: 0, __v: 0, postId: 0, commentatorInfo : {_id : 0, isBanned : 0}, likesInfo : {_id : 0}}
     ).lean()
   }
 
