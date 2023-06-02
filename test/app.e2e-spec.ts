@@ -952,6 +952,43 @@ describe('AppController (e2e)', () => {
         "myStatus": "None"
       }
     })
+    createResponsePost_2 = await request(server)
+      .post('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts')
+      .send({
+        "title": "string1",
+        "shortDescription": "string1",
+        "content": "string1"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+    createResponseComment_2 = await request(server)
+      .post('/posts/' + createResponsePost_1.body.id + '/comments')
+      .send({
+        content  : 'comment to check likes'
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    //set like for another comment
+    await request(server)
+      .put('/comments/' + createResponseComment_2.body.id + '/like-status')
+      .send({
+        "likeStatus": "Like"
+      })
+      .auth(tokenOfBannedUser.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    await request(server)
+      .put('/comments/' + createResponseComment_2.body.id + '/like-status')
+      .send({
+        "likeStatus": "Dislike"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    await request(server)
+      .put('/comments/' + createResponseComment_2.body.id + '/like-status')
+      .send({
+        "likeStatus": "Like"
+      })
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(204)
     let userId = (await service.returnUserByField('userthat')).id
     await request(server)
       .put('/sa/users/' + userId + '/ban')
@@ -961,10 +998,6 @@ describe('AppController (e2e)', () => {
         banReason : 'test ban for user 1 that longer 20'
       })
       .expect(204)
-    res = await request(server)
-      .get('/sa/users/')
-      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
-      .expect(200)
     await request(server)
       .get('/comments/' + createResponseComment_1)
       .expect(404)
@@ -973,6 +1006,20 @@ describe('AppController (e2e)', () => {
       .expect(200)
     expect(res.body).toStrictEqual({
       "items": [
+        {
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "content": "comment to check likes",
+          "createdAt": expect.any(String),
+          "id": expect.any(String),
+          "likesInfo": {
+            "dislikesCount": 1,
+            "likesCount": 1,
+            "myStatus": "None"
+          }
+        },
         {
           "commentatorInfo": {
             "userId": expect.any(String),
@@ -1033,7 +1080,7 @@ describe('AppController (e2e)', () => {
       "page": 1,
       "pageSize": 10,
       "pagesCount": 1,
-      "totalCount": 4
+      "totalCount": 5
     })
   })
 

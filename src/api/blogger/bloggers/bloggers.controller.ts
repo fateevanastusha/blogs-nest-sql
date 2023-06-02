@@ -118,7 +118,6 @@ export class BloggersController {
   async deletePost(@Param('id') postId : string,
                    @Res() res : Response,
                    @Req() req: Request){
-    console.log('CONTROLLER');
     const token = req.headers.authorization!.split(" ")[1]
     const status : boolean = await this.postsService.deletePost(postId, token)
     if (!status) throw new NotFoundException()

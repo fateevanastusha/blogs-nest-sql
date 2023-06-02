@@ -92,11 +92,34 @@ export class QueryRepository {
       {_id: 0, login: 'any login', userId: 1, createdAt: 1})
       .sort({createdAt: 'desc'})
       .limit(3)
-    return Promise.all(newestLikes.map(async like => ({
+    let likesCopy = []
+    let usersId = await Promise.all(likesCopy.map(async (item) => item.commentatorInfo.userId))
+    let listOfBanInfo = await Promise.all(
+      usersId.map(async (userId) => {
+        const user = await this.usersRepository.getFullUser(userId)
+        return user.banInfo.isBanned
+      })
+    )
+    const filteredComments = newestLikes.filter((item, i) => !listOfBanInfo[i])
+    return Promise.all(filteredComments.map(async like => ({
       addedAt : like.createdAt,
       userId : like.userId,
       login : await this.usersRepository.getLoginById(like.userId)
     })))
+  }
+
+  async getLikesOrDislikesCount(id : string, status : 'Like' | 'Dislike' ): Promise<number> {
+    const newestLikes = await  this.likesModel.find(
+      {postOrCommentId: id, $or : [{status: status} , {status: status}]})
+    let usersId = await Promise.all(newestLikes.map(async (item) => item.userId))
+    let listOfBanInfo = await Promise.all(
+      usersId.map(async (userId) => {
+        const user = await this.usersRepository.getFullUser(userId)
+        return user.banInfo.isBanned
+      })
+    )
+    const filteredComments = newestLikes.filter((item, i) => !listOfBanInfo[i])
+    return filteredComments.length
   }
   async filterCommentsOfBannedUser(comments : CommentModel[]) : Promise<CommentModel[]> {
     let a = comments
@@ -127,8 +150,8 @@ export class QueryRepository {
           },
           createdAt: comment.createdAt,
           likesInfo: {
-            likesCount: await this.likesModel.countDocuments({postOrCommentId : comment.id, status : "Like"}),
-            dislikesCount: await this.likesModel.countDocuments({postOrCommentId : comment.id, status : "Dislike"}),
+            likesCount: await this.getLikesOrDislikesCount(comment.id, 'Like'),
+            dislikesCount: await this.getLikesOrDislikesCount(comment.id, 'Dislike'),
             myStatus: status || "None",
           },
         };

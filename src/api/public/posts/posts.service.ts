@@ -81,7 +81,6 @@ export class PostsService {
     return post
   }
   async deletePost(id: string, token : string) : Promise<boolean> {
-    console.log('SERVICE');
     const post : PostModel = await this.postsRepository.getPost(id)
     if (!post) throw new NotFoundException()
     const userId : string = await this.jwtService.getUserIdByToken(token)
