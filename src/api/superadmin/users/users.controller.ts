@@ -32,14 +32,20 @@ export class UsersController{
                  @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                  @Query('searchLoginTerm', new DefaultValuePipe('')) searchLoginTerm : string,
                  @Query('searchEmailTerm', new DefaultValuePipe('')) searchEmailTerm : string,
+                 @Query('banStatus', new DefaultValuePipe('all')) banStatus : "banned" | "all" | "notBanned"
   ){
+    let isBanned
+    if (banStatus === "banned") isBanned = true
+    if (banStatus === "notBanned") isBanned = false
+    if(banStatus === "all") isBanned = undefined
     return await this.usersService.getUsers({
       pageSize : pageSize,
       pageNumber : pageNumber,
       sortBy : sortBy,
       sortDirection : sortDirection,
       searchLoginTerm : searchLoginTerm,
-      searchEmailTerm : searchEmailTerm
+      searchEmailTerm : searchEmailTerm,
+      banStatus : isBanned
     })
   }
   @Post()

@@ -186,6 +186,29 @@ describe('AppController (e2e)', () => {
         }
       ]
     })
+    res = await request(server)
+      .get('/sa/users?sortBy=name&sortDirection=asc&pageSize=1&banStatus=banned')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "page": 1,
+      "pageSize": 1,
+      "pagesCount": 1,
+      "totalCount": 1,
+      "items": [
+        {
+          "banInfo": {
+            "banDate": expect.any(String),
+            "banReason": "test ban for user 1 that longer 20",
+            "isBanned": true
+          },
+          "createdAt": expect.any(String),
+          "email": "user1@gmail.com",
+          "id": createResponseUser_1.body.id,
+          "login": "user1"
+        }
+      ]
+    })
     await request(server)
       .put('/sa/users/' + createResponseUser_1.body.id + '/ban')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})

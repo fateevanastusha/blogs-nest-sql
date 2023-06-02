@@ -12,7 +12,7 @@ export class UsersService {
   constructor(protected usersRepository : UsersRepository,
               protected queryRepository : QueryRepository) {}
   async getUsers(query : QueryModelUsers) : Promise<PaginatedClass>{
-    const total : number = await this.usersRepository.getUsersCount(query.searchLoginTerm, query.searchEmailTerm);
+    const total : number = await this.usersRepository.getUsersCount(query.searchLoginTerm, query.searchEmailTerm, query.banStatus);
     const pageCount = Math.ceil( total / query.pageSize);
     const items : UserViewModel[] = await this.queryRepository.paginationForUsers(query);
     return this.queryRepository.paginationForm(pageCount, total, items, query)

@@ -6,12 +6,13 @@ import { Injectable } from "@nestjs/common";
 export class UsersRepository {
   constructor(@InjectModel('users') private usersModel: Model<UserDocument> ) {
   }
-  async getUsersCount(searchLoginTerm : string, searchEmailTerm : string) : Promise<number>{
+  async getUsersCount(searchLoginTerm : string, searchEmailTerm : string, banStatus) : Promise<number>{
     return this.usersModel.countDocuments({
       $or: [
         {login: {$regex: searchLoginTerm, $options: 'i'}},
         {email: {$regex: searchEmailTerm, $options: 'i'}}
-      ]
+      ],
+      ...(banStatus === true || banStatus === false ? { 'banInfo.isBanned': banStatus } : {})
     })
   }
   async getFullUser (id : string) : Promise<UserModel | null>{

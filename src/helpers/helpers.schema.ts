@@ -84,6 +84,10 @@ export class QueryModelUsers {
   @IsOptional()
   @Prop({ default: "" })
   searchEmailTerm?: string = ''
+
+  @IsOptional()
+  @Prop({ default: undefined })
+  banStatus?: any
 }
 
 export class QueryCommentsUsers {

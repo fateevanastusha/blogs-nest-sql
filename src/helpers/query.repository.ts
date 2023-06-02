@@ -70,7 +70,8 @@ export class QueryRepository {
         $or: [
           {login: {$regex: query.searchLoginTerm, $options: 'i'}},
           {email: {$regex: query.searchEmailTerm, $options: 'i'}}
-        ]
+        ],
+        ...(query.banStatus === true || query.banStatus === false ? { 'banInfo.isBanned': query.banStatus } : {})
       }, {_id: 0, __v: 0, password : 0, confirmedCode : 0, isConfirmed : 0, banInfo : {_id : 0}})
       .sort({[query.sortBy]: query.sortDirection})
       .skip(skipSize)
