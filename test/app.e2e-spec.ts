@@ -1209,9 +1209,12 @@ describe('AppController (e2e)', () => {
       .get('/posts/' + createResponsePost_1.body.id)
       .expect(200)
     expect(res.body).toStrictEqual({
+      "id": expect.any(String),
+      "title": "updated",
+      "shortDescription": "updated",
+      "content": "updated",
       "blogId": expect.any(String),
       "blogName": "updatedname",
-      "content": "updated",
       "createdAt": expect.any(String),
       "extendedLikesInfo": {
         "dislikesCount": 1,
@@ -1229,10 +1232,7 @@ describe('AppController (e2e)', () => {
             "userId": expect.any(String)
           }
         ]
-      },
-      "id": expect.any(String),
-      "shortDescription": "updated",
-      "title": "updated"
+      }
     })
     let userId = (await service.returnUserByField('userthat')).id
     await request(server)
@@ -1247,9 +1247,12 @@ describe('AppController (e2e)', () => {
       .get('/posts/' + createResponsePost_1.body.id)
       .expect(200)
     expect(res.body).toStrictEqual({
+      "id": expect.any(String),
+      "title": "updated",
+      "shortDescription": "updated",
+      "content": "updated",
       "blogId": expect.any(String),
       "blogName": "updatedname",
-      "content": "updated",
       "createdAt": expect.any(String),
       "extendedLikesInfo": {
         "dislikesCount": 1,
@@ -1267,10 +1270,7 @@ describe('AppController (e2e)', () => {
             "userId": expect.any(String)
           }
         ]
-      },
-      "id": expect.any(String),
-      "shortDescription": "updated",
-      "title": "updated"
+      }
     })
   })
 
