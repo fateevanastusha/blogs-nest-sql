@@ -73,6 +73,8 @@ export class PostsService {
     } else {
       post.extendedLikesInfo.myStatus = myStatus
     }
+    post.extendedLikesInfo.likesCount = await this.queryRepository.getLikesOrDislikesCount(id, 'Like')
+    post.extendedLikesInfo.dislikesCount = await this.queryRepository.getLikesOrDislikesCount(id, 'Dislike')
     return post
   }
   async getPost(id: string) : Promise<null | PostModel> {

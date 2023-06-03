@@ -965,12 +965,11 @@ describe('AppController (e2e)', () => {
       "totalCount": 4
     })
   });
-
   it('timer ', async () => {
     await new Promise((resolve) => setTimeout(resolve, 5000)); // Таймер на 10 секунд
   });
 
-  it('COMMENTS PUBLIC check', async () => {
+  it('COMMENTS PUBLIC check for likes', async () => {
     await request(server)
       .post('/auth/registration')
       .send({
@@ -1057,6 +1056,23 @@ describe('AppController (e2e)', () => {
         banReason : 'test ban for user 1 that longer 20'
       })
       .expect(204)
+    res = await request(server)
+      .get('/comments/' + createResponseComment_2.body.id)
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "commentatorInfo": {
+        "userId": expect.any(String),
+        "userLogin": "nastya1"
+      },
+      "content": "comment to check likes",
+      "createdAt": expect.any(String),
+      "id": expect.any(String),
+      "likesInfo": {
+        "dislikesCount": 1,
+        "likesCount": 1,
+        "myStatus": "None"
+      }
+    })
     await request(server)
       .get('/comments/' + createResponseComment_1)
       .expect(404)
@@ -1164,6 +1180,97 @@ describe('AppController (e2e)', () => {
         "likesCount": 2,
         "myStatus": "None"
       }
+    })
+  })
+
+  it ('PUBLIC POSTS check for likes', async () => {
+    await request(server)
+      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .send({
+        "likeStatus": "Like"
+      })
+      .auth(tokenOfBannedUser.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    await request(server)
+      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .send({
+        "likeStatus": "Dislike"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    await request(server)
+      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .send({
+        "likeStatus": "Like"
+      })
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    res = await request(server)
+      .get('/posts/' + createResponsePost_1.body.id)
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "blogId": expect.any(String),
+      "blogName": "updatedname",
+      "content": "updated",
+      "createdAt": expect.any(String),
+      "extendedLikesInfo": {
+        "dislikesCount": 1,
+        "likesCount": 2,
+        "myStatus": "None",
+        "newestLikes": [
+          {
+            "addedAt": expect.any(String),
+            "login": "alina28",
+            "userId": expect.any(String)
+          },
+          {
+            "addedAt": expect.any(String),
+            "login": "userthat",
+            "userId": expect.any(String)
+          }
+        ]
+      },
+      "id": expect.any(String),
+      "shortDescription": "updated",
+      "title": "updated"
+    })
+    let userId = (await service.returnUserByField('userthat')).id
+    await request(server)
+      .put('/sa/users/' + userId + '/ban')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        isBanned : true,
+        banReason : 'test ban for user 1 that longer 20'
+      })
+      .expect(204)
+    res = await request(server)
+      .get('/posts/' + createResponsePost_1.body.id)
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "blogId": expect.any(String),
+      "blogName": "updatedname",
+      "content": "updated",
+      "createdAt": expect.any(String),
+      "extendedLikesInfo": {
+        "dislikesCount": 1,
+        "likesCount": 1,
+        "myStatus": "None",
+        "newestLikes": [
+          {
+            "addedAt": expect.any(String),
+            "login": "alina28",
+            "userId": expect.any(String)
+          },
+          {
+            "addedAt": expect.any(String),
+            "login": "userthat",
+            "userId": expect.any(String)
+          }
+        ]
+      },
+      "id": expect.any(String),
+      "shortDescription": "updated",
+      "title": "updated"
     })
   })
 

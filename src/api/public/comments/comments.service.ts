@@ -16,16 +16,19 @@ export class CommentsService {
               protected likesRepository : LikesRepository,
               protected queryRepository : QueryRepository,
               protected likesHelper : LikesHelpers,
-              protected usersService : UsersService,
               protected usersRepository : UsersRepository) {}
 
   async getCommentById (id : string) : Promise<CommentModel | null> {
+    const status = await this.changeTotalCount(id)
+    if(!status) throw new NotFoundException()
     let comment : CommentModel | null = await this.commentsRepository.getCommentById(id)
     if (!comment) throw new NotFoundException()
     const userId : string = comment.commentatorInfo.userId
     const user : UserModel | null = await this.usersRepository.getFullUser(userId)
     if (!user) throw new NotFoundException()
     if (user.banInfo.isBanned === true) throw new NotFoundException()
+    comment.likesInfo.likesCount = await this.queryRepository.getLikesOrDislikesCount(id, 'Like')
+    comment.likesInfo.dislikesCount = await this.queryRepository.getLikesOrDislikesCount(id, 'Dislike')
     return comment
   }
 
@@ -38,6 +41,8 @@ export class CommentsService {
     if (!user) throw new NotFoundException()
     if (user.banInfo.isBanned === true) throw new NotFoundException()
     comment.likesInfo.myStatus = currentStatus
+    comment.likesInfo.likesCount = await this.queryRepository.getLikesOrDislikesCount(id, 'Like')
+    comment.likesInfo.dislikesCount = await this.queryRepository.getLikesOrDislikesCount(id, 'Dislike')
     return comment
   }
   async deleteCommentById (id: string) : Promise<boolean> {
@@ -117,5 +122,13 @@ export class CommentsService {
     const likesCount : number = await this.likesRepository.findLikes(commentId)
     const dislikesCount : number = await this.likesRepository.findDislikes(commentId)
     return this.commentsRepository.changeLikesTotalCount(commentId, likesCount, dislikesCount)
+  }
+  async getLikesAndDislikesCount(commentId : string) {
+    const likesCount : number = await this.likesRepository.findLikes(commentId)
+    const dislikesCount : number = await this.likesRepository.findDislikes(commentId)
+    return {
+      likesCount : likesCount,
+      dislikesCount : dislikesCount
+    }
   }
 }
