@@ -610,7 +610,7 @@ describe('AppController (e2e)', () => {
         "createdAt": expect.any(String),
         "description": "about me",
         "id": expect.any(String),
-        "isMembership": true,
+        "isMembership": false,
         "name": "2bloguser1",
         "websiteUrl": "http://www.nastyastar.com"
       },
@@ -618,7 +618,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "1bloguser1",
           "websiteUrl": "http://www.nastyastar.com"
         }]
@@ -645,7 +645,7 @@ describe('AppController (e2e)', () => {
         "createdAt": expect.any(String),
         "description": "about me",
         "id": expect.any(String),
-        "isMembership": true,
+        "isMembership": false,
         "name": "2bloguser1",
         "websiteUrl": "http://www.nastyastar.com"
       },
@@ -653,7 +653,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "1bloguser1",
           "websiteUrl": "http://www.nastyastar.com"
         }]
@@ -680,7 +680,7 @@ describe('AppController (e2e)', () => {
         "createdAt": expect.any(String),
         "description": "about me",
         "id": expect.any(String),
-        "isMembership": true,
+        "isMembership": false,
         "name": "2bloguser1",
         "websiteUrl": "http://www.nastyastar.com"
       },
@@ -688,7 +688,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "updatedname",
           "websiteUrl": "http://www.nastyastar.com"
         }]
@@ -712,7 +712,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "2bloguser2",
           "websiteUrl": "http://www.nastyastar.com"
         },
@@ -724,7 +724,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "2bloguser1",
           "websiteUrl": "http://www.nastyastar.com"
         },
@@ -736,7 +736,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "updatedname",
           "websiteUrl": "http://www.nastyastar.com"
         }

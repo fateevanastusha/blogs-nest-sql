@@ -24,7 +24,7 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogBlogsCommand
       description: command.blog.description,
       websiteUrl: command.blog.websiteUrl,
       createdAt: new Date().toISOString(),
-      isMembership: true,
+      isMembership: false,
       blogOwnerInfo : {
         userId: userId,
         userLogin: user.login
