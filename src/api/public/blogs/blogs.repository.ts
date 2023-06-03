@@ -10,7 +10,7 @@ export class BlogsRepository{
     return this.blogsModel.countDocuments({name: {$regex: searchNameTerm, $options : 'i'}})
   }
   async getBlog(id : string) : Promise<BlogModel | null>{
-    return this.blogsModel.findOne({id: id}, {_id: 0, __v: 0})
+    return this.blogsModel.findOne({id: id}, {_id: 0, __v: 0, 'blogOwnerInfo._id' : 0})
   }
   async getBlogPublic(id : string) : Promise<BlogModel | null>{
     return this.blogsModel.findOne({id: id}, {_id: 0, __v: 0, blogOwnerInfo : 0})

@@ -294,7 +294,11 @@ describe('AppController (e2e)', () => {
       "description": "TEST2",
       "websiteUrl": "http://www.test2.com",
       "createdAt": expect.any(String),
-      "isMembership": true
+      "isMembership": true,
+      "blogOwnerInfo" : {
+        userId : expect.any(String),
+        userLogin : expect.any(String)
+      }
     })
   })
 
