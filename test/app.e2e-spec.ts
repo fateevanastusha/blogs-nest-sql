@@ -294,11 +294,7 @@ describe('AppController (e2e)', () => {
       "description": "TEST2",
       "websiteUrl": "http://www.test2.com",
       "createdAt": expect.any(String),
-      "isMembership": true,
-      "blogOwnerInfo" : {
-        userId : expect.any(String),
-        userLogin : expect.any(String)
-      }
+      "isMembership": true
     })
   })
 
@@ -579,6 +575,14 @@ describe('AppController (e2e)', () => {
       })
       .auth(token_1.body.accessToken, {type : 'bearer'})
       .expect(201)
+    expect(createResponseBlog_1.body).toStrictEqual({
+      "name": "1bloguser1",
+      "description": "about me",
+      "websiteUrl": "http://www.nastyastar.com",
+      'id' : expect.any(String),
+      "createdAt" : expect.any(String),
+      'isMemberShip' : false
+    })
     await request(server)
       .post('/blogger/blogs')
       .send({
