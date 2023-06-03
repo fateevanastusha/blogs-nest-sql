@@ -575,14 +575,6 @@ describe('AppController (e2e)', () => {
       })
       .auth(token_1.body.accessToken, {type : 'bearer'})
       .expect(201)
-    expect(createResponseBlog_1.body).toStrictEqual({
-      "name": "1bloguser1",
-      "description": "about me",
-      "websiteUrl": "http://www.nastyastar.com",
-      'id' : expect.any(String),
-      "createdAt" : expect.any(String),
-      'isMemberShip' : false
-    })
     await request(server)
       .post('/blogger/blogs')
       .send({
@@ -601,6 +593,14 @@ describe('AppController (e2e)', () => {
       })
       .auth(token_2.body.accessToken, {type : 'bearer'})
       .expect(201)
+    expect(createResponseBlog_2.body).toStrictEqual({
+      "createdAt": expect.any(String),
+      "description": "about me",
+      "id": expect.any(String),
+      "isMembership": false,
+      "name": "2bloguser2",
+      "websiteUrl": "http://www.nastyastar.com"
+    })
     res = await request(server)
       .get('/blogger/blogs')
       .auth(token_1.body.accessToken, {type : 'bearer'})
