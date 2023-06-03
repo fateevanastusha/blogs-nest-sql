@@ -114,12 +114,13 @@ export class BloggersController {
     return
   }
   @UseGuards(CheckIfUserExist)
-  @Delete(':id/posts')
-  async deletePost(@Param('id') postId : string,
+  @Delete(':blogId/posts/:postId')
+  async deletePost(@Param('blogId') blogId : string,
+                   @Param('postId') postId : string,
                    @Res() res : Response,
                    @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    const status : boolean = await this.postsService.deletePost(postId, token)
+    const status : boolean = await this.postsService.deletePostByBlogId(postId, blogId, token)
     if (!status) throw new NotFoundException()
     return res.sendStatus(204)
   }

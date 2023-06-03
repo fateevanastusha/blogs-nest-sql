@@ -80,14 +80,24 @@ export class PostsService {
     if (!post) return null
     return post
   }
-  async deletePost(id: string, token : string) : Promise<boolean> {
-    const post : PostModel = await this.postsRepository.getPost(id)
+  async deletePost(postId : string, token : string) : Promise<boolean> {
+    const post : PostModel = await this.postsRepository.getPost(postId)
     if (!post) throw new NotFoundException()
     const userId : string = await this.jwtService.getUserIdByToken(token)
     const blog : BlogModel = await this.blogsRepository.getFullBlog(post.blogId)
     if (!blog) throw new NotFoundException()
     if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException()
-    return await this.postsRepository.deletePost(id)
+    return await this.postsRepository.deletePost(postId)
+  }
+  async deletePostByBlogId(postId : string, blogId: string, token : string) : Promise<boolean> {
+    const userId : string = await this.jwtService.getUserIdByToken(token)
+    const blog : BlogModel = await this.blogsRepository.getFullBlog(blogId)
+    if (!blog) throw new NotFoundException()
+    const post : PostModel = await this.postsRepository.getPost(postId)
+    if (!post) throw new NotFoundException()
+    if(post.blogId !== blogId) throw new NotFoundException()
+    if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException()
+    return await this.postsRepository.deletePost(postId)
   }
   async createPost(post: PostsDto, token : string) : Promise <PostModel | null>{
     const blog : BlogModel | null = await this.blogsRepository.getFullBlog(post.blogId)

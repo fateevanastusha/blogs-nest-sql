@@ -1165,14 +1165,14 @@ describe('AppController (e2e)', () => {
 
   it("BLOGGERS AND PUBLIC BLOGS AND POSTS check for deleting blogs and posts ", async () => {
     await request(server)
-      .delete('/blogger/blogs/' + createResponsePost_1.body.id + '/posts')
+      .delete('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts/' + createResponsePost_1.body.id)
       .auth(token_2.body.accessToken, {type : 'bearer'})
       .expect(403)
     await request(server)
       .get('/posts/' + createResponsePost_1.body.id)
       .expect(200)
     await request(server)
-      .delete('/blogger/blogs/' + createResponsePost_1.body.id + '/posts')
+      .delete('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts/' + createResponsePost_1.body.id)
       .auth(token_1.body.accessToken, {type : 'bearer'})
       .expect(204)
     await request(server)
