@@ -87,21 +87,20 @@ export class QueryRepository {
       items: items
     }
   }
-  async getLastLikes(id : string): Promise<LikeViewModel[]> {
+  async getLastLikesForPost(id : string): Promise<LikeViewModel[]> {
     const newestLikes = await  this.likesModel.find(
       {postOrCommentId: id, status: 'Like'},
       {_id: 0, login: 'any login', userId: 1, createdAt: 1})
       .sort({createdAt: 'desc'})
-      .limit(3)
-    let likesCopy = []
-    let usersId = await Promise.all(likesCopy.map(async (item) => item.commentatorInfo.userId))
+    let likesCopy = newestLikes
+    let usersId = await Promise.all(likesCopy.map(async (item) => item.userId))
     let listOfBanInfo = await Promise.all(
       usersId.map(async (userId) => {
         const user = await this.usersRepository.getFullUser(userId)
         return user.banInfo.isBanned
       })
     )
-    const filteredComments = newestLikes.filter((item, i) => !listOfBanInfo[i])
+    const filteredComments = newestLikes.filter((item, i) => !listOfBanInfo[i]).slice(0,3)
     return Promise.all(filteredComments.map(async like => ({
       addedAt : like.createdAt,
       userId : like.userId,
@@ -165,7 +164,7 @@ export class QueryRepository {
   async postsMapping(posts : PostModel[], userId : string) {
     return await Promise.all(
       posts.map(async (post) => {
-        let newestLikes = await this.getLastLikes(post.id)
+        let newestLikes = await this.getLastLikesForPost(post.id)
         let status = null;
         if (userId) {
           status = await this.likesRepository.findStatus(post.id, userId);

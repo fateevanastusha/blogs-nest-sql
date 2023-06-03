@@ -64,7 +64,7 @@ export class PostsService {
         myStatus = findStatus.status
       }
     }
-    const newestLikes : LikeViewModel[] = await this.queryRepository.getLastLikes(id)
+    const newestLikes : LikeViewModel[] = await this.queryRepository.getLastLikesForPost(id)
     const post =  await this.postsRepository.getPost(id);
     if (!post) return null
     post.extendedLikesInfo.newestLikes = newestLikes
