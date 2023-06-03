@@ -608,8 +608,8 @@ describe('AppController (e2e)', () => {
     expect(res.body).toStrictEqual({
       "page": 1,
       "pageSize": 10,
-      "pagesCount": 0,
-      "totalCount": 0,
+      "pagesCount": 1,
+      "totalCount": 2,
       "items": [{
         "createdAt": expect.any(String),
         "description": "about me",
@@ -643,8 +643,8 @@ describe('AppController (e2e)', () => {
     expect(res.body).toStrictEqual({
       "page": 1,
       "pageSize": 10,
-      "pagesCount": 0,
-      "totalCount": 0,
+      "pagesCount": 1,
+      "totalCount": 2,
       "items": [{
         "createdAt": expect.any(String),
         "description": "about me",
@@ -678,8 +678,8 @@ describe('AppController (e2e)', () => {
     expect(res.body).toStrictEqual({
       "page": 1,
       "pageSize": 10,
-      "pagesCount": 0,
-      "totalCount": 0,
+      "pagesCount": 1,
+      "totalCount": 2,
       "items": [{
         "createdAt": expect.any(String),
         "description": "about me",
