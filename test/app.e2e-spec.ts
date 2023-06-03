@@ -285,6 +285,17 @@ describe('AppController (e2e)', () => {
       })
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
       .expect(201)
+    res = await request(server)
+      .get('/blogs/' + createResponseBlog_1.body.id )
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "id": createResponseBlog_1.body.id,
+      "name": "TEST2",
+      "description": "TEST2",
+      "websiteUrl": "http://www.test2.com",
+      "createdAt": expect.any(String),
+      "isMembership": true
+    })
   })
 
   it('SA check for created blog', async () => {
@@ -346,6 +357,23 @@ describe('AppController (e2e)', () => {
         }
       ]
     })
+  })
+
+  it('BLOGGERS delete created blog', async () => {
+    createResponseUser_2 = await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'user2',
+        password : 'qwerty'
+      })
+      .expect(200)
+    await request(server)
+      .delete('/blogger/blogs/' + createResponseBlog_1.body.id)
+      .auth(createResponseUser_2.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    await request(server)
+      .get('/blogs/' + createResponseBlog_1.body.id )
+      .expect(404)
   })
 
   //CHECK BLOGGER
@@ -931,7 +959,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('timer ', async () => {
-    await new Promise((resolve) => setTimeout(resolve, 10000)); // Таймер на 10 секунд
+    await new Promise((resolve) => setTimeout(resolve, 5000)); // Таймер на 10 секунд
   });
 
   it('COMMENTS PUBLIC check', async () => {
@@ -1104,6 +1132,30 @@ describe('AppController (e2e)', () => {
       "pageSize": 10,
       "pagesCount": 1,
       "totalCount": 5
+    })
+    await request(server)
+      .put('/sa/users/' + userId + '/ban')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        isBanned : false,
+        banReason : 'test ban for user 1 that longer 20'
+      })
+    res = await request(server)
+      .get('/comments/' + createResponseComment_2.body.id)
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "commentatorInfo": {
+        "userId": expect.any(String),
+        "userLogin": "nastya1"
+      },
+      "content": "comment to check likes",
+      "createdAt": expect.any(String),
+      "id": expect.any(String),
+      "likesInfo": {
+        "dislikesCount": 1,
+        "likesCount": 2,
+        "myStatus": "None"
+      }
     })
   })
 

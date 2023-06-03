@@ -12,6 +12,9 @@ export class BlogsRepository{
   async getBlog(id : string) : Promise<BlogModel | null>{
     return this.blogsModel.findOne({id: id}, {_id: 0, __v: 0})
   }
+  async getBlogPublic(id : string) : Promise<BlogModel | null>{
+    return this.blogsModel.findOne({id: id}, {_id: 0, __v: 0, blogOwnerInfo : 0})
+  }
   async deleteBlog(id : string) : Promise<boolean>{
     const status = await this.blogsModel.deleteOne({id : id})
     return status.deletedCount === 1
