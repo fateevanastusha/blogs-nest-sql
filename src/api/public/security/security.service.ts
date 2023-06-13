@@ -11,35 +11,22 @@ export class SecurityService {
     if(!idList) return null
     const userId = idList.userId
     const sessions : RefreshTokensMetaModel[] | null = await this.securityRepository.getAllSessions(userId)
-    if (!sessions) {
-      throw new NotFoundException();
-      return null
-    }
+    if (!sessions) throw new NotFoundException();
     return sessions
   }
   async deleteAllSessions(refreshToken : string) : Promise<boolean> {
     const idList = await this.jwtService.getIdByRefreshToken(refreshToken)
-    if(!idList) {
-      throw new NotFoundException()
-      return false
-    }
+    if(!idList) throw new NotFoundException()
     const status : boolean = await this.securityRepository.deleteAllSessions(idList.deviceId, idList.userId)
-    if(!status) {
-      throw new NotFoundException()
-      return false
-    }
+    if(!status) throw new NotFoundException()
     return true
-
   }
   async deleteOneSession(deviceId : string) : Promise<boolean> {
     return await this.securityRepository.deleteOneSessions(deviceId)
   }
   async checkForSameDevice(title : string, userId : string) : Promise<boolean> {
     const status : boolean = await this.securityRepository.checkSameDevice(title,userId)
-    if(!status) {
-      throw new NotFoundException()
-      return false
-    }
+    if(!status) throw new NotFoundException()
     return true
   }
 }

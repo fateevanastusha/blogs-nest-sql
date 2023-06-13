@@ -12,9 +12,7 @@ import { CommentModel } from "../comments/comments.schema";
 import { LikesRepository } from "../../../likes/likes.repository";
 import { LikesHelpers } from "../../../helpers/likes.helper";
 import { LikeViewModel } from "../../../likes/likes.schema";
-import { UserModel } from "../../superadmin/users/users.schema";
 import { UsersRepository } from "../../superadmin/users/users.repository";
-import { PostsBlogDto } from "../blogs/blogs.dto";
 
 @Injectable()
 export class PostsService {
@@ -82,50 +80,6 @@ export class PostsService {
     if (!post) return null
     return post
   }
-  async deletePost(postId : string, token : string) : Promise<boolean> {
-    const post : PostModel = await this.postsRepository.getPost(postId)
-    if (!post) throw new NotFoundException()
-    const userId : string = await this.jwtService.getUserIdByToken(token)
-    const blog : BlogModel = await this.blogsRepository.getFullBlog(post.blogId)
-    if (!blog) throw new NotFoundException()
-    if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException()
-    return await this.postsRepository.deletePost(postId)
-  }
-  async deletePostByBlogId(postId : string, blogId: string, token : string) : Promise<boolean> {
-    const userId : string = await this.jwtService.getUserIdByToken(token)
-    const blog : BlogModel = await this.blogsRepository.getFullBlog(blogId)
-    if (!blog) throw new NotFoundException()
-    const post : PostModel = await this.postsRepository.getPost(postId)
-    if (!post) throw new NotFoundException()
-    if(post.blogId !== blogId) throw new NotFoundException()
-    if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException()
-    return await this.postsRepository.deletePost(postId)
-  }
-  async createPost(post: PostsDto, token : string) : Promise <PostModel | null>{
-    const blog : BlogModel | null = await this.blogsRepository.getFullBlog(post.blogId)
-    if (!blog) return null
-    const userId : string = await this.jwtService.getUserIdByToken(token)
-    const user : UserModel | null = await this.usersRepository.getFullUser(userId)
-    if (user.id !== blog.blogOwnerInfo.userId) throw new ForbiddenException()
-    const newPost : PostModel = {
-      id: '' + (+(new Date())),
-      title : post.title,
-      shortDescription: post.shortDescription,
-      content: post.content,
-      blogId: post.blogId,
-      blogName: blog.name,
-      createdAt : new Date().toISOString(),
-      extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: "None",
-        newestLikes: []
-      }
-    };
-    const createdPost = await this.postsRepository.createPost(newPost);
-    if (!createdPost) return null
-    return createdPost;
-  }
   async updatePost(post : PostsDto, postId : string, token : string) : Promise <boolean>{
     const userId : string = await this.jwtService.getUserIdByToken(token)
     const blog : BlogModel = await this.blogsRepository.getFullBlog(post.blogId)
@@ -148,22 +102,6 @@ export class PostsService {
       let userId = await this.jwtService.getUserIdByToken(token)
       const foundComments = await this.commentsService.getAllCommentsByPostId(query, postId, userId)
       return foundComments
-    }
-  }
-  async createComment(postId : string, content : string, token : string) : Promise <CommentModel | null>{
-    const foundPost : PostModel | null = await this.postsRepository.getPost(postId)
-    if (foundPost === null) {
-      throw new NotFoundException()
-      return null
-    } else {
-      let userId = await this.jwtService.getUserIdByToken(token)
-      const createdComment = await this.commentsService.createComment(postId, userId, content)
-      if (createdComment) {
-        return createdComment
-      } else {
-        throw new UnauthorizedException()
-        return null
-      }
     }
   }
   async changeLikeStatus(requestType : string, postId : string, header : string) : Promise <boolean> {

@@ -48,6 +48,12 @@ import { CqrsModule } from "@nestjs/cqrs";
 import { CreateUserUseCase } from "./api/use-cases/users/users-create-user-use-case";
 import { DeleteUserUseCase } from "./api/use-cases/users/users-delete-user-use-case";
 import { CreateBlogUseCase } from "./api/use-cases/blogs/blogs-create-blog-use-case";
+import { CreatePostUseCase } from "./api/use-cases/posts/posts-create-post-use-case";
+import { DeletePostUseCase } from "./api/use-cases/posts/posts-delete-post-use-case";
+import { DeleteBlogUseCase } from "./api/use-cases/blogs/blogs-delete-blog-use-case";
+import { CreateCommentUseCase } from "./api/use-cases/comments/comments-create-comment-use-case";
+import { BloggersUsersService } from "./api/blogger/users/bloggers.users.service";
+import { BloggersUsersController } from "./api/blogger/users/bloggers.users.controller";
 
 const repositories = [
   UsersRepository,
@@ -63,6 +69,7 @@ const repositories = [
 ]
 const services = [
   UsersService,
+  BloggersUsersService,
   SecurityService,
   PostsService,
   CommentsService,
@@ -78,7 +85,11 @@ const services = [
 const useCases = [
   CreateUserUseCase,
   DeleteUserUseCase,
-  CreateBlogUseCase
+  CreateBlogUseCase,
+  DeleteBlogUseCase,
+  CreatePostUseCase,
+  DeletePostUseCase,
+  CreateCommentUseCase
 ]
 
 @Module({
@@ -134,7 +145,8 @@ const useCases = [
     CommentsController,
     AppController,
     AuthController,
-    SecurityController],
+    SecurityController,
+    BloggersUsersController],
   providers: [IsUserAlreadyExistConstraint,
     ...repositories,
     ...services,

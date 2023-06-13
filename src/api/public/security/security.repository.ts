@@ -45,10 +45,6 @@ export class SecurityRepository {
     return this.refreshTokensMetaModel
       .findOne({deviceId: deviceId})
   }
-  async findSessionByDeviceIdAndUserId(userId : string, deviceId: string) : Promise<RefreshTokensMetaModel | null> {
-    return this.refreshTokensMetaModel
-      .findOne({userId : userId, deviceId: deviceId})
-  }
   async updateSession(ip : string, title : string, lastActiveDate : string, deviceId : string) : Promise<boolean>{
     const result = await this.refreshTokensMetaModel
       .updateOne({deviceId : deviceId},
@@ -61,16 +57,13 @@ export class SecurityRepository {
         });
     return result.matchedCount === 1;
   }
-  async getAll() : Promise<RefreshTokensMetaModel[]>{
-    return await this.refreshTokensMetaModel.find({}).lean()
-  }
-  async deleteAllData() {
-    await this.refreshTokensMetaModel.deleteMany({});
-    return [];
-  }
   async checkSameDevice(title : string, userId : string) : Promise<boolean> {
     const result = await this.refreshTokensMetaModel.find({title: title, userId : userId})
     if (result) return true
     return false
+  }
+  async deleteAllData() {
+    await this.refreshTokensMetaModel.deleteMany({});
+    return [];
   }
 }

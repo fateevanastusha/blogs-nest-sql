@@ -51,9 +51,7 @@ describe('AppController (e2e)', () => {
   let createResponseComment_1 : any = null
   let createResponseComment_2 : any = null
   let res : any = null
-
   //SA testing
-
   it ('SA check empty blogs array', async  () => {
     const res = await request(server)
       .get('/sa/blogs')
@@ -67,7 +65,6 @@ describe('AppController (e2e)', () => {
     })
     expect(res.status).toBe(200)
   })
-
   it ('SA check empty user', async  () => {
     const res = await request(server)
       .get('/sa/users')
@@ -81,7 +78,6 @@ describe('AppController (e2e)', () => {
     })
     expect(res.status).toBe(200)
   })
-
   it ('SA create 1 user', async  () => {
     createResponseUser_1 = await request(server)
       .post('/sa/users')
@@ -104,7 +100,6 @@ describe('AppController (e2e)', () => {
       "login": "user1"
     })
   })
-
   it ('SA create 2 user', async  () => {
     createResponseUser_2 = await request(server)
       .post('/sa/users')
@@ -116,7 +111,6 @@ describe('AppController (e2e)', () => {
       })
       .expect(201)
   })
-
   it('SA get 2 users with pagination', async () => {
     res = await request(server)
       .get('/sa/users?sortBy=name&sortDirection=asc&pageSize=5')
@@ -153,7 +147,6 @@ describe('AppController (e2e)', () => {
       ]
     })
   })
-
   it ('SA ban user', async  () => {
     await request(server)
       .put('/sa/users/' + createResponseUser_1.body.id + '/ban')
@@ -241,14 +234,12 @@ describe('AppController (e2e)', () => {
       ]
     })
   })
-
   it ('SA delete 1 user', async  () => {
     await request(server)
       .delete('/sa/users/' + createResponseUser_1.body.id)
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
       .expect(204)
   })
-
   it('SA check for deleted 1 user', async () => {
     res = await request(server)
       .get('/sa/users')
@@ -274,7 +265,6 @@ describe('AppController (e2e)', () => {
       ]
     })
   })
-
   it ('SA create new blog', async () => {
     createResponseBlog_1 = await request(server)
       .post('/blog')
@@ -297,7 +287,6 @@ describe('AppController (e2e)', () => {
       "isMembership": true
     })
   })
-
   it('SA check for created blog', async () => {
     res = await request(server)
       .get('/sa/blogs')
@@ -324,14 +313,12 @@ describe('AppController (e2e)', () => {
       ]
     })
   })
-
   it ('SA bind blog', async  () => {
     await request(server)
       .put('/sa/blogs/' + createResponseBlog_1.body.id + '/bind-with-user/' + createResponseUser_2.body.id)
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
       .expect(204)
   })
-
   it('SA check for binded blog', async () => {
     res = await request(server)
       .get('/sa/blogs')
@@ -358,7 +345,6 @@ describe('AppController (e2e)', () => {
       ]
     })
   })
-
   it('BLOGGERS delete created blog', async () => {
     createResponseUser_2 = await request(server)
       .post('/auth/login')
@@ -375,9 +361,7 @@ describe('AppController (e2e)', () => {
       .get('/blogs/' + createResponseBlog_1.body.id )
       .expect(404)
   })
-
   //CHECK BLOGGER
-
   it('PUBLIC AND BLOGGER delete all data after SA', async () => {
     //runDb()
     await request(server)
@@ -386,7 +370,6 @@ describe('AppController (e2e)', () => {
       .expect(204)
   })
   //try to auth with banned user
-
   it ('AUTH PUBLIC login with banned user', async () => {
     //create user
     await request(server)
@@ -422,7 +405,6 @@ describe('AppController (e2e)', () => {
         banReason : 'test ban for user 1 that longer 20'
       })
   })
-
   //starts with create user
   let user
   it('AUTH PUBLIC test email sending', async () => {
@@ -480,7 +462,6 @@ describe('AppController (e2e)', () => {
       })
       .expect(204)
   });
-
   it('AUTH PUBLIC test change password', async () => {
     await request(server)
       .post('/auth/password-recovery')
@@ -544,7 +525,6 @@ describe('AppController (e2e)', () => {
     })
   })
   //create second user
-
   it('AUTH PUBLIC create second user for check blogs', async () => {
     await request(server)
       .post('/auth/registration')
@@ -564,7 +544,6 @@ describe('AppController (e2e)', () => {
     expect(token_2.body).toBeDefined()
   })
   //check for bloggers
-
   it ('BLOGGER test blogs', async () => {
     createResponseBlog_1 = await request(server)
       .post('/blogger/blogs')
@@ -747,9 +726,7 @@ describe('AppController (e2e)', () => {
       ]
     })
   })
-
   //test for posts
-
   it ('BLOGGER test posts', async () => {
     await request(server)
       .post('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts')
@@ -848,8 +825,7 @@ describe('AppController (e2e)', () => {
       .auth(token_2.body.accessToken, {type : 'bearer'})
       .expect(403)
   })
-
-  it("PUBLIC COMMENTS check for likes", async () => {
+  it("PUBLIC COMMENTS check for comments and likes", async () => {
     createResponseComment_1 = await request(server)
       .post('/posts/' + createResponsePost_1.body.id + '/comments')
       .send({
@@ -965,10 +941,143 @@ describe('AppController (e2e)', () => {
       "totalCount": 4
     })
   });
+  it('BLOGGER get all comments for blog', async () => {
+    res = await request(server)
+      .get('/blogger/blogs/comments')
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "items": [
+        {
+          "id": expect.any(String),
+          "content": "3 comment content for posts 1",
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "alina28"
+          },
+          "createdAt": expect.any(String),
+          "postInfo": {
+            "blogId": expect.any(String),
+            "blogName": "updatedname",
+            "id": expect.any(String),
+            "title": "updated"
+          }
+        },
+        {
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "content": "2 comment content for posts 1",
+          "createdAt": expect.any(String),
+          "id": expect.any(String),
+          "postInfo": {
+            "blogId": expect.any(String),
+            "blogName": "updatedname",
+            "id": expect.any(String),
+            "title": "updated"
+          }
+        },
+        {
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "content": "2 comment content for posts 1",
+          "createdAt": expect.any(String),
+          "id": expect.any(String),
+          "postInfo": {
+            "blogId": expect.any(String),
+            "blogName": "updatedname",
+            "id": expect.any(String),
+            "title": "updated"
+          }
+        },
+        {
+          "commentatorInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "content": "1 comment content for posts 1",
+          "createdAt": expect.any(String),
+          "id": expect.any(String),
+          "postInfo": {
+            "blogId": expect.any(String),
+            "blogName": "updatedname",
+            "id": expect.any(String),
+            "title": "updated"
+          }
+        }
+      ],
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 1,
+      "totalCount": 4
+    })
+  })
+
+  it('BLOGGER ban user for blog', async () => {
+    let userId = (await service.returnUserByField('alina28')).id
+    await request(server)
+      .put('/blogger/users/' + userId + '/ban')
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .send({
+        "isBanned": true,
+        "banReason": "test ban reason for user alina28",
+        "blogId": createResponseBlog_1.body.id
+      })
+    res = await request(server)
+      .get('/blogger/users/blog/' + createResponseBlog_1.body.id)
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "pagesCount": 1,
+      "page": 1,
+      "pageSize": 10,
+      "totalCount": 1,
+      items : [
+        {
+          id : userId,
+          login : 'alina28',
+          banInfo : {
+            isBanned : true,
+            banDate : expect.any(String),
+            banReason : 'test ban reason for user alina28'
+          }
+        }
+      ]
+    })
+    await request(server)
+      .post('/posts/' + createResponsePost_1.body.id + '/comments')
+      .send({
+        content  : '3 comment content for posts 1'
+      })
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(401)
+    await request(server)
+      .put('/blogger/users/' + userId + '/ban')
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .send({
+        "isBanned": false,
+        "banReason": "test ban reason for user alina28",
+        "blogId": createResponseBlog_1.body.id
+      })
+    res = await request(server)
+      .get('/blogger/users/blog/' + createResponseBlog_1.body.id)
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "pagesCount": 0,
+      "page": 1,
+      "pageSize": 10,
+      "totalCount": 0,
+      items : []
+    })
+  })
+
   it('timer ', async () => {
     await new Promise((resolve) => setTimeout(resolve, 5000)); // Таймер на 10 секунд
   });
-
   it('COMMENTS PUBLIC check for likes', async () => {
     await request(server)
       .post('/auth/registration')
@@ -1182,7 +1291,6 @@ describe('AppController (e2e)', () => {
       }
     })
   })
-
   it ('PUBLIC POSTS check for likes', async () => {
     await request(server)
       .put('/posts/' + createResponsePost_1.body.id + '/like-status')
@@ -1268,7 +1376,6 @@ describe('AppController (e2e)', () => {
       "title": "updated"
     })
   })
-
   it("BLOGGERS AND PUBLIC BLOGS AND POSTS check for deleting blogs and posts ", async () => {
     await request(server)
       .delete('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts/' + createResponsePost_1.body.id)
@@ -1285,8 +1392,6 @@ describe('AppController (e2e)', () => {
       .get('/posts/' + createResponsePost_1.body.id)
       .expect(404)
   });
-
-
   afterAll(async () => {
     await request(server)
       .delete('/testing/all-data')

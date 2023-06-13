@@ -1,13 +1,26 @@
-import { BlogModel, PaginatedClass, BlogDocument, BlogViewModel } from "../api/public/blogs/blogs.schema";
-import { QueryCommentsUsers, QueryModelBlogs, QueryModelPosts, QueryModelUsers } from "./helpers.schema";
+import {
+  BlogModel,
+  PaginatedClass,
+  BlogDocument,
+  BlogViewModel,
+  BannedUserInfo
+} from "../api/public/blogs/blogs.schema";
+import {
+  QueryCommentsUsers,
+  QueryModelBannedUsersForBlog,
+  QueryModelBlogs,
+  QueryModelPosts,
+  QueryModelUsers
+} from "./helpers.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { PostDocument, PostModel } from "../api/public/posts/posts.schema";
 import { UserModel, UserViewModel } from "../api/superadmin/users/users.schema";
-import { CommentDocument, CommentModel } from "../api/public/comments/comments.schema";
+import { CommentDocument, CommentModel, CommentViewModel } from "../api/public/comments/comments.schema";
 import { LikesRepository } from "../likes/likes.repository";
 import { LikeDocument, LikeViewModel } from "../likes/likes.schema";
 import { UsersRepository } from "../api/superadmin/users/users.repository";
+import { User } from "node-telegram-bot-api";
 
 export class QueryRepository {
   constructor(@InjectModel('bloggers') private blogsModel: Model<BlogDocument>,
@@ -21,7 +34,7 @@ export class QueryRepository {
   async paginationForBlogs(query : QueryModelBlogs) : Promise <BlogModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.blogsModel
-      .find({name: {$regex: query.searchNameTerm, $options: 'i'}}, {_id: 0, __v: 0, blogOwnerInfo : {_id : 0}})
+      .find({name: {$regex: query.searchNameTerm, $options: 'i'}}, {_id: 0, __v: 0, blogOwnerInfo : {_id : 0}, bannedUsers : 0})
       .sort({[query.sortBy]: query.sortDirection})
       .skip(skipSize)
       .limit(+query.pageSize)
@@ -30,7 +43,7 @@ export class QueryRepository {
   async paginationForBlogsWithUser(query : QueryModelBlogs, userId : string) : Promise <BlogViewModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.blogsModel
-      .find({name: {$regex: query.searchNameTerm, $options: 'i'}, 'blogOwnerInfo.userId': userId}, {_id: 0, __v: 0, blogOwnerInfo : 0})
+      .find({name: {$regex: query.searchNameTerm, $options: 'i'}, 'blogOwnerInfo.userId': userId}, {_id: 0, __v: 0, blogOwnerInfo : 0, bannedUsers : 0})
       .sort({[query.sortBy]: query.sortDirection})
       .skip(skipSize)
       .limit(+query.pageSize)
@@ -61,6 +74,25 @@ export class QueryRepository {
       .sort({[query.sortBy]: query.sortDirection})
       .skip(skipSize)
       .limit(+query.pageSize)
+      .lean()
+  }
+  async paginatorForCommentsByBlogOwner(query : QueryCommentsUsers, userId : string): Promise<CommentViewModel[]> {
+    const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
+    return this.commentsModel
+      .find({'postInfo.blogOwnerId' : userId}, {_id: 0, __v: 0, postId : 0, likesInfo : 0, 'postInfo.blogOwnerId' : 0,
+        'postInfo._id' : 0, 'commentatorInfo._id' : 0})
+      .sort({[query.sortBy]: query.sortDirection})
+      .skip(skipSize)
+      .limit(+query.pageSize)
+      .lean()
+  }
+  async paginationForBlogBannedUsers(query: QueryModelBannedUsersForBlog, bannedList : string[]): Promise<UserViewModel[]> {
+    const skipSize: number = query.pageSize * (query.pageNumber - 1)
+    return this.usersModel
+      .find({id: { $in: bannedList }, login: {$regex: query.searchLoginTerm, $options: 'i'} }, {_id: 0, __v: 0, password : 0, confirmedCode : 0, isConfirmed : 0, banInfo : {_id : 0}})
+      .sort({[query.sortBy]: query.sortDirection})
+      .skip(skipSize)
+      .limit(query.pageSize)
       .lean()
   }
   async paginationForUsers(query: QueryModelUsers): Promise<UserViewModel[]> {
@@ -160,6 +192,21 @@ export class QueryRepository {
   }
 
   //PAGINATION FOR POSTS
+
+  async usersMapping(users : UserViewModel[], banInfo : BannedUserInfo[]){
+    return await users.map((a) => {
+      let userInfo = banInfo.find(item => item.userId === a.id)
+      return
+      {
+        id : a.id
+        login : a.login
+          banInfo : {
+          isBanned : userInfo.isBanned
+          banDate : userInfo.banDate
+          banReason : userInfo.banReason
+        }
+    }})
+  }
 
   async postsMapping(posts : PostModel[], userId : string) {
     return await Promise.all(

@@ -21,6 +21,19 @@ export class LikesInfo {
   myStatus: string
 }
 
+@Schema()
+export class PostInfo {
+  @Prop({required : true})
+  id: string
+  @Prop({required : true})
+  title: string
+  @Prop({required : true})
+  blogId: string
+  @Prop({required : true})
+  blogName: string
+  @Prop({required : true})
+  blogOwnerId : string
+}
 
 @Schema()
 export class CommentModel {
@@ -36,6 +49,33 @@ export class CommentModel {
   postId : string
   @Prop({required : true})
   likesInfo: LikesInfo
+  @Prop({required : true})
+  postInfo : PostInfo
+}
+
+@Schema()
+export class PostInfoViewModel {
+  @Prop({required : true})
+  id: string
+  @Prop({required : true})
+  title: string
+  @Prop({required : true})
+  blogId: string
+  @Prop({required : true})
+  blogName: string
+}
+
+export class CommentViewModel {
+  @Prop({required : true})
+  id : string
+  @Prop({required : true})
+  content : string
+  @Prop({required : true})
+  commentatorInfo : CommentatorInfo
+  @Prop({required : true})
+  createdAt: string
+  @Prop({required : true})
+  postInfo : PostInfoViewModel
 }
 
 export const CommentSchema = SchemaFactory.createForClass(CommentModel)

@@ -22,11 +22,13 @@ import { BlogModel } from "../../public/blogs/blogs.schema";
 import { Response, Request } from "express";
 import { PostModel } from "../../public/posts/posts.schema";
 import { CheckIfUserExist } from "../../../auth.guard";
-import { PostsDto } from "../../public/posts/posts.dto";
 import { CommandBus } from "@nestjs/cqrs";
 import { CreateBlogBlogsCommand } from "../../use-cases/blogs/blogs-create-blog-use-case";
+import { CreatePostPostsCommand } from "../../use-cases/posts/posts-create-post-use-case";
+import { DeletePostPostsCommand } from "../../use-cases/posts/posts-delete-post-use-case";
+import { DeleteBlogBlogsCommand } from "../../use-cases/blogs/blogs-delete-blog-use-case";
 
-@Controller('blogger/blogs')
+@Controller('blogger/blogs/')
 export class BloggersController {
   constructor(protected bloggersService : BloggersService,
               protected postsService : PostsService,
@@ -49,6 +51,22 @@ export class BloggersController {
     }, token)
   }
   @UseGuards(CheckIfUserExist)
+  @Get('comments')
+  async getComments(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
+                 @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
+                 @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
+                 @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
+                 @Query('searchNameTerm', new DefaultValuePipe('')) searchNameTerm : string,
+                 @Req() req: Request){
+    const token = req.headers.authorization!.split(" ")[1]
+    return await this.bloggersService.getComments({
+      pageSize : pageSize,
+      pageNumber : pageNumber,
+      sortBy : sortBy,
+      sortDirection : sortDirection
+    }, token)
+  }
+  @UseGuards(CheckIfUserExist)
   @Post()
   async createBlog(
     @Body() blog : BlogDto,
@@ -66,12 +84,13 @@ export class BloggersController {
                    @Body() post : PostsBlogDto,
                    @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    const createdPost : PostModel | null = await this.postsService.createPost({
+    const createdPost : PostModel | null = await this.commandBus.execute(
+      new CreatePostPostsCommand({
       title: post.title,
       shortDescription: post.shortDescription,
       content: post.content,
       blogId: blogId
-    }, token)
+    }, token))
     if (!createdPost) throw new NotFoundException()
     return createdPost
   }
@@ -110,7 +129,7 @@ export class BloggersController {
   async deleteBlog(@Param('id') blogId : string,
                    @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    await this.bloggersService.deleteBlog(blogId, token)
+    await this.commandBus.execute(new DeleteBlogBlogsCommand(blogId, token))
     return
   }
   @UseGuards(CheckIfUserExist)
@@ -120,7 +139,8 @@ export class BloggersController {
                    @Res() res : Response,
                    @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    const status : boolean = await this.postsService.deletePostByBlogId(postId, blogId, token)
+    const status : boolean = await this.commandBus.execute(
+      new DeletePostPostsCommand(postId, blogId, token))
     if (!status) throw new NotFoundException()
     return res.sendStatus(204)
   }

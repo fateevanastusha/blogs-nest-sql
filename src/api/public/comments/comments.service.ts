@@ -7,7 +7,6 @@ import { QueryCommentsUsers } from "../../../helpers/helpers.schema";
 import { QueryRepository } from "../../../helpers/query.repository";
 import { PaginatedClass } from "../blogs/blogs.schema";
 import { LikesHelpers } from "../../../helpers/likes.helper";
-import { UsersService } from "../../superadmin/users/users.service";
 import { UsersRepository } from "../../superadmin/users/users.repository";
 
 @Injectable()
@@ -51,25 +50,6 @@ export class CommentsService {
   async updateCommentById (content: string, id: string) : Promise <boolean> {
     return await this.commentsRepository.updateCommentById(content, id)
   }
-    async createComment(postId : string, userId: string, content : string) : Promise <CommentModel | null> {
-    const user : UserModel | null = await this.usersRepository.getFullUser(userId)
-    const comment : CommentModel = {
-      id : (+new Date()).toString(),
-      content : content,
-      commentatorInfo : {
-        userId: userId,
-        userLogin: user!.login
-      },
-      createdAt: new Date().toISOString(),
-      postId : postId,
-      likesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: "None"
-      }
-    }
-    return this.commentsRepository.createNewComment(comment);
-  }
   async getAllCommentsByPostId(query : QueryCommentsUsers, postId: string, userId : string) : Promise<PaginatedClass> {
     const items : CommentModel[] = await this.queryRepository.paginatorForCommentsByPostId(query, postId)
     const filteredItems : CommentModel[] = await this.queryRepository.filterCommentsOfBannedUser(items)
@@ -80,55 +60,34 @@ export class CommentsService {
     let paginatedComments = await this.queryRepository.paginationForm(pageCount, total, comments, query)
     return paginatedComments
   }
-
   //change like status
 
   async changeLikeStatus(requestType : string, commentId : string, userId : string) : Promise <boolean> {
     const comment : CommentModel | null = await this.commentsRepository.getCommentById(commentId)
-    if (!comment) {
-      return false;
-    }
+    if (!comment) return false;
     const status1 = await this.likesRepository.findStatus(commentId, userId)
     const currentStatus = await this.likesHelper.requestType(status1)
-    if (currentStatus === requestType) {
-      return true
-    }
+    if (currentStatus === requestType) return true
     const status = {
       status : requestType,
       userId : userId,
       postOrCommentId : commentId,
       createdAt : new Date().toISOString()
     }
-
-    //if no status
     if (currentStatus === "None"){
-      //add new like or dislike
       await this.likesRepository.createNewStatus(status)
     }
-
     else if (requestType === "None"){
-      //delete status
       await this.likesRepository.deleteStatus(commentId, userId)
     } else {
-      //change status
       await this.likesRepository.updateStatus(status)
     }
-    //change total
     await this.changeTotalCount(commentId)
     return true;
   }
-
   async changeTotalCount(commentId : string) : Promise<boolean> {
     const likesCount : number = await this.likesRepository.findLikes(commentId)
     const dislikesCount : number = await this.likesRepository.findDislikes(commentId)
     return this.commentsRepository.changeLikesTotalCount(commentId, likesCount, dislikesCount)
-  }
-  async getLikesAndDislikesCount(commentId : string) {
-    const likesCount : number = await this.likesRepository.findLikes(commentId)
-    const dislikesCount : number = await this.likesRepository.findDislikes(commentId)
-    return {
-      likesCount : likesCount,
-      dislikesCount : dislikesCount
-    }
   }
 }

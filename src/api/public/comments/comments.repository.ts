@@ -9,15 +9,16 @@ export class CommentsRepository {
   async getCommentById(id: string): Promise<CommentModel | null> {
     return await this.commentsModel.findOne(
       {id: id},
-      { _id: 0, __v: 0, postId: 0, commentatorInfo : {_id : 0, isBanned : 0}, likesInfo : {_id : 0}}
+      { _id: 0, __v: 0, postId: 0, commentatorInfo : {_id : 0, isBanned : 0}, likesInfo : {_id : 0}, postInfo : 0}
     ).lean()
   }
-
+  async getCommentsCountByBlogOwnerId(userId : string) : Promise<number>{
+    return await this.commentsModel.find({'postInfo.blogOwnerId' : userId}).count()
+  }
   async deleteCommentById(id: string): Promise<boolean> {
     const result = await this.commentsModel.deleteOne({id: id})
     return result.deletedCount === 1
   }
-
   async updateCommentById(content: string, id: string): Promise<boolean> {
     const result = await this.commentsModel.updateOne({id: id}, {
       $set: {
@@ -26,7 +27,6 @@ export class CommentsRepository {
     })
     return result.matchedCount === 1
   }
-
   async createNewComment(comment: CommentModel): Promise<CommentModel | null> {
     await this.commentsModel.insertMany(comment)
     const createdComment = await this.getCommentById(comment.id)
@@ -36,25 +36,10 @@ export class CommentsRepository {
       return null
     }
   }
-
-  async getAllCommentsByPostId(postId: string): Promise<CommentModel[] | null> {
-    return this.commentsModel
-      .find({postId: postId}, {_id: 0, __v: 0, postId: 0})
-      .lean()
-  }
-
   async countCommentsByPostId(postId: string): Promise<number> {
     return this.commentsModel.countDocuments({postId: postId}, {_id: 0, __v: 0, postId: 0})
 
   }
-
-  async commentsCount(): Promise<number> {
-    return this.commentsModel
-      .find()
-      .count()
-  }
-
-
   async changeLikesTotalCount(commentId: string, likesCount: number, dislikesCount: number): Promise<boolean> {
     const status = await this.commentsModel.updateOne({
       id: commentId,
@@ -66,13 +51,8 @@ export class CommentsRepository {
     })
     return status.matchedCount === 1
   }
-
   async deleteAllData() {
     const result = await this.commentsModel.deleteMany({})
     return []
-  }
-
-  async getAllComments() {
-    return await this.commentsModel.find({}).lean()
   }
 }

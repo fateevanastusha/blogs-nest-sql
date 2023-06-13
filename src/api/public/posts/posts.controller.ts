@@ -17,10 +17,13 @@ import { PostModel } from "./posts.schema";
 import { Request } from "express";
 import { CheckIfUserExist } from "../../../auth.guard";
 import { LikesDto } from "../../../likes/likes.dto";
+import { CommandBus } from "@nestjs/cqrs";
+import { CreateCommentCommentsCommand } from "../../use-cases/comments/comments-create-comment-use-case";
 
 @Controller('posts')
 export class PostsController{
-  constructor(protected postsService : PostsService) {}
+  constructor(protected postsService : PostsService,
+              protected commandBus : CommandBus) {}
   @Get()
   async getPosts(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
@@ -69,12 +72,12 @@ export class PostsController{
     }, req.headers.authorization, postId)
   }
   @UseGuards(CheckIfUserExist)
-  @Post(':id/comments')
-  async postComment(@Param('id') postId : string,
+  @Post(':postId/comments')
+  async postComment(@Param('postId') postId : string,
                     @Body() comment : CommentsDto,
                     @Req() req: any){
     const token = req.headers.authorization!.split(" ")[1]
-    return await this.postsService.createComment(postId, comment.content, token)
+    return await this.commandBus.execute(new CreateCommentCommentsCommand(postId, comment.content, token))
   }
   @UseGuards(CheckIfUserExist)
   @HttpCode(204)
@@ -83,9 +86,7 @@ export class PostsController{
                 @Body() like : LikesDto,
                 @Req() req: any){
     const status : boolean = await this.postsService.changeLikeStatus(like.likeStatus, postId, req.headers.authorization)
-    if (!status){
-      throw new NotFoundException()
-    }
+    if (!status) throw new NotFoundException()
     return
   }
 

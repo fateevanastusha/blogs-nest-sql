@@ -15,6 +15,9 @@ export class UsersRepository {
       ...(banStatus === true || banStatus === false ? { 'banInfo.isBanned': banStatus } : {})
     })
   }
+  async getBlogBannedUsersCount(bannedList : string[], searchLoginTerm : string) : Promise<number>{
+    return this.usersModel.countDocuments({id: { $in: bannedList }, login: {$regex: searchLoginTerm, $options: 'i'} })
+  }
   async getFullUser (id : string) : Promise<UserModel | null>{
     return this.usersModel.findOne({id: id}, {_id: 0, __v: 0})
   }

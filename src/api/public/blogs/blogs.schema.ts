@@ -13,6 +13,18 @@ export class BlogOwnerModel {
   userLogin: string
 }
 
+@Schema()
+export class BannedUserInfo {
+  @Prop({required: true})
+  isBanned: boolean
+  @Prop({required: true})
+  banDate: string
+  @Prop({required: true})
+  banReason: string
+  @Prop({required: true})
+  userId: string
+}
+
 
 @Schema()
 export class BlogModel {
@@ -30,6 +42,8 @@ export class BlogModel {
   isMembership : boolean
   @Prop({required: true})
   blogOwnerInfo: BlogOwnerModel
+  @Prop({required: true})
+  bannedUsers : BannedUserInfo[]
 }
 
 @Schema()

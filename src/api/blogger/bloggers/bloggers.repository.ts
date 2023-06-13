@@ -1,4 +1,4 @@
-import { BlogModel, BlogDocument } from "../../public/blogs/blogs.schema";
+import { BlogModel, BlogDocument, BannedUserInfo } from "../../public/blogs/blogs.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { BlogDto } from "../../public/blogs/blogs.dto";
@@ -25,9 +25,12 @@ export class BloggersRepository {
     if(createdBlog) return createdBlog;
     return null;
   }
-  //PUT - update
   async updateBlog(blog : BlogDto, id: string) : Promise <boolean>{
     const result = await this.blogsModel.updateOne({id: id}, { $set: blog})
+    return result.matchedCount === 1
+  }
+  async updateBlogBannedUsers(blogId : string, bannedUsers : BannedUserInfo[] ) : Promise <boolean>{
+    const result = await this.blogsModel.updateOne({id: blogId}, { $set : {bannedUsers : bannedUsers}})
     return result.matchedCount === 1
   }
   async deleteAllData(){

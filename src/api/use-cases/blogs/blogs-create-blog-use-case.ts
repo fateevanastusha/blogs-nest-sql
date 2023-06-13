@@ -1,4 +1,3 @@
-import { UsersDto } from "../../superadmin/users/users.dto";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { BlogModel } from "../../public/blogs/blogs.schema";
 import { JwtService } from "../../../jwt.service";
@@ -28,7 +27,8 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogBlogsCommand
       blogOwnerInfo : {
         userId: userId,
         userLogin: user.login
-      }
+      },
+      bannedUsers : []
     }
     return await this.blogsRepository.createBlog(newBlog);
   }
