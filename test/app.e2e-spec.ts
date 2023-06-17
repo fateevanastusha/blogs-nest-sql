@@ -305,6 +305,7 @@ describe('AppController (e2e)', () => {
           id: createResponseBlog_1.body.id,
           createdAt: createResponseBlog_1.body.createdAt,
           isMembership: true,
+          isBanned : false,
           blogOwnerInfo: {
             userId : expect.any(String),
             userLogin : expect.any(String)
@@ -337,6 +338,7 @@ describe('AppController (e2e)', () => {
           id: createResponseBlog_1.body.id,
           createdAt: createResponseBlog_1.body.createdAt,
           isMembership: true,
+          isBanned : false,
           blogOwnerInfo: {
             userId : createResponseUser_2.body.id,
             userLogin : createResponseUser_2.body.login
@@ -697,6 +699,7 @@ describe('AppController (e2e)', () => {
           "id": expect.any(String),
           "isMembership": false,
           "name": "2bloguser2",
+          isBanned : false,
           "websiteUrl": "http://www.nastyastar.com"
         },
         {
@@ -709,6 +712,7 @@ describe('AppController (e2e)', () => {
           "id": expect.any(String),
           "isMembership": false,
           "name": "2bloguser1",
+          isBanned : false,
           "websiteUrl": "http://www.nastyastar.com"
         },
         {
@@ -721,6 +725,7 @@ describe('AppController (e2e)', () => {
           "id": expect.any(String),
           "isMembership": false,
           "name": "updatedname",
+          isBanned : false,
           "websiteUrl": "http://www.nastyastar.com"
         }
       ]
@@ -1053,7 +1058,7 @@ describe('AppController (e2e)', () => {
         content  : '3 comment content for posts 1'
       })
       .auth(token_2.body.accessToken, {type : 'bearer'})
-      .expect(401)
+      .expect(403)
     await request(server)
       .put('/blogger/users/' + userId + '/ban')
       .auth(token_1.body.accessToken, {type : 'bearer'})
@@ -1392,6 +1397,145 @@ describe('AppController (e2e)', () => {
       .get('/posts/' + createResponsePost_1.body.id)
       .expect(404)
   });
+  it("SA BLOGS ban blog and check banned blog", async () => {
+    createResponseBlog_1 = await request(server)
+      .post('/blogger/blogs')
+      .send({
+        "name": "blog for ban",
+        "description": "blog for ban",
+        "websiteUrl": "http://www.blogforban.com"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    createResponsePost_1 = await request(server)
+      .post('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts')
+      .send({
+        "title": "string1",
+        "shortDescription": "string1",
+        "content": "string1"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    createResponsePost_2 = await request(server)
+      .post('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts')
+      .send({
+        "title": "string2",
+        "shortDescription": "string2",
+        "content": "string2"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    await request(server)
+      .put('/sa/blogs/' + createResponseBlog_1.body.id + '/ban')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({isBanned : true})
+      .expect(200)
+    res = await request(server)
+      .get('/sa/blogs')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "items": [
+        {
+          "blogOwnerInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "createdAt": expect.any(String),
+          "description": "blog for ban",
+          "id": expect.any(String),
+          "isBanned": true,
+          "isMembership": false,
+          "name": "blog for ban",
+          "websiteUrl": "http://www.blogforban.com"
+        },
+        {
+          "blogOwnerInfo": {
+            "userId": expect.any(String),
+            "userLogin": "alina28"
+          },
+          "createdAt": expect.any(String),
+          "description": "about me",
+          "id": expect.any(String),
+          "isBanned": false,
+          "isMembership": false,
+          "name": "2bloguser2",
+          "websiteUrl": "http://www.nastyastar.com"
+        },
+        {
+          "blogOwnerInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "createdAt": expect.any(String),
+          "description": "about me",
+          "id": expect.any(String),
+          "isBanned": false,
+          "isMembership": false,
+          "name": "2bloguser1",
+          "websiteUrl": "http://www.nastyastar.com"
+        },
+        {
+          "blogOwnerInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "createdAt": expect.any(String),
+          "description": "about me",
+          "id": expect.any(String),
+          "isBanned": false,
+          "isMembership": false,
+          "name": "updatedname",
+          "websiteUrl": "http://www.nastyastar.com"
+        }
+      ],
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 1,
+      "totalCount": 4
+    })
+    res = await request(server)
+      .get('/blogger/blogs/')
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "items": [
+        {
+          "createdAt": expect.any(String),
+          "description": "about me",
+          "id": expect.any(String),
+          "isMembership": false,
+          "name": "2bloguser1",
+          "websiteUrl": "http://www.nastyastar.com"
+        },
+        {
+          "createdAt": expect.any(String),
+          "description": "about me",
+          "id": expect.any(String),
+          "isMembership": false,
+          "name": "updatedname",
+          "websiteUrl": "http://www.nastyastar.com"
+        }
+      ],
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 1,
+      "totalCount": 2
+    })
+    res = await request(server)
+      .get('/blogs/' + createResponseBlog_1.body.id + '/posts')
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 0,
+      "totalCount": 0,
+      items : []
+    })
+    await request(server)
+      .get('/posts/' + createResponsePost_1.body.id)
+      .expect(404)
+  })
   afterAll(async () => {
     await request(server)
       .delete('/testing/all-data')

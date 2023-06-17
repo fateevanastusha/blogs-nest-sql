@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { BanUserForBlogDto } from "./bloggers.users.dto";
 import { JwtService } from "../../../jwt.service";
 import { BloggersRepository } from "../bloggers/bloggers.repository";
@@ -36,7 +36,6 @@ export class BloggersUsersService {
       }
       return await this.bloggerRepository.updateBlogBannedUsers(banInfo.blogId, bannedUsers)
     }
-
   }
   async getAllBannedUsers(token : string, blogId : string, query : QueryModelBannedUsersForBlog) : Promise<PaginatedClass>{
     const ownerId = await this.jwtService.getUserIdByToken(token)

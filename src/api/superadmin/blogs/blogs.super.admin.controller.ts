@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   DefaultValuePipe,
   Get, HttpCode, NotFoundException,
@@ -9,7 +10,7 @@ import {
 } from "@nestjs/common";
 import { BlogsSuperAdminService } from "./blogs.super.admin.service";
 import { AuthGuard } from "../../../auth.guard";
-import { log } from "util";
+import { BanBlogDto } from "./blogs.super.admin.dto";
 
 @UseGuards(AuthGuard)
 @Controller('sa/blogs')
@@ -28,6 +29,13 @@ export class BlogsSuperAdminController {
       sortDirection : sortDirection,
       searchNameTerm : searchNameTerm
     })
+  }
+  @Put(':blogId/ban')
+  async banBlog(@Param('blogId') blogId : string,
+                @Body() request : BanBlogDto){
+    const status : boolean = await this.blogsService.banBlog(blogId, request)
+    if(!status) throw new NotFoundException()
+    return
   }
   @HttpCode(204)
   @Put(':id/bind-with-user/:userId')

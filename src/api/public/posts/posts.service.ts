@@ -42,11 +42,16 @@ export class PostsService {
   }
   async getPostsByBlogId (query : QueryModelPosts, blogId: string, token : string) : Promise<PaginatedClass | null>{
     const userId = await this.jwtService.getUserIdByToken(token)
-    const blog : BlogModel | null = await this.blogsRepository.getBlog(blogId)
+    const blog : BlogModel | null = await this.blogsRepository.getFullBlog(blogId)
     if(!blog) return null
     let total : number = await this.postsRepository.countPostsByBlogId(blogId)
-    const pageCount = Math.ceil( total / query.pageSize)
-    const items : PostModel[] = await this.queryRepository.paginatorForPostsWithBlog(query, blogId);
+    let pageCount = Math.ceil( total / query.pageSize)
+    let items : PostModel[] = await this.queryRepository.paginatorForPostsWithBlog(query, blogId);
+    if(blog.isBanned) {
+      items = [];
+      total = 0
+      pageCount = 0
+    }
     const paginatedPosts : PostModel[] = await this.queryRepository.postsMapping(items, userId)
     return await this.queryRepository.paginationForm(pageCount, total, paginatedPosts, query)
   }
@@ -65,6 +70,9 @@ export class PostsService {
     const newestLikes : LikeViewModel[] = await this.queryRepository.getLastLikesForPost(id)
     const post =  await this.postsRepository.getPost(id);
     if (!post) return null
+    const blog = await this.blogsRepository.getFullBlog(post.blogId)
+    if(!blog) throw new NotFoundException()
+    if(blog.isBanned) throw new NotFoundException()
     post.extendedLikesInfo.newestLikes = newestLikes
     if(myStatus === null){
       post.extendedLikesInfo.myStatus = 'None'

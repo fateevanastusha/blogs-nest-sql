@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ForbiddenException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "../../../jwt.service";
 import { PostModel } from "../../public/posts/posts.schema";
 import { PostsRepository } from "../../public/posts/posts.repository";
@@ -28,7 +28,7 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommen
     const foundBlog : BlogModel | null = await this.blogsRepository.getFullBlog(foundPost.blogId)
     if (foundBlog === null) throw new NotFoundException()
     let userId = await this.jwtService.getUserIdByToken(command.token)
-    if(foundBlog.bannedUsers.find(a => a.userId === userId)) throw new UnauthorizedException()
+    if(foundBlog.bannedUsers.find(a => a.userId === userId)) throw new ForbiddenException()
     const user : UserModel | null = await this.usersRepository.getFullUser(userId)
     const comment : CommentModel = {
       id : (+new Date()).toString(),

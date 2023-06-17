@@ -44,6 +44,8 @@ export class BlogModel {
   blogOwnerInfo: BlogOwnerModel
   @Prop({required: true})
   bannedUsers : BannedUserInfo[]
+  @Prop({required: true})
+  isBanned : boolean
 }
 
 @Schema()

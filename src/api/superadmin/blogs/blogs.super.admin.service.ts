@@ -1,10 +1,11 @@
 import { QueryModelBlogs } from "../../../helpers/helpers.schema";
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { BlogsSuperAdminRepository } from "./blogs.super.admin.repository";
 import { BlogModel, BlogOwnerModel, PaginatedClass } from "../../public/blogs/blogs.schema";
 import { UsersRepository } from "../users/users.repository";
 import { QueryRepository } from "../../../helpers/query.repository";
 import { UserModel } from "../users/users.schema";
+import { BanBlogDto } from "./blogs.super.admin.dto";
 
 @Injectable()
 export class BlogsSuperAdminService {
@@ -15,6 +16,9 @@ export class BlogsSuperAdminService {
     const pageCount = Math.ceil( total / +query.pageSize)
     const items : BlogModel[] = await this.queryRepository.paginationForBlogs(query);
     return await this.queryRepository.paginationForm(pageCount, total, items, query)
+  }
+  async banBlog(blogId : string, request : BanBlogDto) : Promise<boolean> {
+    return await this.blogsRepository.banBlog(blogId, request.isBanned)
   }
   async bindBlog(blogId : string, userId : string) : Promise <boolean>{
     const user : UserModel | null = await this.usersRepository.getFullUser(userId)

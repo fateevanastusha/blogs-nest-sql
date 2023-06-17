@@ -43,7 +43,7 @@ export class QueryRepository {
   async paginationForBlogsWithUser(query : QueryModelBlogs, userId : string) : Promise <BlogViewModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.blogsModel
-      .find({name: {$regex: query.searchNameTerm, $options: 'i'}, 'blogOwnerInfo.userId': userId}, {_id: 0, __v: 0, blogOwnerInfo : 0, bannedUsers : 0})
+      .find({name: {$regex: query.searchNameTerm, $options: 'i'}, 'blogOwnerInfo.userId': userId, isBanned : false}, {_id: 0, __v: 0, blogOwnerInfo : 0, bannedUsers : 0, isBanned : 0})
       .sort({[query.sortBy]: query.sortDirection})
       .skip(skipSize)
       .limit(+query.pageSize)
