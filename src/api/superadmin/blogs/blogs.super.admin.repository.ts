@@ -12,7 +12,7 @@ export class BlogsSuperAdminRepository {
     return await this.blogsModel.findOne({id : blogId})
   }
   async banBlog(blogId : string, status : BlogBanInfo) : Promise<boolean>{
-    const result = await this.blogsModel.updateOne({id : blogId}, {$set : {banInfo : status}})
+    const result = await this.blogsModel.updateOne({id : blogId}, {$set : {'banInfo.isBanned' : status.isBanned, 'banInfo.banDate' : status.banDate}})
     return result.matchedCount === 1
   }
   async bindUser(blogId : string, userInfo : BlogOwnerModel) : Promise <boolean>{

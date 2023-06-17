@@ -30,6 +30,7 @@ export class BlogsSuperAdminController {
       searchNameTerm : searchNameTerm
     })
   }
+  @HttpCode(204)
   @Put(':blogId/ban')
   async banBlog(@Param('blogId') blogId : string,
                 @Body() request : BanBlogDto){

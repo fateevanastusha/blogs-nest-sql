@@ -1474,7 +1474,7 @@ describe('AppController (e2e)', () => {
       .put('/sa/blogs/' + createResponseBlog_1.body.id + '/ban')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
       .send({isBanned : true})
-      .expect(200)
+      .expect(204)
     res = await request(server)
       .get('/sa/blogs')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
@@ -1492,7 +1492,7 @@ describe('AppController (e2e)', () => {
           },
           "createdAt": expect.any(String),
           "description": "blog for ban",
-          "id": expect.any(String),
+          "id": createResponseBlog_1.body.id,
           "isMembership": false,
           "name": "blog for ban",
           "websiteUrl": "http://www.blogforban.com"

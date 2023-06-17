@@ -50,6 +50,7 @@ export class BloggersController {
       searchNameTerm : searchNameTerm
     }, token)
   }
+  @HttpCode(200)
   @UseGuards(CheckIfUserExist)
   @Get('comments')
   async getComments(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
