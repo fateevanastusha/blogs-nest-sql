@@ -14,7 +14,7 @@ export class BlogsSuperAdminService {
   async getBlogs(query : QueryModelBlogs): Promise<PaginatedClass>{
     const total = await this.blogsRepository.getBlogsCount(query.searchNameTerm)
     const pageCount = Math.ceil( total / +query.pageSize)
-    const items : BlogModel[] = await this.queryRepository.paginationForBlogs(query);
+    const items : BlogModel[] = await this.queryRepository.paginationForBlogsWithAdmin(query);
     return await this.queryRepository.paginationForm(pageCount, total, items, query)
   }
   async banBlog(blogId : string, request : BanBlogDto) : Promise<boolean> {
