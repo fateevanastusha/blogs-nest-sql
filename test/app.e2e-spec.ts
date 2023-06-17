@@ -1462,6 +1462,22 @@ describe('AppController (e2e)', () => {
     expect(res.body).toStrictEqual({
       "items": [
         {
+          "banInfo": {
+            "banDate": expect.any(String),
+            "isBanned": true
+          },
+          "blogOwnerInfo": {
+            "userId": expect.any(String),
+            "userLogin": "nastya1"
+          },
+          "createdAt": expect.any(String),
+          "description": "blog for ban",
+          "id": expect.any(String),
+          "isMembership": false,
+          "name": "blog for ban",
+          "websiteUrl": "http://www.blogforban.com"
+        },
+        {
           "blogOwnerInfo": {
             "userId": expect.any(String),
             "userLogin": "alina28"
