@@ -29,7 +29,10 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogBlogsCommand
         userLogin: user.login
       },
       bannedUsers : [],
-      isBanned : false
+      banInfo : {
+        isBanned : false,
+        banDate : null
+      }
     }
     return await this.blogsRepository.createBlog(newBlog);
   }

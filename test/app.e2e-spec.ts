@@ -305,7 +305,10 @@ describe('AppController (e2e)', () => {
           id: createResponseBlog_1.body.id,
           createdAt: createResponseBlog_1.body.createdAt,
           isMembership: true,
-          isBanned : false,
+          "banInfo": {
+            banDate : null,
+            isBanned : false
+          },
           blogOwnerInfo: {
             userId : expect.any(String),
             userLogin : expect.any(String)
@@ -338,7 +341,10 @@ describe('AppController (e2e)', () => {
           id: createResponseBlog_1.body.id,
           createdAt: createResponseBlog_1.body.createdAt,
           isMembership: true,
-          isBanned : false,
+          banInfo: {
+            banDate : null,
+            isBanned : false
+          },
           blogOwnerInfo: {
             userId : createResponseUser_2.body.id,
             userLogin : createResponseUser_2.body.login
@@ -699,7 +705,10 @@ describe('AppController (e2e)', () => {
           "id": expect.any(String),
           "isMembership": false,
           "name": "2bloguser2",
-          isBanned : false,
+          "banInfo": {
+            banDate : null,
+            isBanned : false
+          },
           "websiteUrl": "http://www.nastyastar.com"
         },
         {
@@ -712,7 +721,10 @@ describe('AppController (e2e)', () => {
           "id": expect.any(String),
           "isMembership": false,
           "name": "2bloguser1",
-          isBanned : false,
+          "banInfo": {
+            banDate : null,
+            isBanned : false
+          },
           "websiteUrl": "http://www.nastyastar.com"
         },
         {
@@ -725,7 +737,10 @@ describe('AppController (e2e)', () => {
           "id": expect.any(String),
           "isMembership": false,
           "name": "updatedname",
-          isBanned : false,
+          "banInfo": {
+            banDate : null,
+            isBanned : false
+          },
           "websiteUrl": "http://www.nastyastar.com"
         }
       ]
@@ -1454,7 +1469,10 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isBanned": false,
+          "banInfo": {
+            banDate : null,
+            isBanned : false
+          },
           "isMembership": false,
           "name": "2bloguser2",
           "websiteUrl": "http://www.nastyastar.com"
@@ -1467,7 +1485,10 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isBanned": false,
+          "banInfo": {
+            banDate : null,
+            isBanned : false
+          },
           "isMembership": false,
           "name": "2bloguser1",
           "websiteUrl": "http://www.nastyastar.com"
@@ -1480,7 +1501,10 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isBanned": false,
+          "banInfo": {
+            banDate : null,
+            isBanned : false
+          },
           "isMembership": false,
           "name": "updatedname",
           "websiteUrl": "http://www.nastyastar.com"

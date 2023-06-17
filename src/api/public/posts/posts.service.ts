@@ -47,7 +47,7 @@ export class PostsService {
     let total : number = await this.postsRepository.countPostsByBlogId(blogId)
     let pageCount = Math.ceil( total / query.pageSize)
     let items : PostModel[] = await this.queryRepository.paginatorForPostsWithBlog(query, blogId);
-    if(blog.isBanned) {
+    if(blog.banInfo.isBanned) {
       items = [];
       total = 0
       pageCount = 0
@@ -72,7 +72,7 @@ export class PostsService {
     if (!post) return null
     const blog = await this.blogsRepository.getFullBlog(post.blogId)
     if(!blog) throw new NotFoundException()
-    if(blog.isBanned) throw new NotFoundException()
+    if(blog.banInfo.isBanned) throw new NotFoundException()
     post.extendedLikesInfo.newestLikes = newestLikes
     if(myStatus === null){
       post.extendedLikesInfo.myStatus = 'None'

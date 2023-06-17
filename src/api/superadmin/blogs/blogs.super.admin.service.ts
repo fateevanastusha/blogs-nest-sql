@@ -18,7 +18,10 @@ export class BlogsSuperAdminService {
     return await this.queryRepository.paginationForm(pageCount, total, items, query)
   }
   async banBlog(blogId : string, request : BanBlogDto) : Promise<boolean> {
-    return await this.blogsRepository.banBlog(blogId, request.isBanned)
+    return await this.blogsRepository.banBlog(blogId, {
+      isBanned : request.isBanned,
+      banDate : new Date().toISOString()
+    })
   }
   async bindBlog(blogId : string, userId : string) : Promise <boolean>{
     const user : UserModel | null = await this.usersRepository.getFullUser(userId)

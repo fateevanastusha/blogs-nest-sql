@@ -7,10 +7,10 @@ export class BloggersRepository {
   constructor(@InjectModel('bloggers') private blogsModel: Model<BlogDocument> ) {
   }
   async getBlogsCount(searchNameTerm: string, userId : string): Promise<number>{
-    return this.blogsModel.countDocuments({name: {$regex: searchNameTerm, $options : 'i'}, 'blogOwnerInfo.userId' : userId, isBanned : false})
+    return this.blogsModel.countDocuments({name: {$regex: searchNameTerm, $options : 'i'}, 'blogOwnerInfo.userId' : userId, 'banInfo.isBanned' : false})
   }
   async getBlog(id : string) : Promise<BlogModel | null>{
-    return this.blogsModel.findOne({id: id}, {_id: 0, __v: 0, blogOwnerInfo : 0, isBanned : false})
+    return this.blogsModel.findOne({id: id}, {_id: 0, __v: 0, blogOwnerInfo : 0, 'banInfo.isBanned' : false})
   }
   async getFullBlog(id : string) : Promise<BlogModel | null>{
     return this.blogsModel.findOne({id: id})

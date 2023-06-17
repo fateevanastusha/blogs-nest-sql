@@ -60,7 +60,10 @@ export class AppController {
         userLogin: 'userLogin'
       },
       bannedUsers : [],
-      isBanned : false
+      banInfo : {
+        isBanned : false,
+        banDate : null
+      }
     }
     const createdBlog : BlogModel | null = await this.blogsRepository.createBlog(newBlog)
     if(!createdBlog) throw new BadRequestException()
