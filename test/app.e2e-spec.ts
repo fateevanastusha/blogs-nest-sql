@@ -981,6 +981,11 @@ describe('AppController (e2e)', () => {
             "blogName": "updatedname",
             "id": expect.any(String),
             "title": "updated"
+          },
+          likesInfo : {
+            dislikesCount : 0,
+            likesCount : 0,
+            myStatus : 'None'
           }
         },
         {
@@ -996,6 +1001,11 @@ describe('AppController (e2e)', () => {
             "blogName": "updatedname",
             "id": expect.any(String),
             "title": "updated"
+          },
+          likesInfo : {
+            dislikesCount : 0,
+            likesCount : 0,
+            myStatus : 'None'
           }
         },
         {
@@ -1011,6 +1021,11 @@ describe('AppController (e2e)', () => {
             "blogName": "updatedname",
             "id": expect.any(String),
             "title": "updated"
+          },
+          likesInfo : {
+            dislikesCount : 0,
+            likesCount : 0,
+            myStatus : 'None'
           }
         },
         {
@@ -1026,6 +1041,11 @@ describe('AppController (e2e)', () => {
             "blogName": "updatedname",
             "id": expect.any(String),
             "title": "updated"
+          },
+          likesInfo : {
+            dislikesCount : 0,
+            likesCount : 0,
+            myStatus : 'None'
           }
         }
       ],

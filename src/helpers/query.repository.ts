@@ -79,8 +79,8 @@ export class QueryRepository {
   async paginatorForCommentsByBlogOwner(query : QueryCommentsUsers, userId : string): Promise<CommentViewModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.commentsModel
-      .find({'postInfo.blogOwnerId' : userId}, {_id: 0, __v: 0, postId : 0, likesInfo : 0, 'postInfo.blogOwnerId' : 0,
-        'postInfo._id' : 0, 'commentatorInfo._id' : 0})
+      .find({'postInfo.blogOwnerId' : userId}, {_id: 0, __v: 0, postId : 0, 'postInfo.blogOwnerId' : 0,
+        'postInfo._id' : 0, 'commentatorInfo._id' : 0, 'likesInfo._id' : 0})
       .sort({[query.sortBy]: query.sortDirection})
       .skip(skipSize)
       .limit(+query.pageSize)
