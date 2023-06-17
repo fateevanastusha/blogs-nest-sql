@@ -6,7 +6,8 @@ import { QueryRepository } from "../../../helpers/query.repository";
 import { QueryModelBannedUsersForBlog } from "../../../helpers/helpers.schema";
 import { BannedUserInfo, BlogModel, PaginatedClass } from "../../public/blogs/blogs.schema";
 import { UsersRepository } from "../../superadmin/users/users.repository";
-import { UserViewModel } from "../../superadmin/users/users.schema";
+import { UserModel, UserViewModel } from "../../superadmin/users/users.schema";
+import { User } from "node-telegram-bot-api";
 
 @Injectable()
 export class BloggersUsersService {
@@ -15,6 +16,8 @@ export class BloggersUsersService {
               protected queryRepository : QueryRepository,
               protected usersRepository : UsersRepository) {}
   async BanUserForBlog(token : string, userId : string, banInfo : BanUserForBlogDto) : Promise<boolean> {
+    const user : UserModel | null = await this.usersRepository.getFullUser(userId)
+    if(!user) throw new NotFoundException()
     const ownerId = await this.jwtService.getUserIdByToken(token)
     const blog : BlogModel = await this.bloggerRepository.getFullBlog(banInfo.blogId)
     if(!blog) throw new NotFoundException()

@@ -6,7 +6,7 @@ export class BlogsSuperAdminRepository {
   constructor(@InjectModel('bloggers') private blogsModel: Model<BlogDocument> ) {
   }
   async getBlogsCount(searchNameTerm: string): Promise<number>{
-    return this.blogsModel.countDocuments({name: {$regex: searchNameTerm, $options : 'i'}})
+    return this.blogsModel.countDocuments({name: {$regex: searchNameTerm, $options : 'i'}, isBanned : false})
   }
   async getBlog(blogId : string) : Promise<BlogModel | null>{
     return await this.blogsModel.findOne({id : blogId})

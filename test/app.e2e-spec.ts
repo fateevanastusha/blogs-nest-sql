@@ -1022,6 +1022,15 @@ describe('AppController (e2e)', () => {
   })
 
   it('BLOGGER ban user for blog', async () => {
+    await request(server)
+      .put('/blogger/users/' + 'notexisting' + '/ban')
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .send({
+        "isBanned": true,
+        "banReason": "test ban reason for user alina28",
+        "blogId": createResponseBlog_1.body.id
+      })
+      .expect(404)
     let userId = (await service.returnUserByField('alina28')).id
     await request(server)
       .put('/blogger/users/' + userId + '/ban')
@@ -1031,6 +1040,7 @@ describe('AppController (e2e)', () => {
         "banReason": "test ban reason for user alina28",
         "blogId": createResponseBlog_1.body.id
       })
+      .expect(204)
     res = await request(server)
       .get('/blogger/users/blog/' + createResponseBlog_1.body.id)
       .auth(token_1.body.accessToken, {type : 'bearer'})
@@ -1439,19 +1449,6 @@ describe('AppController (e2e)', () => {
         {
           "blogOwnerInfo": {
             "userId": expect.any(String),
-            "userLogin": "nastya1"
-          },
-          "createdAt": expect.any(String),
-          "description": "blog for ban",
-          "id": expect.any(String),
-          "isBanned": true,
-          "isMembership": false,
-          "name": "blog for ban",
-          "websiteUrl": "http://www.blogforban.com"
-        },
-        {
-          "blogOwnerInfo": {
-            "userId": expect.any(String),
             "userLogin": "alina28"
           },
           "createdAt": expect.any(String),
@@ -1492,7 +1489,7 @@ describe('AppController (e2e)', () => {
       "page": 1,
       "pageSize": 10,
       "pagesCount": 1,
-      "totalCount": 4
+      "totalCount": 3
     })
     res = await request(server)
       .get('/blogger/blogs/')
