@@ -40,6 +40,7 @@ export class QueryRepository {
       .limit(+query.pageSize)
       .lean()
   }
+  //comment
   async paginationForBlogsWithAdmin(query : QueryModelBlogs) : Promise <BlogModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.blogsModel
