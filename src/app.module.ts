@@ -44,7 +44,6 @@ import { BlogsSuperAdminRepository } from "./api/superadmin/blogs/blogs.super.ad
 import { BlogsRepository } from "./api/public/blogs/blogs.repository";
 import { BlogsService } from "./api/public/blogs/blogs.service";
 import { BlogsSuperAdminService } from "./api/superadmin/blogs/blogs.super.admin.service";
-import { CqrsModule } from "@nestjs/cqrs";
 import { CreateUserUseCase } from "./api/use-cases/users/users-create-user-use-case";
 import { DeleteUserUseCase } from "./api/use-cases/users/users-delete-user-use-case";
 import { CreateBlogUseCase } from "./api/use-cases/blogs/blogs-create-blog-use-case";
@@ -54,6 +53,9 @@ import { DeleteBlogUseCase } from "./api/use-cases/blogs/blogs-delete-blog-use-c
 import { CreateCommentUseCase } from "./api/use-cases/comments/comments-create-comment-use-case";
 import { BloggersUsersService } from "./api/blogger/users/bloggers.users.service";
 import { BloggersUsersController } from "./api/blogger/users/bloggers.users.controller";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { TestRepo } from "./test.repo";
+import { CqrsModule } from "@nestjs/cqrs";
 
 const repositories = [
   UsersRepository,
@@ -66,6 +68,7 @@ const repositories = [
   BloggersRepository,
   BlogsRepository,
   BlogsSuperAdminRepository,
+  TestRepo
 ]
 const services = [
   UsersService,
@@ -95,6 +98,16 @@ const useCases = [
 @Module({
   imports: [
     CqrsModule,
+      TypeOrmModule.forRoot({
+        type : 'postgres',
+        host : 'localhost',
+        port : 5432,
+        username : 'nodejs',
+        password : 'nodejs',
+        database : 'BlogsNestApi',
+        autoLoadEntities : false,
+        synchronize : false
+      }),
      PassportModule,
      MongoModule,
      MongooseModule.forFeature([{

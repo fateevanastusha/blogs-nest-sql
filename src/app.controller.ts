@@ -3,7 +3,7 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, HttpCode,
   Post,
   Res,
   UseGuards
@@ -19,6 +19,7 @@ import { AuthGuard, CheckIfUserExist } from "./auth.guard";
 import { BlogDto } from "./api/public/blogs/blogs.dto";
 import { BlogModel } from "./api/public/blogs/blogs.schema";
 import { BloggersService } from "./api/blogger/bloggers/bloggers.service";
+import { TestRepo } from "./test.repo";
 
 @Controller()
 export class AppController {
@@ -28,7 +29,8 @@ export class AppController {
               protected securityRepository : SecurityRepository,
               protected likesRepository : LikesRepository,
               protected commentsRepository : CommentsRepository,
-              protected blogsService : BloggersService
+              protected blogsService : BloggersService,
+              protected appRepository : TestRepo
               ) {}
 
   @Delete('/testing/all-data')
@@ -68,5 +70,10 @@ export class AppController {
     const createdBlog : BlogModel | null = await this.blogsRepository.createBlog(newBlog)
     if(!createdBlog) throw new BadRequestException()
     return createdBlog
+  }
+  @HttpCode(200)
+  @Get('/test-sql')
+  async testForSql(){
+    return await this.appRepository.sqlTest()
   }
 }

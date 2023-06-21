@@ -7,7 +7,7 @@ import {
   Res,
   Body,
   HttpCode,
-  BadRequestException, UnauthorizedException, NotFoundException
+  BadRequestException, UnauthorizedException
 } from "@nestjs/common";
 import { CheckAttempts, CheckForRefreshToken, CheckForSameDevice } from "../../../auth.guard";
 import { AuthService } from "./auth.service";
