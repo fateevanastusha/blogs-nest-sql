@@ -2,9 +2,12 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { UserBanInfo, UserDocument, UserModel } from "./users.schema";
 import { Injectable } from "@nestjs/common";
+import { InjectDataSource } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectModel('users') private usersModel: Model<UserDocument> ) {
+  constructor(@InjectModel('users') private usersModel: Model<UserDocument>,
+              @InjectDataSource() protected dataSource : DataSource) {
   }
   async getUsersCount(searchLoginTerm : string, searchEmailTerm : string, banStatus) : Promise<number>{
     return this.usersModel.countDocuments({
@@ -19,7 +22,11 @@ export class UsersRepository {
     return this.usersModel.countDocuments({id: { $in: bannedList }, login: {$regex: searchLoginTerm, $options: 'i'} })
   }
   async getFullUser (id : string) : Promise<UserModel | null>{
-    return this.usersModel.findOne({id: id}, {_id: 0, __v: 0})
+    return this.dataSource.query(`
+    SELECT *
+    FROM public."Users"
+    WHERE id = '${id}'
+    `)
   }
   async getUserWithId(id : string) : Promise <UserModel | null> {
     return this.usersModel
@@ -31,12 +38,19 @@ export class UsersRepository {
     return user
   }
   async returnUserByEmail(email : string) : Promise <UserModel | null> {
-    const user =  this.usersModel
-      .findOne({email : email},{_id: 0, __v: 0})
-    return user
+    return this.dataSource.query(`
+    SELECT *
+    FROM public."Users"
+    WHERE email = '${email}'
+    `)
   }
   async createUser(newUser : UserModel): Promise <UserModel | null> {
-    await this.usersModel.insertMany(newUser)
+    //SQL base insert
+    this.dataSource.query(`
+    INSERT INTO public."Users"(
+    "email", "login", "password", "createdAt", "isConfirmed", "confirmedCode")
+    VALUES ('${newUser.email}', '${newUser.login}', '${newUser.password}','${newUser.createdAt}', '${newUser.isConfirmed}', '${newUser.confirmedCode}' );
+    `)
     const createdUser = await this.getUserWithId(newUser.id)
     if (createdUser) {
       return createdUser
@@ -44,8 +58,11 @@ export class UsersRepository {
     return null
   }
   async getLoginById(id : string) : Promise <string> {
-    const user = await this.usersModel
-      .findOne({id: id}, {_id: 0, password : 0,  isConfirmed: 0, confirmedCode : 0, __v: 0})
+    const user = await this.dataSource.query(`
+    SELECT *
+    FROM public."Users"
+    WHERE id = '${id}'
+    `)
     if (!user) return 'login'
     return user.login
   }

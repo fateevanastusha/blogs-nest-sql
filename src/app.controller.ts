@@ -35,9 +35,9 @@ export class AppController {
 
   @Delete('/testing/all-data')
   async deleteAllData(@Res() res : Response) {
+    await this.usersRepository.deleteAllData();
     await this.blogsRepository.deleteAllData();
     await this.postsRepository.deleteAllData();
-    await this.usersRepository.deleteAllData();
     await this.securityRepository.deleteAllData();
     await this.likesRepository.deleteAllData();
     await this.commentsRepository.deleteAllData();

@@ -20,7 +20,6 @@ import { CommentDocument, CommentModel, CommentViewModel } from "../api/public/c
 import { LikesRepository } from "../likes/likes.repository";
 import { LikeDocument, LikeViewModel } from "../likes/likes.schema";
 import { UsersRepository } from "../api/superadmin/users/users.repository";
-import { User } from "node-telegram-bot-api";
 
 export class QueryRepository {
   constructor(@InjectModel('bloggers') private blogsModel: Model<BlogDocument>,
@@ -40,7 +39,6 @@ export class QueryRepository {
       .limit(+query.pageSize)
       .lean()
   }
-  //comment
   async paginationForBlogsWithAdmin(query : QueryModelBlogs) : Promise <BlogModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.blogsModel
