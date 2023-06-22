@@ -21,7 +21,7 @@ export class BloggersUsersService {
     const ownerId = await this.jwtService.getUserIdByToken(token)
     const blog : BlogModel = await this.bloggerRepository.getFullBlog(banInfo.blogId)
     if(!blog) throw new NotFoundException()
-    if(blog.blogOwnerInfo.userId !== ownerId) throw new ForbiddenException()
+    if(blog.userId !== ownerId) throw new ForbiddenException()
     const bannedUsers  = blog.bannedUsers
     if (banInfo.isBanned === true){
       const bannedInfo : BannedUserInfo = {
@@ -44,7 +44,7 @@ export class BloggersUsersService {
     const ownerId = await this.jwtService.getUserIdByToken(token)
     const blog = await this.bloggerRepository.getFullBlog(blogId)
     if(!blog) throw new NotFoundException()
-    if(blog.blogOwnerInfo.userId !== ownerId) throw new ForbiddenException()
+    if(blog.userId !== ownerId) throw new ForbiddenException()
     const banInfo = [...blog.bannedUsers]
     const bannedId  = []
     for(let i = 0; i < blog.bannedUsers.length; i++){

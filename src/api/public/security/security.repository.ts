@@ -2,68 +2,78 @@ import { RefreshTokensMetaModel, RefreshTokensMetaDocument } from "./security.sc
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Injectable } from "@nestjs/common";
+import { InjectDataSource } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
 @Injectable()
 export class SecurityRepository {
-  constructor(@InjectModel('refresh token meta') private refreshTokensMetaModel: Model<RefreshTokensMetaDocument>) {}
+  constructor(@InjectModel('refresh token meta') private refreshTokensMetaModel: Model<RefreshTokensMetaDocument>,
+              @InjectDataSource() protected dataSource : DataSource) {}
   async getAllSessions(userId : string) : Promise<RefreshTokensMetaModel[] | null> {
-    return this.refreshTokensMetaModel
-      .find({userId}, {_id: 0, __v: 0, userId : 0})
-      .lean()
+    return await this.dataSource.query(`
+        SELECT "ip", "title", "lastActiveDate", "deviceId"
+        FROM public."RefreshTokens"
+        WHERE "userId" = ${userId}
+    `)
   }
   async deleteAllSessions(deviceId : string, userId : string) : Promise<boolean> {
-    const result = await this.refreshTokensMetaModel
-      .deleteMany({
-        userId,
-        deviceId : {$ne : deviceId}
-      })
-    return result.deletedCount > 0
+    await this.dataSource.query(`
+    DELETE FROM refresh_tokens_meta
+        WHERE "userId" = ${userId} AND NOT ("deviceId" = '${deviceId}')
+    `)
+    return true
   }
   async deleteOneSessions(deviceId : string) : Promise<boolean> {
-    await this.refreshTokensMetaModel.deleteOne({deviceId : deviceId})
+    await this.dataSource.query(`
+    DELETE FROM public."RefreshTokens"
+        WHERE "deviceId" = '${deviceId}';
+    `)
     return true
   }
   async createNewSession(refreshTokensMeta : RefreshTokensMetaModel) : Promise<boolean> {
-    await this.refreshTokensMetaModel
-      .insertMany({
-        userId : refreshTokensMeta.userId,
-        ip: refreshTokensMeta.ip,
-        title: refreshTokensMeta.title,
-        lastActiveDate: refreshTokensMeta.lastActiveDate,
-        deviceId: refreshTokensMeta.deviceId
-      });
+    return this.dataSource.query(`
+    INSERT INTO public."RefreshTokens"(
+        "ip", "title", "lastActiveDate", "deviceId", "userId")
+        VALUES ('${refreshTokensMeta.ip}', '${refreshTokensMeta.title}', '${refreshTokensMeta.lastActiveDate}', '${refreshTokensMeta.deviceId}', ${refreshTokensMeta.userId});
+    `)
     const createdSession = await this.findSessionByIp(refreshTokensMeta.ip);
     if (createdSession) return true;
     return false;
-
-
   }
   async findSessionByIp(ip : string) : Promise<RefreshTokensMetaModel | null> {
-    return this.refreshTokensMetaModel
-      .findOne({ip: ip})
+    return await this.dataSource.query(`
+        SELECT *
+        FROM public."RefreshTokens"
+        WHERE "ip" = '${ip}'
+    `)
   }
   async findSessionByDeviceId(deviceId: string) : Promise<RefreshTokensMetaModel | null> {
-    return this.refreshTokensMetaModel
-      .findOne({deviceId: deviceId})
+    return await this.dataSource.query(`
+        SELECT *
+        FROM public."RefreshTokens"
+        WHERE "deviceId" = '${deviceId}'
+    `)
   }
   async updateSession(ip : string, title : string, lastActiveDate : string, deviceId : string) : Promise<boolean>{
-    const result = await this.refreshTokensMetaModel
-      .updateOne({deviceId : deviceId},
-        {$set : {
-            ip: ip,
-            title: title,
-            lastActiveDate: lastActiveDate,
-            deviceId: deviceId
-          }
-        });
-    return result.matchedCount === 1;
+    await this.dataSource.query(`
+    UPDATE public."RefreshTokens"
+        SET ip='${ip}', title='${title}', "lastActiveDate"='${lastActiveDate}', "deviceId"='${deviceId}'
+        WHERE "deviceId"='${deviceId}';
+    `)
+    return true
   }
   async checkSameDevice(title : string, userId : string) : Promise<boolean> {
-    const result = await this.refreshTokensMetaModel.find({title: title, userId : userId})
+    const result = await this.dataSource.query(`
+        SELECT *
+        FROM public."RefreshTokens"
+        WHERE "title" = '${title}' AND "userId" = ${userId}
+    `)
     if (result) return true
     return false
   }
   async deleteAllData() {
-    await this.refreshTokensMetaModel.deleteMany({});
-    return [];
+    this.dataSource.query(`
+    DELETE FROM public."RefreshTokens"
+    `)
+    return true
   }
 }

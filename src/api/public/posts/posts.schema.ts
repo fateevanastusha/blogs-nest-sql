@@ -5,7 +5,7 @@ import { LikeViewModel } from "../../../likes/likes.schema";
 export type PostDocument = HydratedDocument<PostModel>
 
 @Schema()
-export class extendedLikesInfo {
+export class ExtendedLikesInfo {
   @Prop({required : true} )
   likesCount: number
   @Prop({required : true} )
@@ -32,8 +32,26 @@ export class PostModel {
   blogName: string
   @Prop({required : true})
   createdAt: string
-  @Prop({required : true} )
-  extendedLikesInfo: extendedLikesInfo
+}
+
+@Schema()
+export class PostViewModel {
+  @Prop({required : true})
+  id: string
+  @Prop({required : true})
+  title: string
+  @Prop({required : true})
+  shortDescription: string
+  @Prop({required : true})
+  content: string
+  @Prop({required : true})
+  blogId: string
+  @Prop({required : true})
+  blogName: string
+  @Prop({required : true})
+  createdAt: string
+  @Prop({required : true})
+  extendedLikesInfo : ExtendedLikesInfo
 }
 
 

@@ -52,7 +52,7 @@ export class CheckIfUserExist implements CanActivate {
     if(!userId) throw new UnauthorizedException()
     const user = await this.userRepo.getFullUser(userId)
     if(!user) throw new UnauthorizedException()
-    if (user.banInfo.isBanned === true) throw new UnauthorizedException()
+    if (user.isBanned === true) throw new UnauthorizedException()
     return true
   }
 }
@@ -79,7 +79,7 @@ export class CommentCheckForSameUser implements CanActivate {
     if(!user) throw new UnauthorizedException()
     const comment = await this.commentsService.getCommentByIdWithUser(req.params.id, userId);
     if (!comment) throw new NotFoundException();
-    else if (comment.commentatorInfo.userId !== userId) throw new ForbiddenException();
+    else if (comment.userId !== userId) throw new ForbiddenException();
     return true
   }
 }

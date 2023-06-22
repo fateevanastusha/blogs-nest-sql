@@ -48,12 +48,16 @@ export class BlogModel {
   createdAt : string
   @Prop({required: true})
   isMembership : boolean
-  @Prop({required: true})
-  blogOwnerInfo: BlogOwnerModel
+  @Prop({required : true})
+  userId: string
+  @Prop({required : true})
+  userLogin: string
   @Prop({required: true})
   bannedUsers : BannedUserInfo[]
   @Prop({required: true})
-  banInfo : BlogBanInfo
+  isBanned: boolean
+  @Prop({type : String})
+  banDate: string
 
 }
 

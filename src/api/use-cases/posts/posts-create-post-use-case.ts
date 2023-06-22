@@ -25,7 +25,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostPostsCommand
     if (!blog) return null
     const userId : string = await this.jwtService.getUserIdByToken(command.token)
     const user : UserModel | null = await this.usersRepository.getFullUser(userId)
-    if (user.id !== blog.blogOwnerInfo.userId) throw new ForbiddenException()
+    if (user.id !== blog.userId) throw new ForbiddenException()
     const newPost : PostModel = {
       id: '' + (+(new Date())),
       title : command.post.title,
@@ -33,13 +33,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostPostsCommand
       content: command.post.content,
       blogId: command.post.blogId,
       blogName: blog.name,
-      createdAt : new Date().toISOString(),
-      extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: "None",
-        newestLikes: []
-      }
+      createdAt : new Date().toISOString()
     };
     const createdPost = await this.postsRepository.createPost(newPost);
     if (!createdPost) return null

@@ -9,7 +9,6 @@ export class CreateUserUsersCommand {
   constructor(public user : UsersDto) {
   }
 }
-
 @CommandHandler(CreateUserUsersCommand)
 export class CreateUserUseCase implements ICommandHandler<CreateUserUsersCommand>{
   constructor( protected usersRepository : UsersRepository, protected businessService : BusinessService) {}
@@ -24,11 +23,9 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserUsersCommand
       createdAt: new Date().toISOString(),
       isConfirmed: false,
       confirmedCode: confirmationCode,
-      banInfo : {
-        isBanned : false,
-        banReason : null,
-        banDate : null
-      }
+      isBanned : false,
+      banReason : null,
+      banDate : null
     }
     await this.businessService.sendConfirmationCode(command.user.email, confirmationCode)
     return await this.usersRepository.createUser(newUser)

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { CommentsRepository } from "./comments.repository";
 import { LikesRepository } from "../../../likes/likes.repository";
 import { UserModel } from "../../superadmin/users/users.schema";
-import { CommentModel } from "./comments.schema";
+import { CommentModel, CommentViewModel, LikesInfo } from "./comments.schema";
 import { QueryCommentsUsers } from "../../../helpers/helpers.schema";
 import { QueryRepository } from "../../../helpers/query.repository";
 import { PaginatedClass } from "../blogs/blogs.schema";
@@ -16,33 +16,44 @@ export class CommentsService {
               protected queryRepository : QueryRepository,
               protected likesHelper : LikesHelpers,
               protected usersRepository : UsersRepository) {}
-
-  async getCommentById (id : string) : Promise<CommentModel | null> {
-    const status = await this.changeTotalCount(id)
-    if(!status) throw new NotFoundException()
+  async getCommentById (id : string) : Promise<CommentViewModel> {
     let comment : CommentModel | null = await this.commentsRepository.getCommentById(id)
     if (!comment) throw new NotFoundException()
-    const userId : string = comment.commentatorInfo.userId
-    const user : UserModel | null = await this.usersRepository.getFullUser(userId)
+    const user : UserModel | null = await this.usersRepository.getFullUser(comment.userId)
     if (!user) throw new NotFoundException()
-    if (user.banInfo.isBanned === true) throw new NotFoundException()
-    comment.likesInfo.likesCount = await this.queryRepository.getLikesOrDislikesCount(id, 'Like')
-    comment.likesInfo.dislikesCount = await this.queryRepository.getLikesOrDislikesCount(id, 'Dislike')
-    return comment
+    if (user.isBanned === true) throw new NotFoundException()
+    const likes : LikesInfo = await this.likesRepository.getLikesInfo(id)
+    const commentView : CommentViewModel = {
+      id: comment.id,
+      content: comment.content,
+      commentatorInfo: {
+        userId: comment.userId,
+        userLogin: comment.userLogin
+      },
+      createdAt: comment.createdAt,
+      likesInfo: likes
+    }
+    return commentView
   }
 
-  async getCommentByIdWithUser (id : string, userId : string) : Promise<CommentModel | null> {
-    const currentStatus = await this.likesHelper.requestType(await this.likesRepository.findStatus(id, userId))
+  async getCommentByIdWithUser (id : string, userId : string) : Promise<CommentViewModel> {
     let comment : CommentModel | null = await this.commentsRepository.getCommentById(id)
     if (!comment) return null
-    const userCommentOwnerId : string = comment.commentatorInfo.userId
-    const user : UserModel | null = await this.usersRepository.getFullUser(userCommentOwnerId)
+    const user : UserModel | null = await this.usersRepository.getFullUser(comment.userId)
     if (!user) throw new NotFoundException()
-    if (user.banInfo.isBanned === true) throw new NotFoundException()
-    comment.likesInfo.myStatus = currentStatus
-    comment.likesInfo.likesCount = await this.queryRepository.getLikesOrDislikesCount(id, 'Like')
-    comment.likesInfo.dislikesCount = await this.queryRepository.getLikesOrDislikesCount(id, 'Dislike')
-    return comment
+    if (user.isBanned === true) throw new NotFoundException()
+    const likes : LikesInfo = await this.likesRepository.getLikesInfoWithUser(userId, comment.id)
+    const commentView : CommentViewModel = {
+      id: comment.id,
+      content: comment.content,
+      commentatorInfo: {
+        userId: comment.userId,
+        userLogin: comment.userLogin
+      },
+      createdAt: comment.createdAt,
+      likesInfo: likes
+    }
+    return commentView
   }
   async deleteCommentById (id: string) : Promise<boolean> {
     return this.commentsRepository.deleteCommentById(id)
@@ -61,7 +72,6 @@ export class CommentsService {
     return paginatedComments
   }
   //change like status
-
   async changeLikeStatus(requestType : string, commentId : string, userId : string) : Promise <boolean> {
     const comment : CommentModel | null = await this.commentsRepository.getCommentById(commentId)
     if (!comment) return false;
@@ -82,12 +92,6 @@ export class CommentsService {
     } else {
       await this.likesRepository.updateStatus(status)
     }
-    await this.changeTotalCount(commentId)
     return true;
-  }
-  async changeTotalCount(commentId : string) : Promise<boolean> {
-    const likesCount : number = await this.likesRepository.findLikes(commentId)
-    const dislikesCount : number = await this.likesRepository.findDislikes(commentId)
-    return this.commentsRepository.changeLikesTotalCount(commentId, likesCount, dislikesCount)
   }
 }

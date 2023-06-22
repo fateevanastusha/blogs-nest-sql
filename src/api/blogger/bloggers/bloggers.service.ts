@@ -8,7 +8,7 @@ import { JwtService } from "../../../jwt.service";
 import { PostModel } from "../../public/posts/posts.schema";
 import { PostsRepository } from "../../public/posts/posts.repository";
 import { CommentsRepository } from "../../public/comments/comments.repository";
-import { CommentModel, CommentViewModel } from "../../public/comments/comments.schema";
+import { CommentModel, CommentForBloggerViewModel } from "../../public/comments/comments.schema";
 
 @Injectable()
 export class BloggersService {
@@ -28,14 +28,14 @@ export class BloggersService {
     const userId = await this.jwtService.getUserIdByToken(token)
     const total = await this.commentsRepository.getCommentsCountByBlogOwnerId(userId)
     const pageCount = Math.ceil( total / +query.pageSize)
-    const items : CommentViewModel[] = await this.queryRepository.paginatorForCommentsByBlogOwner(query, userId)
+    const items : CommentForBloggerViewModel[] = await this.queryRepository.paginatorForCommentsByBlogOwner(query, userId)
     return await this.queryRepository.paginationForm(pageCount,total,items,query)
   }
   async updateBlog(blog : BlogDto, id: string, token : string) : Promise <boolean>{
     const userId = await this.jwtService.getUserIdByToken(token)
     const blogForUpdate : BlogModel | null = await this.blogsRepository.getFullBlog(id)
     if (!blogForUpdate) throw new NotFoundException();
-    if (blogForUpdate.blogOwnerInfo.userId !== userId) throw new ForbiddenException()
+    if (blogForUpdate.userId !== userId) throw new ForbiddenException()
     return await this.blogsRepository.updateBlog(blog, id)
   }
   async deleteAllData(){

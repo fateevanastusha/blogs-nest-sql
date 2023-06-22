@@ -2,39 +2,71 @@ import { BlogModel, BlogDocument, BannedUserInfo } from "../../public/blogs/blog
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { BlogDto } from "../../public/blogs/blogs.dto";
+import { InjectDataSource } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
 
 export class BloggersRepository {
-  constructor(@InjectModel('bloggers') private blogsModel: Model<BlogDocument> ) {
+  constructor(@InjectModel('bloggers') private blogsModel: Model<BlogDocument> ,
+              @InjectDataSource() protected dataSource : DataSource) {
   }
   async getBlogsCount(searchNameTerm: string, userId : string): Promise<number>{
-    return this.blogsModel.countDocuments({name: {$regex: searchNameTerm, $options : 'i'}, 'blogOwnerInfo.userId' : userId, 'banInfo.isBanned' : false})
+    const count = await this.dataSource.query(`
+    SELECT COUNT(*) AS "total"
+        FROM public."Blogs"
+        WHERE "name" LIKE '%${searchNameTerm}%' AND "isBanned" = false AND "userId"=${userId}
+    `)
+    return count.total
   }
   async getBlog(id : string) : Promise<BlogModel | null>{
-    return this.blogsModel.findOne({id: id}, {_id: 0, __v: 0, blogOwnerInfo : 0, 'banInfo.isBanned' : false})
+    return this.dataSource.query(`
+    SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
+    FROM public."Blogs"
+    WHERE id = '${id}' AND "isBanned"=false
+    `)
   }
   async getFullBlog(id : string) : Promise<BlogModel | null>{
-    return this.blogsModel.findOne({id: id})
+    return this.dataSource.query(`
+    SELECT *
+    FROM public."Blogs"
+    WHERE id = '${id}'
+    `)
   }
   async deleteBlog(id : string) : Promise<boolean>{
-    const status = await this.blogsModel.deleteOne({id : id})
-    return status.deletedCount === 1
+    await this.dataSource.query(`
+    DELETE FROM public."Blogs"
+        WHERE id = ${id};
+    `)
+    return true
   }
   async createBlog(newBlog: BlogModel) : Promise<BlogModel | null>{
-    await this.blogsModel.insertMany(newBlog);
+    this.dataSource.query(`
+    INSERT INTO public."Blogs"(
+    "name", "description", "websiteUrl", "createdAt", "userId", "userLogin")
+    VALUES ('${newBlog.name}', '${newBlog.description}', '${newBlog.websiteUrl}', '${newBlog.createdAt}', '${Number(newBlog.userId)}', '${newBlog.userLogin}');
+    `)
     const createdBlog = await this.getBlog(newBlog.id);
     if(createdBlog) return createdBlog;
     return null;
   }
   async updateBlog(blog : BlogDto, id: string) : Promise <boolean>{
-    const result = await this.blogsModel.updateOne({id: id}, { $set: blog})
-    return result.matchedCount === 1
+    await this.dataSource.query(`
+    UPDATE public."Blogs"
+        SET name='${blog.name}', description='${blog.description}', "websiteUrl"='${blog.websiteUrl}'
+        WHERE "id" = ${id};`)
+    return true
   }
+  //ЗАМЕНИТЬ НА АЙДИШНИК
   async updateBlogBannedUsers(blogId : string, bannedUsers : BannedUserInfo[] ) : Promise <boolean>{
-    const result = await this.blogsModel.updateOne({id: blogId}, { $set : {bannedUsers : bannedUsers}})
-    return result.matchedCount === 1
+    await this.dataSource.query(`
+    UPDATE public."Blogs"
+        SET bannedUsers=ARRAY_APPEND("bannedUsers", ${bannedUsers})
+        WHERE "id" = ${blogId};`)
+    return true
   }
   async deleteAllData(){
-    await this.blogsModel.deleteMany({})
-    return []
+    this.dataSource.query(`
+    DELETE FROM public."Blogs"
+    `)
+    return true
   }
 }

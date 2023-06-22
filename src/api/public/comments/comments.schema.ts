@@ -42,15 +42,35 @@ export class CommentModel {
   @Prop({required : true})
   content : string
   @Prop({required : true})
-  commentatorInfo : CommentatorInfo
+  userId: string
+  @Prop({required : true})
+  userLogin: string
   @Prop({required : true})
   createdAt: string
   @Prop({required : true})
   postId : string
   @Prop({required : true})
-  likesInfo: LikesInfo
+  title: string
   @Prop({required : true})
-  postInfo : PostInfo
+  blogId: string
+  @Prop({required : true})
+  blogName: string
+  @Prop({required : true})
+  blogOwnerId : string
+}
+
+@Schema()
+export class CommentViewModel {
+  @Prop({required : true})
+  id : string
+  @Prop({required : true})
+  content : string
+  @Prop({required : true})
+  commentatorInfo : CommentatorInfo
+  @Prop({required : true})
+  createdAt: string
+  @Prop({required : true})
+  likesInfo : LikesInfo
 }
 
 @Schema()
@@ -65,7 +85,7 @@ export class PostInfoViewModel {
   blogName: string
 }
 
-export class CommentViewModel {
+export class CommentForBloggerViewModel {
   @Prop({required : true})
   id : string
   @Prop({required : true})

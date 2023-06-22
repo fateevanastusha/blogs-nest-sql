@@ -57,15 +57,11 @@ export class AppController {
       websiteUrl: blog.websiteUrl,
       createdAt: new Date().toISOString(),
       isMembership: true,
-      blogOwnerInfo : {
-        userId: 'userId',
-        userLogin: 'userLogin'
-      },
+      userId: 'userId',
+      userLogin: 'userLogin',
       bannedUsers : [],
-      banInfo : {
-        isBanned : false,
-        banDate : null
-      }
+      isBanned : false,
+      banDate : null
     }
     const createdBlog : BlogModel | null = await this.blogsRepository.createBlog(newBlog)
     if(!createdBlog) throw new BadRequestException()

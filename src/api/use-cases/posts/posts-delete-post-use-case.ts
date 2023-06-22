@@ -23,7 +23,7 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostPostsCommand
     const post : PostModel = await this.postsRepository.getPost(command.postId)
     if (!post) throw new NotFoundException()
     if(post.blogId !== command.blogId) throw new NotFoundException()
-    if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException()
+    if (blog.userId !== userId) throw new ForbiddenException()
     return await this.postsRepository.deletePost(command.postId)
   }
 }

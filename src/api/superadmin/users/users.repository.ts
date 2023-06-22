@@ -10,13 +10,13 @@ export class UsersRepository {
               @InjectDataSource() protected dataSource : DataSource) {
   }
   async getUsersCount(searchLoginTerm : string, searchEmailTerm : string, banStatus) : Promise<number>{
-    return this.usersModel.countDocuments({
-      $or: [
-        {login: {$regex: searchLoginTerm, $options: 'i'}},
-        {email: {$regex: searchEmailTerm, $options: 'i'}}
-      ],
-      ...(banStatus === true || banStatus === false ? { 'banInfo.isBanned': banStatus } : {})
-    })
+    const count = await this.dataSource.query(`
+    SELECT COUNT(*)
+        AS "total"
+        FROM public."Users"
+        WHERE "login" LIKE '%${searchLoginTerm}%' AND "email" LIKE '%${searchEmailTerm}%' AND "isBanned" = ${banStatus}
+    `)
+    return count.total
   }
   async getBlogBannedUsersCount(bannedList : string[], searchLoginTerm : string) : Promise<number>{
     return this.usersModel.countDocuments({id: { $in: bannedList }, login: {$regex: searchLoginTerm, $options: 'i'} })
@@ -29,13 +29,20 @@ export class UsersRepository {
     `)
   }
   async getUserWithId(id : string) : Promise <UserModel | null> {
+    this.dataSource.query(`
+    SELECT id, email, login, "createdAt", "isBanned", "banDate", "banReason"
+        FROM public."Users";
+        WHERE "id" = ${id}
+    `)
     return this.usersModel
       .findOne({id: id}, {_id: 0, password : 0,  isConfirmed: 0, confirmedCode : 0, __v: 0, banInfo : { _id: 0}})
   }
   async returnUserByField(field : string) : Promise <UserModel | null> {
-    const user = await this.usersModel
-      .findOne({$or : [{login: field} , {email: field}]})
-    return user
+    return this.dataSource.query(`
+    SELECT *
+        FROM public."Users"
+        WHERE "login" = '${field}' OR "email" = '${field}'
+    `)
   }
   async returnUserByEmail(email : string) : Promise <UserModel | null> {
     return this.dataSource.query(`
@@ -67,60 +74,64 @@ export class UsersRepository {
     return user.login
   }
   async checkForConfirmationCode (confirmedCode : string) : Promise<boolean> {
-    const user = await this.usersModel.findOne({confirmedCode : confirmedCode})
+    const user = await this.dataSource.query(`
+        SELECT *
+            FROM public."Users"
+            WHERE "confirmedCode" = '${confirmedCode}'
+    `)
     return user !== null
   }
   async changeConfirmedStatus (confirmedCode : string) : Promise<boolean> {
-    const status = await this.usersModel.updateOne(
-      {confirmedCode : confirmedCode},
-      { $set : {
-          isConfirmed : true
-        }
-      })
-    return status.matchedCount === 1
+    await this.dataSource.query(`
+        UPDATE public."Users" 
+        SET "isConfirmed" = true
+        WHERE "confirmedCode" = '${confirmedCode}'
+    `)
+    return true
   }
 
-  async changeConfirmationCode (confirmationCode : string, email : string) : Promise <boolean> {
-    const status = await this.usersModel.updateOne(
-      {email : email},
-      { $set : {
-          confirmedCode : confirmationCode
-        }
-      })
-    return status.matchedCount === 1
+  async changeConfirmationCode (confirmedCode : string, email : string) : Promise <boolean> {
+    await this.dataSource.query(`
+        UPDATE public."Users" 
+        SET "confirmedCode" = '${confirmedCode}'
+        WHERE "email" = '${email}'
+    `)
+    return true
   }
 
   async checkForConfirmedAccountByEmailOrCode (emailOrCode : string) : Promise <boolean> {
-    const user = await this.usersModel.findOne({$or: [{email: emailOrCode}, {confirmedCode: emailOrCode}]})
-    if (user?.isConfirmed) {
-      return true
-    } else {
-      return false
-    }
+    const user = await this.dataSource.query(`
+    SELECT *
+        FROM public."Users"
+        WHERE "confirmedCode" = '${emailOrCode}' OR "email" = '${emailOrCode}'
+    `)
+    return user.isConfirmed
   }
   async changeUserPassword(code : string, password : string) : Promise <boolean> {
-    const result = await this.usersModel.updateOne({confirmedCode: code}, {$set :
-        {
-          password: password
-        }
-    })
-    return result.matchedCount === 1
+    await this.dataSource.query(`
+        UPDATE public."Users" 
+        SET "password" = '${password}'
+        WHERE "confirmedCode" = '${code}'
+    `)
+    return true
   }
   async banUser(userId : string, banInfo : UserBanInfo) : Promise<boolean>{
-    const result = await this.usersModel.updateOne({id: userId}, {$set : { banInfo : {
-          isBanned : banInfo.isBanned,
-          banDate : banInfo.banDate,
-          banReason : banInfo.banReason
-        } } })
-    return result.matchedCount === 1
+    await this.dataSource.query(`
+        UPDATE public."Users" 
+        SET "isBanned" = '${banInfo.isBanned}', "banDate" = '${banInfo.banDate}', "banReason" = '${banInfo.banReason}'
+        WHERE "id" = ${userId}
+    `)
+    return true
   }
   async deleteUser(id: string) : Promise<boolean>{
-    const result = await this.usersModel.deleteOne({id: id, __v: 0})
-    return result.deletedCount === 1
+    await this.dataSource.query(`
+    DELETE FROM public."Users"
+        WHERE id = ${id};
+    `)
+    return true
   }
   async deleteAllData(){
-    await this.usersModel.deleteMany({})
-    return []
+    await this.dataSource.query(`DELETE FROM public."Users"`)
+    return true
   }
-
 }

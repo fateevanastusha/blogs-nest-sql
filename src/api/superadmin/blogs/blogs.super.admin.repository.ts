@@ -1,26 +1,46 @@
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { BlogBanInfo, BlogDocument, BlogModel, BlogOwnerModel } from "../../public/blogs/blogs.schema";
+import { InjectDataSource } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
 
 export class BlogsSuperAdminRepository {
-  constructor(@InjectModel('bloggers') private blogsModel: Model<BlogDocument> ) {
+  constructor(@InjectModel('bloggers') private blogsModel: Model<BlogDocument>,
+              @InjectDataSource() protected dataSource : DataSource) {
   }
   async getBlogsCount(searchNameTerm: string): Promise<number>{
-    return this.blogsModel.countDocuments({name: {$regex: searchNameTerm, $options : 'i'}, 'banInfo.isBanned' : false})
+    const count = await this.dataSource.query(`
+    SELECT COUNT(*) AS "total"
+        FROM public."Blogs"
+        WHERE "name" LIKE '%${searchNameTerm}%' AND "isBanned" = false
+    `)
+    return count.total
   }
   async getBlog(blogId : string) : Promise<BlogModel | null>{
-    return await this.blogsModel.findOne({id : blogId})
+    return await this.dataSource.query(`
+    SELECT *
+        FROM public."Blogs"
+        WHERE "id" = ${blogId} 
+    `)
   }
   async banBlog(blogId : string, status : BlogBanInfo) : Promise<boolean>{
-    const result = await this.blogsModel.updateOne({id : blogId}, {$set : {'banInfo.isBanned' : status.isBanned, 'banInfo.banDate' : status.banDate}})
-    return result.matchedCount === 1
+    await this.dataSource.query(`
+    UPDATE public."Blogs"
+        SET "isBanned"=${status.isBanned}, "banDate"='${status.banDate}'
+        WHERE id=${blogId}
+    `)
+    return true
   }
   async bindUser(blogId : string, userInfo : BlogOwnerModel) : Promise <boolean>{
-    const result = await this.blogsModel.updateOne({id: blogId}, { $set: { blogOwnerInfo : userInfo }})
-    return result.matchedCount === 1
+    await this.dataSource.query(`
+    UPDATE public."Blogs"
+        SET "userId"='${userInfo.userId}', "userLogin"='${userInfo.userLogin}'
+        WHERE id=${blogId}
+    `)
+    return true
   }
   async deleteAllData(){
-    await this.blogsModel.deleteMany({})
-    return []
+    await this.dataSource.query(`DELETE FROM public."Blogs"`)
+    return true
   }
 }

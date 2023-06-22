@@ -31,21 +31,17 @@ export class PostsController{
                  @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                  @Req() req: any
                  ){
+    const query = {
+      pageSize : pageSize,
+      pageNumber : pageNumber,
+      sortBy : sortBy,
+      sortDirection : sortDirection,
+    }
     if (!req.headers.authorization){
-      return await this.postsService.getPosts({
-        pageSize : pageSize,
-        pageNumber : pageNumber,
-        sortBy : sortBy,
-        sortDirection : sortDirection,
-      })
+      return await this.postsService.getPosts(query)
     } else {
       const token = req.headers.authorization!.split(" ")[1]
-      return await this.postsService.getPostsWithUser({
-        pageSize : pageSize,
-        pageNumber : pageNumber,
-        sortBy : sortBy,
-        sortDirection : sortDirection,
-      }, token)
+      return await this.postsService.getPostsWithUser(query, token)
     }
   }
   @Get(':id')
@@ -53,8 +49,6 @@ export class PostsController{
                 @Req() req: Request){
     const post : PostModel | null =  await this.postsService.getPostWithUser(postId, req.headers.authorization)
     if (!post) throw new NotFoundException()
-    //mapping for likes
-
     return post
   }
   @Get(':id/comments')

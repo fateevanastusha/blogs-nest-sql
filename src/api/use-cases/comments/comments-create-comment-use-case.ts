@@ -33,24 +33,14 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommen
     const comment : CommentModel = {
       id : (+new Date()).toString(),
       content : command.content,
-      commentatorInfo : {
-        userId: userId,
-        userLogin: user!.login
-      },
       createdAt: new Date().toISOString(),
       postId : command.postId,
-      likesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: "None"
-      },
-      postInfo : {
-        id : command.postId,
-        title : foundPost.title,
-        blogId : foundPost.blogId,
-        blogName : foundPost.blogName,
-        blogOwnerId : foundBlog.blogOwnerInfo.userId
-      }
+      userId : user.id,
+      userLogin : user.login,
+      blogId : foundBlog.id,
+      blogName : foundBlog.name,
+      blogOwnerId : foundBlog.userId,
+      title : foundPost.title
     }
     const createdComment = await this.commentsRepository.createNewComment(comment);
     if (!createdComment) throw new UnauthorizedException()

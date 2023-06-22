@@ -32,7 +32,11 @@ export class UserModel {
   @Prop({required : true})
   confirmedCode : string
   @Prop({required : true})
-  banInfo : UserBanInfo
+  isBanned : boolean
+  @Prop({type : String})
+  banDate : string
+  @Prop({type : String})
+  banReason : string
 }
 
 @Schema()

@@ -1,18 +1,18 @@
 import { PostsRepository } from "./posts.repository";
 import { QueryModelComments, QueryModelPosts } from "../../../helpers/helpers.schema";
 import { QueryRepository } from "../../../helpers/query.repository";
-import { PostModel } from "./posts.schema";
+import { PostModel, PostViewModel } from "./posts.schema";
 import { BlogModel, PaginatedClass } from "../blogs/blogs.schema";
 import { BloggersRepository } from "../../blogger/bloggers/bloggers.repository";
 import { PostsDto } from "./posts.dto";
 import { ForbiddenException, Injectable, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "../../../jwt.service";
 import { CommentsService } from "../comments/comments.service";
-import { CommentModel } from "../comments/comments.schema";
 import { LikesRepository } from "../../../likes/likes.repository";
 import { LikesHelpers } from "../../../helpers/likes.helper";
 import { LikeViewModel } from "../../../likes/likes.schema";
 import { UsersRepository } from "../../superadmin/users/users.repository";
+import { LikesInfo } from "../comments/comments.schema";
 
 @Injectable()
 export class PostsService {
@@ -47,7 +47,7 @@ export class PostsService {
     let total : number = await this.postsRepository.countPostsByBlogId(blogId)
     let pageCount = Math.ceil( total / query.pageSize)
     let items : PostModel[] = await this.queryRepository.paginatorForPostsWithBlog(query, blogId);
-    if(blog.banInfo.isBanned) {
+    if(blog.isBanned) {
       items = [];
       total = 0
       pageCount = 0
@@ -55,33 +55,34 @@ export class PostsService {
     const paginatedPosts : PostModel[] = await this.queryRepository.postsMapping(items, userId)
     return await this.queryRepository.paginationForm(pageCount, total, paginatedPosts, query)
   }
-  async getPostWithUser(id: string, header : string) : Promise<null | PostModel> {
-    let myStatus = 'None'
-    if(header){
-      const token = header.split(" ")[1];
-      const userId : string = await this.jwtService.getUserIdByToken(token)
-      let findStatus = await this.likesRepository.findStatus(id, userId)
-      if (!findStatus) {
-        myStatus = "None";
-      } else {
-        myStatus = findStatus.status
-      }
-    }
-    const newestLikes : LikeViewModel[] = await this.queryRepository.getLastLikesForPost(id)
+  async getPostWithUser(id: string, header : string) : Promise<PostViewModel> {
     const post =  await this.postsRepository.getPost(id);
     if (!post) return null
     const blog = await this.blogsRepository.getFullBlog(post.blogId)
-    if(!blog) throw new NotFoundException()
-    if(blog.banInfo.isBanned) throw new NotFoundException()
-    post.extendedLikesInfo.newestLikes = newestLikes
-    if(myStatus === null){
-      post.extendedLikesInfo.myStatus = 'None'
-    } else {
-      post.extendedLikesInfo.myStatus = myStatus
+    if(blog.isBanned) throw new NotFoundException()
+    let likesInfo : LikesInfo
+    //with user
+    if(header){
+      const token = header.split(" ")[1];
+      const userId : string = await this.jwtService.getUserIdByToken(token)
+      likesInfo = await this.likesRepository.getLikesInfoWithUser(userId,id)
     }
-    post.extendedLikesInfo.likesCount = await this.queryRepository.getLikesOrDislikesCount(id, 'Like')
-    post.extendedLikesInfo.dislikesCount = await this.queryRepository.getLikesOrDislikesCount(id, 'Dislike')
-    return post
+    //without user
+    else {
+      likesInfo = await this.likesRepository.getLikesInfo(id)
+    }
+    const newestLikes : LikeViewModel[] = await this.likesRepository.getLastLikes(id)
+    const postView : PostViewModel = {
+      id : post.id,
+      title : post.title,
+      shortDescription : post.shortDescription,
+      content : post.content,
+      blogId : post.blogId,
+      blogName : post.blogName,
+      createdAt : post.createdAt,
+      extendedLikesInfo : {...likesInfo, newestLikes}
+    }
+    return postView
   }
   async getPost(id: string) : Promise<null | PostModel> {
     const post =  await this.postsRepository.getPost(id);
@@ -92,7 +93,7 @@ export class PostsService {
     const userId : string = await this.jwtService.getUserIdByToken(token)
     const blog : BlogModel = await this.blogsRepository.getFullBlog(post.blogId)
     if (!blog) throw new NotFoundException()
-    if (blog.blogOwnerInfo.userId !== userId) throw new ForbiddenException()
+    if (blog.userId !== userId) throw new ForbiddenException()
     return await this.postsRepository.updatePost(post,postId)
   }
   async getComments(query : QueryModelComments, header : string, postId : string) : Promise<PaginatedClass>{
