@@ -16,7 +16,25 @@ export class BlogsSuperAdminService {
     if(!total) total = 0
     const pageCount = Math.ceil( total / +query.pageSize)
     const items : BlogModel[] = await this.queryRepository.paginationForBlogsWithAdmin(query);
-    return await this.queryRepository.paginationForm(pageCount, total, items, query)
+    const mappedItems = items.map(a => {
+      return {
+        name: a.name,
+        description: a.description,
+        websiteUrl: a.websiteUrl,
+        id: a.id,
+        createdAt: a.createdAt,
+        isMembership: a.isMembership,
+        "banInfo": {
+          banDate : a.banDate,
+          isBanned : a.isBanned
+        },
+        blogOwnerInfo: {
+          userId : a.userId,
+          userLogin : a.userLogin
+        }
+      }
+    })
+    return await this.queryRepository.paginationForm(pageCount, total, mappedItems, query)
   }
   async banBlog(blogId : string, request : BanBlogDto) : Promise<boolean> {
     const banInfo : BlogBanInfo = {
@@ -26,14 +44,13 @@ export class BlogsSuperAdminService {
     return await this.blogsRepository.banBlog(blogId, banInfo)
   }
   async bindBlog(blogId : string, userId : string) : Promise <boolean>{
-    const user : UserModel | null = await this.usersRepository.getFullUser(userId)
-    if (!user) throw new NotFoundException()
+    const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
+    if (user.length === 0) throw new NotFoundException()
     const blog : BlogModel | null = await this.blogsRepository.getBlog(blogId)
     if(!blog) throw new NotFoundException()
-    // if (blog.blogOwnerInfo.userId !== null) throw new BadRequestException()
     const userInfo : BlogOwnerModel = {
       userId : userId,
-      userLogin : user.login
+      userLogin : user[0].login
     }
     return await this.blogsRepository.bindUser(blogId, userInfo)
   }

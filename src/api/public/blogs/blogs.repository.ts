@@ -8,10 +8,11 @@ export class BlogsRepository{
   async getBlogsCount(searchNameTerm: string): Promise<number>{
     const count = await this.dataSource.query(`
     SELECT COUNT(*) AS "total"
-        FROM public."Blogs"
-        WHERE "name" LIKE '%${searchNameTerm}%' AND "isBanned" = false
+    FROM public."Blogs"
+    WHERE "name" LIKE '%' || CASE WHEN '${searchNameTerm}' = '' THEN '' ELSE '${searchNameTerm}' END || '%'
+    AND "isBanned" = false
     `)
-    return count.total
+    return +(count[0].total)
   }
   async getBlog(id : string) : Promise<BlogModel | null>{
     return this.dataSource.query(`
@@ -20,7 +21,7 @@ export class BlogsRepository{
     WHERE id = ${id}
     `)
   }
-  async getFullBlog(id : string) : Promise<BlogModel | null>{
+  async getFullBlog(id : string) : Promise<BlogModel[]>{
     return this.dataSource.query(`
     SELECT *
     FROM public."Blogs"
@@ -28,14 +29,13 @@ export class BlogsRepository{
     `)
   }
   async createBlog(newBlog: CreateBlogModel) : Promise<BlogModel | null>{
-    console.log(newBlog);
     await this.dataSource.query(`
     INSERT INTO public."Blogs"(
     "name", "description", "websiteUrl", "createdAt", "userId", "userLogin")
     VALUES ('${newBlog.name}', '${newBlog.description}', '${newBlog.websiteUrl}', '${newBlog.createdAt}', ${newBlog.userId}, '${newBlog.userLogin}');
     `)
     return (await this.dataSource.query(`
-      SELECT *
+      SELECT "createdAt", "description", "id", "isMembership", "name", "websiteUrl"
       FROM public."Blogs"
       WHERE "createdAt" = '${newBlog.createdAt}'
     `))[0]

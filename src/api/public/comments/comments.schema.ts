@@ -60,6 +60,21 @@ export class CommentModel {
 }
 
 @Schema()
+export class CommentViewFullModel {
+  @Prop({required : true})
+  id : string
+  @Prop({required : true})
+  content : string
+  @Prop({required : true})
+  commentatorInfo : CommentatorInfo
+  @Prop({required : true})
+  createdAt: string
+  @Prop({required : true})
+  likesInfo : LikesInfo
+}
+
+
+@Schema()
 export class CommentViewModel {
   @Prop({required : true})
   id : string

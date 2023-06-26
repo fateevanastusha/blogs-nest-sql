@@ -19,9 +19,9 @@ export class CommentsService {
   async getCommentById (id : string) : Promise<CommentViewModel> {
     let comment : CommentModel | null = await this.commentsRepository.getCommentById(id)
     if (!comment) throw new NotFoundException()
-    const user : UserModel | null = await this.usersRepository.getFullUser(comment.userId)
-    if (!user) throw new NotFoundException()
-    if (user.isBanned === true) throw new NotFoundException()
+    const user : UserModel[] | null = await this.usersRepository.getFullUser(comment.userId)
+    if (user.length === 0) throw new NotFoundException()
+    if (user[0].isBanned === true) throw new NotFoundException()
     const likes : LikesInfo = await this.likesRepository.getLikesInfo(id)
     const commentView : CommentViewModel = {
       id: comment.id,
@@ -39,10 +39,11 @@ export class CommentsService {
   async getCommentByIdWithUser (id : string, userId : string) : Promise<CommentViewModel> {
     let comment : CommentModel | null = await this.commentsRepository.getCommentById(id)
     if (!comment) return null
-    const user : UserModel | null = await this.usersRepository.getFullUser(comment.userId)
-    if (!user) throw new NotFoundException()
-    if (user.isBanned === true) throw new NotFoundException()
+    const user : UserModel[] | null = await this.usersRepository.getFullUser(comment.userId)
+    if (user.length === 0) throw new NotFoundException()
+    if (user[0].isBanned === true) throw new NotFoundException()
     const likes : LikesInfo = await this.likesRepository.getLikesInfoWithUser(userId, comment.id)
+    console.log(likes);
     const commentView : CommentViewModel = {
       id: comment.id,
       content: comment.content,

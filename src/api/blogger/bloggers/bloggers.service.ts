@@ -33,9 +33,9 @@ export class BloggersService {
   }
   async updateBlog(blog : BlogDto, id: string, token : string) : Promise <boolean>{
     const userId = await this.jwtService.getUserIdByToken(token)
-    const blogForUpdate : BlogModel | null = await this.blogsRepository.getFullBlog(id)
-    if (!blogForUpdate) throw new NotFoundException();
-    if (blogForUpdate.userId !== userId) throw new ForbiddenException()
+    const blogForUpdate : BlogModel[] = await this.blogsRepository.getFullBlog(id)
+    if (blogForUpdate.length === 0 ) throw new NotFoundException();
+    if (blogForUpdate[0].userId !== userId) throw new ForbiddenException()
     return await this.blogsRepository.updateBlog(blog, id)
   }
   async deleteAllData(){

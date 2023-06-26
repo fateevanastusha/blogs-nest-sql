@@ -32,7 +32,7 @@ export class UsersService {
     })
     return this.queryRepository.paginationForm(pageCount, total, mappedItems, query)
   }
-  async getUser(id : string) : Promise<UserModel | null>{
+  async getUser(id : string) : Promise<UserModel[] | null>{
     return this.usersRepository.getFullUser(id)
   }
   async changeUserPassword(code : string, password : string) : Promise<boolean>{

@@ -116,8 +116,8 @@ export class BloggersController {
     @Body() post : PostsBlogDto,
     @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    const status : boolean = await this.postsService.updatePost(
-      { title : post.title,
+    const status : boolean = await this.postsService.updatePost({
+        title : post.title,
         content : post.content,
         shortDescription : post.shortDescription,
         blogId : blogId }, postId, token)

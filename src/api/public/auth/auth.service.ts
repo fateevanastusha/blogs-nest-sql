@@ -96,8 +96,9 @@ export class AuthService {
 
   async getUserByToken (token : string) : Promise<UserModel | null> {
     const userId : string = await this.jwtService.getUserIdByToken(token)
-    const user : UserModel | null = await this.usersService.getUser(userId)
-    return user
+    const user : UserModel[] = await this.usersService.getUser(userId)
+    if(user.length > 0) return user[0]
+    return null
   }
 
   async authFindUser (loginOrEmail : string) : Promise<UserModel> {
@@ -115,7 +116,6 @@ export class AuthService {
   //CHANGE PASSWORD
 
   async changePasswordWithCode (confirmationCode : string, newPassword : string ) : Promise <boolean>  {
-    //change confirmed code
     return await this.usersService.changeUserPassword(confirmationCode, newPassword)
   }
   async updateConfirmationCode (confirmationCode : string, email : string) : Promise <boolean> {
@@ -131,12 +131,12 @@ export class AuthService {
 
   async emailResending (email : string) : Promise <boolean> {
     //check email
-    const user : UserModel | null = await this.usersRepository.returnUserByEmail(email)
-    if(!user){
+    const user : UserModel[] = await this.usersRepository.returnUserByEmail(email)
+    if(user.length === 0){
       throw new BadRequestException({ message : ['email is wrong'] })
       return false
     }
-    if(user.isConfirmed === true){
+    if(user[0].isConfirmed === true){
       throw new BadRequestException({ message : ['email is confirmed'] })
       return false
     }
@@ -157,15 +157,8 @@ export class AuthService {
   }
   //GET INFORMATION ABOUT CURRENT USER
   async getInformationAboutCurrentUser (accessToken : string) : Promise <UserModel | null> {
-
-    const getUser : UserModel | null = await this.getUserByToken(accessToken)
-
-    if (getUser) {
-      return getUser
-    }
-    else {
-      return null
-    }
-
+    const getUser : UserModel | null = await this.getUserByToken(accessToken);
+    if (getUser) return getUser;
+    return null;
   }
 }

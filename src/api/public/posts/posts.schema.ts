@@ -32,6 +32,22 @@ export class PostModel {
 }
 
 @Schema()
+export class CreatePostModel {
+  @Prop({required : true})
+  title: string
+  @Prop({required : true})
+  shortDescription: string
+  @Prop({required : true})
+  content: string
+  @Prop({required : true})
+  blogId: string
+  @Prop({required : true})
+  blogName: string
+  @Prop({required : true})
+  createdAt: string
+}
+
+@Schema()
 export class PostViewModel {
   @Prop({required : true})
   id: string

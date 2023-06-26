@@ -30,30 +30,23 @@ export class UsersRepository {
     }
     return Number(count[0].total);
   }
-  async getFullUser (id : string) : Promise<UserModel | null>{
+  async getFullUser (id : string) : Promise<UserModel[] | null>{
     return await this.dataSource.query(`
     SELECT *
     FROM public."Users"
     WHERE id = ${id}
     `)
   }
-  async getUserWithId(id : string) : Promise <UserModel | null> {
-    return this.dataSource.query(`
-    SELECT id, email, login, "createdAt", "isBanned", "banDate", "banReason"
-        FROM public."Users";
-        WHERE "id" = ${id}
-    `)
-  }
   async returnUserByField(field : string) : Promise <UserModel> {
     const user =  await this.dataSource.query(`
     SELECT *
         FROM public."Users"
-        WHERE "login" = '${field}' OR "email" = '${field}'
+        WHERE "login" = '${field}' OR "email" = '${field}' OR "confirmedCode" = '${field}'
     `)
     if(user.length === 0) return null
     return user[0]
   }
-  async returnUserByEmail(email : string) : Promise <UserModel | null> {
+  async returnUserByEmail(email : string) : Promise <UserModel[]> {
     return this.dataSource.query(`
     SELECT *
     FROM public."Users"
@@ -90,7 +83,7 @@ export class UsersRepository {
             FROM public."Users"
             WHERE "confirmedCode" = '${confirmedCode}'
     `)
-    return user !== null
+    return user.length > 0
   }
   async changeConfirmedStatus (confirmedCode : string) : Promise<boolean> {
     await this.dataSource.query(`
@@ -102,6 +95,8 @@ export class UsersRepository {
   }
 
   async changeConfirmationCode (confirmedCode : string, email : string) : Promise <boolean> {
+    let user = await this.returnUserByField(email)
+    if(!user) return false
     await this.dataSource.query(`
         UPDATE public."Users" 
         SET "confirmedCode" = '${confirmedCode}'
@@ -119,6 +114,8 @@ export class UsersRepository {
     return user.isConfirmed
   }
   async changeUserPassword(code : string, password : string) : Promise <boolean> {
+    const user = await this.returnUserByField(code)
+    if(!user) return false
     await this.dataSource.query(`
         UPDATE public."Users" 
         SET "password" = '${password}'

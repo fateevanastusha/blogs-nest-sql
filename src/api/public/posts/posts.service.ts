@@ -42,12 +42,12 @@ export class PostsService {
   }
   async getPostsByBlogId (query : QueryModelPosts, blogId: string, token : string) : Promise<PaginatedClass | null>{
     const userId = await this.jwtService.getUserIdByToken(token)
-    const blog : BlogModel | null = await this.blogsRepository.getFullBlog(blogId)
-    if(!blog) return null
+    const blog : BlogModel[] = await this.blogsRepository.getFullBlog(blogId)
+    if(blog.length === 0 ) return null
     let total : number = await this.postsRepository.countPostsByBlogId(blogId)
     let pageCount = Math.ceil( total / query.pageSize)
     let items : PostModel[] = await this.queryRepository.paginatorForPostsWithBlog(query, blogId);
-    if(blog.isBanned) {
+    if(blog[0].isBanned) {
       items = [];
       total = 0
       pageCount = 0
@@ -56,10 +56,10 @@ export class PostsService {
     return await this.queryRepository.paginationForm(pageCount, total, paginatedPosts, query)
   }
   async getPostWithUser(id: string, header : string) : Promise<PostViewModel> {
-    const post =  await this.postsRepository.getPost(id);
-    if (!post) return null
-    const blog = await this.blogsRepository.getFullBlog(post.blogId)
-    if(blog.isBanned) throw new NotFoundException()
+    const post : PostModel[] =  await this.postsRepository.getPost(id);
+    if (post.length === 0) return null
+    const blog = await this.blogsRepository.getFullBlog(post[0].blogId)
+    if(blog[0].isBanned) throw new NotFoundException()
     let likesInfo : LikesInfo
     //with user
     if(header){
@@ -73,27 +73,27 @@ export class PostsService {
     }
     const newestLikes : LikeViewModel[] = await this.likesRepository.getLastLikes(id)
     const postView : PostViewModel = {
-      id : post.id,
-      title : post.title,
-      shortDescription : post.shortDescription,
-      content : post.content,
-      blogId : post.blogId,
-      blogName : post.blogName,
-      createdAt : post.createdAt,
+      id : post[0].id,
+      title : post[0].title,
+      shortDescription : post[0].shortDescription,
+      content : post[0].content,
+      blogId : post[0].blogId,
+      blogName : post[0].blogName,
+      createdAt : post[0].createdAt,
       extendedLikesInfo : {...likesInfo, newestLikes}
     }
     return postView
   }
   async getPost(id: string) : Promise<null | PostModel> {
-    const post =  await this.postsRepository.getPost(id);
-    if (!post) return null
-    return post
+    const post : PostModel[] =  await this.postsRepository.getPost(id);
+    if (post.length === 0) return null
+    return post[0]
   }
   async updatePost(post : PostsDto, postId : string, token : string) : Promise <boolean>{
     const userId : string = await this.jwtService.getUserIdByToken(token)
-    const blog : BlogModel = await this.blogsRepository.getFullBlog(post.blogId)
-    if (!blog) throw new NotFoundException()
-    if (blog.userId !== userId) throw new ForbiddenException()
+    const blog : BlogModel[] = await this.blogsRepository.getFullBlog(post.blogId)
+    if (blog.length ===0 ) throw new NotFoundException()
+    if (blog[0].userId !== userId) throw new ForbiddenException()
     return await this.postsRepository.updatePost(post,postId)
   }
   async getComments(query : QueryModelComments, header : string, postId : string) : Promise<PaginatedClass>{
@@ -116,10 +116,8 @@ export class PostsService {
   async changeLikeStatus(requestType : string, postId : string, header : string) : Promise <boolean> {
     if(!header) throw new UnauthorizedException(401)
     const token = header.split(" ")[1]
-    const post : PostModel | null = await this.postsRepository.getPost(postId)
-    if (!post) {
-      return false
-    }
+    const post : PostModel[] = await this.postsRepository.getPost(postId)
+    if (post.length === 0) return false
     let userId = await this.jwtService.getUserIdByToken(token)
     const status1 = await this.likesRepository.findStatus(postId, userId)
     const currentStatus = await this.likesHelper.requestType(status1)

@@ -12,7 +12,7 @@ export class BloggersRepository {
         FROM public."Blogs"
         WHERE "name" LIKE '%${searchNameTerm}%' AND "isBanned" = false AND "userId"=${userId}
     `)
-    return count.total
+    return +(count[0].total)
   }
   async getBlog(id : string) : Promise<BlogModel | null>{
     return this.dataSource.query(`
@@ -21,7 +21,7 @@ export class BloggersRepository {
     WHERE id = '${id}' AND "isBanned"=false
     `)
   }
-  async getFullBlog(id : string) : Promise<BlogModel | null>{
+  async getFullBlog(id : string) : Promise<BlogModel[]>{
     return this.dataSource.query(`
     SELECT *
     FROM public."Blogs"

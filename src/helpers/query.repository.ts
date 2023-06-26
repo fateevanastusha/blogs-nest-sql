@@ -31,9 +31,10 @@ export class QueryRepository {
   async paginationForBlogs(query : QueryModelBlogs) : Promise <BlogModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.dataSource.query(`
-    SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership", "isBanned", "banDate"
+    SELECT *
         FROM public."Blogs"
-        WHERE "name" LIKE '%${query.searchNameTerm}%' AND "isBanned" = false
+        WHERE "name" LIKE '%' || CASE WHEN '${query.searchNameTerm}' = '' THEN '' ELSE '${query.searchNameTerm}' END || '%' 
+        AND "isBanned" = false
         ORDER BY "${query.sortBy}" ${query.sortDirection}
         OFFSET ${skipSize} LIMIT ${query.pageSize};
     `)
@@ -41,7 +42,7 @@ export class QueryRepository {
   async paginationForBlogsWithAdmin(query : QueryModelBlogs) : Promise <BlogModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.dataSource.query(`
-    SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership", "isBanned", "banDate"
+    SELECT *
         FROM public."Blogs"
         WHERE "name" LIKE '%${query.searchNameTerm}%'
         ORDER BY "${query.sortBy}" ${query.sortDirection}
@@ -144,7 +145,7 @@ export class QueryRepository {
     let listOfBanInfo = await Promise.all(
       usersId.map(async (userId) => {
         const user = await this.usersRepository.getFullUser(userId)
-        return user.isBanned
+        return user[0].isBanned
       })
     )
     const filteredComments = newestLikes.filter((item, i) => !listOfBanInfo[i])
@@ -156,7 +157,7 @@ export class QueryRepository {
     let listOfBanInfo = await Promise.all(
       usersId.map(async (userId) => {
         const user = await this.usersRepository.getFullUser(userId)
-        return user.isBanned
+        return user[0].isBanned
       })
     )
     const filteredComments = comments.filter((item, i) => !listOfBanInfo[i])

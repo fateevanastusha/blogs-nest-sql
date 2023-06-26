@@ -16,13 +16,13 @@ export class BloggersUsersService {
               protected queryRepository : QueryRepository,
               protected usersRepository : UsersRepository) {}
   async BanUserForBlog(token : string, userId : string, banInfo : BanUserForBlogDto) : Promise<boolean> {
-    const user : UserModel | null = await this.usersRepository.getFullUser(userId)
-    if(!user) throw new NotFoundException()
+    const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
+    if(user.length === 0) throw new NotFoundException()
     const ownerId = await this.jwtService.getUserIdByToken(token)
-    const blog : BlogModel = await this.bloggerRepository.getFullBlog(banInfo.blogId)
-    if(!blog) throw new NotFoundException()
-    if(blog.userId !== ownerId) throw new ForbiddenException()
-    const bannedUsers  = blog.bannedUsers
+    const blog : BlogModel[] = await this.bloggerRepository.getFullBlog(banInfo.blogId)
+    if(blog.length === 0) throw new NotFoundException()
+    if(blog[0].userId !== ownerId) throw new ForbiddenException()
+    const bannedUsers  = blog[0].bannedUsers
     if (banInfo.isBanned === true){
       const bannedInfo : BannedUserInfo = {
         isBanned : banInfo.isBanned,
@@ -43,14 +43,14 @@ export class BloggersUsersService {
   async getAllBannedUsers(token : string, blogId : string, query : QueryModelBannedUsersForBlog) : Promise<PaginatedClass>{
     const ownerId = await this.jwtService.getUserIdByToken(token)
     const blog = await this.bloggerRepository.getFullBlog(blogId)
-    if(!blog) throw new NotFoundException()
-    if(blog.userId !== ownerId) throw new ForbiddenException()
-    const banInfo = [...blog.bannedUsers]
+    if(blog.length === 0) throw new NotFoundException()
+    if(blog[0].userId !== ownerId) throw new ForbiddenException()
+    const banInfo = [...blog[0].bannedUsers]
     const bannedId  = []
-    for(let i = 0; i < blog.bannedUsers.length; i++){
-      bannedId.push(blog.bannedUsers[i].userId)
+    for(let i = 0; i < blog[0].bannedUsers.length; i++){
+      bannedId.push(blog[0].bannedUsers[i].userId)
     }
-    const total : number = blog.bannedUsers.length
+    const total : number = blog[0].bannedUsers.length
     const pageCount : number = Math.ceil( total / query.pageSize);
     const items : UserViewModel[] = await this.queryRepository.paginationForBlogBannedUsers(query, bannedId)
     const mappedItems = items.map((a) => {

@@ -15,9 +15,9 @@ export class DeleteBlogUseCase implements ICommandHandler<DeleteBlogBlogsCommand
   constructor(protected jwtService : JwtService, protected blogsRepository : BloggersRepository) {}
   async execute (command : DeleteBlogBlogsCommand) : Promise<boolean>{
     const userId = await this.jwtService.getUserIdByToken(command.token)
-    const blogForUpdate : BlogModel | null = await this.blogsRepository.getFullBlog(command.blogId)
-    if (!blogForUpdate) throw new NotFoundException();
-    if (blogForUpdate.userId !== userId) throw new ForbiddenException()
+    const blogForDelete : BlogModel[] = await this.blogsRepository.getFullBlog(command.blogId)
+    if (blogForDelete.length === 0) throw new NotFoundException();
+    if (blogForDelete[0].userId !== userId) throw new ForbiddenException()
     return await this.blogsRepository.deleteBlog(command.blogId)
   }
 }

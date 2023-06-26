@@ -52,8 +52,8 @@ export class CheckIfUserExist implements CanActivate {
     const userId = await this.jwtService.getUserIdByToken(token)
     if(!userId) throw new UnauthorizedException()
     const user = await this.userRepo.getFullUser(userId)
-    if(!user) throw new UnauthorizedException()
-    if (user.isBanned === true) throw new UnauthorizedException()
+    if(user.length === 0) throw new UnauthorizedException()
+    if (user[0].isBanned === true) throw new UnauthorizedException()
     return true
   }
 }

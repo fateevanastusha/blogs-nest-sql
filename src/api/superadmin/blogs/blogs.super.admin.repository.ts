@@ -6,12 +6,22 @@ export class BlogsSuperAdminRepository {
   constructor(@InjectDataSource() protected dataSource : DataSource) {
   }
   async getBlogsCount(searchNameTerm: string): Promise<number>{
-    const count = await this.dataSource.query(`
-    SELECT COUNT(*) AS "total"
-        FROM public."Blogs"
-        WHERE "name" LIKE '%${searchNameTerm}%' AND "isBanned" = false
-    `)
-    return count.total
+    let count
+    if (searchNameTerm = '') {
+      count = await this.dataSource.query(`
+        SELECT COUNT(*) AS "total"
+          FROM public."Blogs"
+          WHERE "name" LIKE '%' || CASE WHEN '${searchNameTerm}' = '' THEN '' ELSE '${searchNameTerm}' END || '%'
+          AND "isBanned" = false
+        `)
+    } else {
+      count = await this.dataSource.query(`
+        SELECT COUNT(*) AS "total"
+          FROM public."Blogs"
+          WHERE "isBanned" = false
+        `)
+    }
+    return Number(count[0].total)
   }
   async getBlog(blogId : string) : Promise<BlogModel | null>{
     return await this.dataSource.query(`

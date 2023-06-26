@@ -12,11 +12,11 @@ export class LikesRepository {
         (SELECT COUNT(*) AS "likesCount"
          FROM public."Likes"
          WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Like') likes,
-         
+               
         (SELECT COUNT(*) AS "dislikesCount"
          FROM public."Likes"
          WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Dislike') dislikes,
-      
+            
         (SELECT status AS "myStatus"
          FROM public."Likes"
          WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "userId" = ${userId}) myStatus;

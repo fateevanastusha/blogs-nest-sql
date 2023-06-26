@@ -7,11 +7,13 @@ import { DataSource } from "typeorm";
 export class CommentsRepository {
   constructor(@InjectDataSource() protected dataSource : DataSource) {}
   async getCommentById(id: string): Promise<CommentModel | null> {
-    return await this.dataSource.query(`
-    SELECT "id", "content", "createdAt", "blogName", "userId", "userLogin"
+    const comment = await this.dataSource.query(`
+    SELECT *
         FROM public."Comments"
         WHERE "id" = ${id}
     `)
+    if (comment.length === 0) return null
+    return comment[0]
   }
   async getCommentsCountByBlogOwnerId(userId : string) : Promise<number>{
     const count = await this.dataSource.query(`
@@ -39,12 +41,16 @@ export class CommentsRepository {
   async createNewComment(comment: CommentModel): Promise<CommentModel | null> {
     await this.dataSource.query(`
     INSERT INTO public."Comments"(
-        "content","blogOwnerId", "blogId", "postId", "blogName", "userId", "userLogin")
-        VALUES ('${comment.content}', ${comment.blogOwnerId}, ${comment.blogId}, ${comment.postId}, '${comment.blogName}', ${comment.userId}, '${comment.userLogin}');
+        "content","blogOwnerId", "blogId", "postId", "blogName", "userId", "userLogin", "createdAt")
+        VALUES ('${comment.content}', ${comment.blogOwnerId}, ${comment.blogId}, ${comment.postId}, '${comment.blogName}', ${comment.userId}, '${comment.userLogin}', '${comment.createdAt}');
     `)
-    const createdComment = await this.getCommentById(comment.id)
-    if (createdComment)return createdComment
-    return null
+    const createdComment = await this.dataSource.query(`
+        SELECT *
+          FROM public."Comments"
+          WHERE "createdAt" = '${comment.createdAt}'
+    `)
+    if (createdComment.length === 0) return null
+    return createdComment[0]
   }
   async countCommentsByPostId(postId: string): Promise<number> {
     const count = await this.dataSource.query(`

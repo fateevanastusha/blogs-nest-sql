@@ -1,4 +1,4 @@
-import { PostModel } from "./posts.schema";
+import { CreatePostModel, PostModel } from "./posts.schema";
 import { PostsDto } from "./posts.dto";
 import { Injectable } from "@nestjs/common";
 import { InjectDataSource } from "@nestjs/typeorm";
@@ -14,7 +14,7 @@ export class PostsRepository {
         FROM public."Posts";
     `)
   }
-  async getPost(id: string) : Promise<PostModel | null>{
+  async getPost(id: string) : Promise<PostModel[]>{
     return this.dataSource.query(`
     SELECT "id", "title", "shortDescription", "content", "blogName", "createdAt", "blogId"
         FROM public."Posts"
@@ -28,13 +28,17 @@ export class PostsRepository {
     `)
     return true
   }
-  async createPost(newPost: PostModel) : Promise <PostModel | null>{
+  async createPost(newPost: CreatePostModel) : Promise <PostModel | null>{
     await this.dataSource.query(`
     INSERT INTO public."Posts"(
         "title", "shortDescription", "content", "blogName", "createdAt", "blogId")
         VALUES ('${newPost.title}','${newPost.shortDescription}','${newPost.content}','${newPost.blogName}', '${newPost.createdAt}', ${newPost.blogId});
     `)
-    return this.getPost(newPost.id)
+    return (await this.dataSource.query(`
+    SELECT *
+        FROM public."Posts"
+        WHERE "createdAt"='${newPost.createdAt}'
+    `))[0]
   }
   async updatePost(post : PostsDto, postId : string) : Promise <boolean>{
     await this.dataSource.query(`
@@ -50,7 +54,7 @@ export class PostsRepository {
         FROM public."Posts"
         WHERE "blogId"=${blogId}
     `)
-    return count.total
+    return +(count[0].total)
   }
   async deleteAllData() {
     this.dataSource.query(`
