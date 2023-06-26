@@ -50,7 +50,7 @@ export class BloggersUsersService {
     for(let i = 0; i < blog.bannedUsers.length; i++){
       bannedId.push(blog.bannedUsers[i].userId)
     }
-    const total : number = await this.usersRepository.getBlogBannedUsersCount(bannedId, query.searchLoginTerm)
+    const total : number = blog.bannedUsers.length
     const pageCount : number = Math.ceil( total / query.pageSize);
     const items : UserViewModel[] = await this.queryRepository.paginationForBlogBannedUsers(query, bannedId)
     const mappedItems = items.map((a) => {

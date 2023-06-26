@@ -1,48 +1,57 @@
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-import { UserBanInfo, UserDocument, UserModel } from "./users.schema";
+import { UserBanInfo, UserModel, UserModelCreate, UserViewModel } from "./users.schema";
 import { Injectable } from "@nestjs/common";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectModel('users') private usersModel: Model<UserDocument>,
-              @InjectDataSource() protected dataSource : DataSource) {
+  constructor(@InjectDataSource() protected dataSource : DataSource) {
   }
-  async getUsersCount(searchLoginTerm : string, searchEmailTerm : string, banStatus) : Promise<number>{
-    const count = await this.dataSource.query(`
-    SELECT COUNT(*)
-        AS "total"
-        FROM public."Users"
-        WHERE "login" LIKE '%${searchLoginTerm}%' AND "email" LIKE '%${searchEmailTerm}%' AND "isBanned" = ${banStatus}
-    `)
-    return count.total
-  }
-  async getBlogBannedUsersCount(bannedList : string[], searchLoginTerm : string) : Promise<number>{
-    return this.usersModel.countDocuments({id: { $in: bannedList }, login: {$regex: searchLoginTerm, $options: 'i'} })
+  async getUsersCount(searchLoginTerm: string, searchEmailTerm: string, banStatus: boolean | undefined): Promise<number> {
+    let count;
+    if (banStatus === undefined) {
+      count = await this.dataSource.query(`
+      SELECT COUNT(*) AS "total"
+      FROM public."Users"
+      WHERE (("login" LIKE '%' || CASE WHEN '${searchLoginTerm}' = '' THEN '' ELSE '${searchLoginTerm}' END || '%'
+             OR '${searchLoginTerm}' = '')
+        OR ("email" LIKE '%' || CASE WHEN '${searchEmailTerm}' = '' THEN '' ELSE '${searchEmailTerm}' END || '%'
+             OR '${searchEmailTerm}' = ''))
+    `);
+    } else {
+      count = await this.dataSource.query(`
+      SELECT COUNT(*) AS "total"
+      FROM public."Users"
+      WHERE (("login" LIKE '%' || CASE WHEN '${searchLoginTerm}' = '' THEN '' ELSE '${searchLoginTerm}' END || '%'
+             OR '${searchLoginTerm}' = '')
+        OR ("email" LIKE '%' || CASE WHEN '${searchEmailTerm}' = '' THEN '' ELSE '${searchEmailTerm}' END || '%'
+             OR '${searchEmailTerm}' = ''))
+        AND "isBanned" = ${banStatus}
+    `);
+    }
+    return Number(count[0].total);
   }
   async getFullUser (id : string) : Promise<UserModel | null>{
-    return this.dataSource.query(`
+    return await this.dataSource.query(`
     SELECT *
     FROM public."Users"
-    WHERE id = '${id}'
+    WHERE id = ${id}
     `)
   }
   async getUserWithId(id : string) : Promise <UserModel | null> {
-    this.dataSource.query(`
+    return this.dataSource.query(`
     SELECT id, email, login, "createdAt", "isBanned", "banDate", "banReason"
         FROM public."Users";
         WHERE "id" = ${id}
     `)
-    return this.usersModel
-      .findOne({id: id}, {_id: 0, password : 0,  isConfirmed: 0, confirmedCode : 0, __v: 0, banInfo : { _id: 0}})
   }
-  async returnUserByField(field : string) : Promise <UserModel | null> {
-    return this.dataSource.query(`
+  async returnUserByField(field : string) : Promise <UserModel> {
+    const user =  await this.dataSource.query(`
     SELECT *
         FROM public."Users"
         WHERE "login" = '${field}' OR "email" = '${field}'
     `)
+    if(user.length === 0) return null
+    return user[0]
   }
   async returnUserByEmail(email : string) : Promise <UserModel | null> {
     return this.dataSource.query(`
@@ -51,27 +60,29 @@ export class UsersRepository {
     WHERE email = '${email}'
     `)
   }
-  async createUser(newUser : UserModel): Promise <UserModel | null> {
+  async createUser(newUser : UserModelCreate): Promise <UserViewModel | null> {
     //SQL base insert
-    this.dataSource.query(`
+    await this.dataSource.query(`
     INSERT INTO public."Users"(
-    "email", "login", "password", "createdAt", "isConfirmed", "confirmedCode")
-    VALUES ('${newUser.email}', '${newUser.login}', '${newUser.password}','${newUser.createdAt}', '${newUser.isConfirmed}', '${newUser.confirmedCode}' );
+    "email", "login", "password", "createdAt", "confirmedCode")
+    VALUES ('${newUser.email}', '${newUser.login}', '${newUser.password}','${newUser.createdAt}', '${newUser.confirmedCode}' );
     `)
-    const createdUser = await this.getUserWithId(newUser.id)
-    if (createdUser) {
-      return createdUser
+    const createdUser = (await this.dataSource.query(`
+      SELECT *
+      FROM public."Users"
+      WHERE "confirmedCode" = '${newUser.confirmedCode}'
+    `))[0]
+    return {
+      id : createdUser.id,
+      createdAt : createdUser.createdAt,
+      email : createdUser.email,
+      login : createdUser.login,
+      banInfo : {
+        isBanned : createdUser.isBanned,
+        banReason : createdUser.banReason,
+        banDate : createdUser.banDate
+      }
     }
-    return null
-  }
-  async getLoginById(id : string) : Promise <string> {
-    const user = await this.dataSource.query(`
-    SELECT *
-    FROM public."Users"
-    WHERE id = '${id}'
-    `)
-    if (!user) return 'login'
-    return user.login
   }
   async checkForConfirmationCode (confirmedCode : string) : Promise<boolean> {
     const user = await this.dataSource.query(`
@@ -118,7 +129,15 @@ export class UsersRepository {
   async banUser(userId : string, banInfo : UserBanInfo) : Promise<boolean>{
     await this.dataSource.query(`
         UPDATE public."Users" 
-        SET "isBanned" = '${banInfo.isBanned}', "banDate" = '${banInfo.banDate}', "banReason" = '${banInfo.banReason}'
+        SET "isBanned" = ${banInfo.isBanned}, "banDate" = '${banInfo.banDate}', "banReason" = '${banInfo.banReason}'
+        WHERE "id" = ${userId}
+    `)
+    return true
+  }
+  async unbanUser(userId : string) : Promise<boolean>{
+    await this.dataSource.query(`
+        UPDATE public."Users" 
+        SET "isBanned" = false, "banDate" = null, "banReason" = null
         WHERE "id" = ${userId}
     `)
     return true

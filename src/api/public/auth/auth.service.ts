@@ -25,7 +25,7 @@ export class AuthService {
     const status : boolean = await this.authRepository.authRequest(loginOrEmail, password)
     if (!status) return null
     //CHECK FOR USER
-    const user : UserModel | null = await this.usersRepository.returnUserByField(loginOrEmail);
+    const user : UserModel = await this.usersRepository.returnUserByField(loginOrEmail);
     if (!user) return null;
     const isBanned = user.isBanned
     if(isBanned === true) return null
@@ -100,10 +100,8 @@ export class AuthService {
     return user
   }
 
-  async authFindUser (loginOrEmail : string) : Promise<UserModel | null> {
-    return await this.usersRepository.returnUserByField(
-      loginOrEmail
-    )
+  async authFindUser (loginOrEmail : string) : Promise<UserModel> {
+    return await this.usersRepository.returnUserByField(loginOrEmail)
   }
   async checkForConfirmationCode (confirmationCode : string) : Promise <boolean>  {
     const statusOfCode : boolean = await this.usersRepository.checkForConfirmationCode(confirmationCode)

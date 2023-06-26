@@ -15,7 +15,7 @@ export class BlogsService {
     return await this.queryRepository.paginationForm(pageCount, total, items, query)
   }
   async getBlog(id: string) : Promise<BlogModel | null>{
-    return await this.blogsRepository.getBlog(id)
+    return (await this.blogsRepository.getBlog(id))[0]
   }
   async deleteAllData(){
     await this.blogsRepository.deleteAllData()

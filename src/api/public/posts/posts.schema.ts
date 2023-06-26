@@ -1,8 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
 import { LikeViewModel } from "../../../likes/likes.schema";
-
-export type PostDocument = HydratedDocument<PostModel>
 
 @Schema()
 export class ExtendedLikesInfo {

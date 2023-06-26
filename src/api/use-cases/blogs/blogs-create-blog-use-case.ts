@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { BlogModel } from "../../public/blogs/blogs.schema";
+import { BlogModel, CreateBlogModel } from "../../public/blogs/blogs.schema";
 import { JwtService } from "../../../jwt.service";
 import { UsersRepository } from "../../superadmin/users/users.repository";
 import { BlogDto } from "../../public/blogs/blogs.dto";
@@ -17,22 +17,13 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogBlogsCommand
   async execute (command : CreateBlogBlogsCommand) : Promise<BlogModel | null>{
     const userId = await this.jwtService.getUserIdByToken(command.token)
     const user = await this.usersRepository.getFullUser(userId)
-    const newBlog : BlogModel = {
-      id: (+new Date()).toString(),
+    const newBlog : CreateBlogModel = {
       name: command.blog.name,
       description: command.blog.description,
       websiteUrl: command.blog.websiteUrl,
       createdAt: new Date().toISOString(),
-      isMembership: false,
-      blogOwnerInfo : {
-        userId: userId,
-        userLogin: user.login
-      },
-      bannedUsers : [],
-      banInfo : {
-        isBanned : false,
-        banDate : null
-      }
+      userId: userId,
+      userLogin: user[0].login
     }
     return await this.blogsRepository.createBlog(newBlog);
   }

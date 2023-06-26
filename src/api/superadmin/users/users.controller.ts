@@ -14,11 +14,11 @@ import {
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { BanUserDto, UsersDto } from "./users.dto";
-import { UserModel } from "./users.schema";
 import { AuthGuard } from "../../../auth.guard";
 import { CommandBus } from "@nestjs/cqrs";
 import { CreateUserUsersCommand } from "../../use-cases/users/users-create-user-use-case";
 import { DeleteUserUsersCommand } from "../../use-cases/users/users-delete-user-use-case";
+import { UserModel, UserViewModel } from "./users.schema";
 
 @UseGuards(AuthGuard)
 @Controller('sa/users')

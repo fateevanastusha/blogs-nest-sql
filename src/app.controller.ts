@@ -20,6 +20,8 @@ import { BlogDto } from "./api/public/blogs/blogs.dto";
 import { BlogModel } from "./api/public/blogs/blogs.schema";
 import { BloggersService } from "./api/blogger/bloggers/bloggers.service";
 import { TestRepo } from "./test.repo";
+import { InjectDataSource } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
 
 @Controller()
 export class AppController {
@@ -29,18 +31,18 @@ export class AppController {
               protected securityRepository : SecurityRepository,
               protected likesRepository : LikesRepository,
               protected commentsRepository : CommentsRepository,
-              protected blogsService : BloggersService,
-              protected appRepository : TestRepo
+              protected appRepository : TestRepo,
+              @InjectDataSource() protected dataSource : DataSource
               ) {}
 
   @Delete('/testing/all-data')
   async deleteAllData(@Res() res : Response) {
-    await this.usersRepository.deleteAllData();
-    await this.blogsRepository.deleteAllData();
-    await this.postsRepository.deleteAllData();
     await this.securityRepository.deleteAllData();
     await this.likesRepository.deleteAllData();
     await this.commentsRepository.deleteAllData();
+    await this.postsRepository.deleteAllData();
+    await this.blogsRepository.deleteAllData();
+    await this.usersRepository.deleteAllData();
     res.sendStatus(204)
     return;
   }

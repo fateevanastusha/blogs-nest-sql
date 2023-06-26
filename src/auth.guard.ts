@@ -19,6 +19,7 @@ import { SecurityService } from "./api/public/security/security.service";
 import { AuthService } from "./api/public/auth/auth.service";
 import { AttemptsModel } from "./attempts/attempts.schema";
 import { AttemptsRepository } from "./attempts/attempts.repository";
+import { CommentsRepository } from "./api/public/comments/comments.repository";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -62,7 +63,8 @@ export class CommentCheckForSameUser implements CanActivate {
   constructor(
     protected jwtService: JwtService,
     private userRepo: UsersRepository,
-    private commentsService : CommentsService) {
+    private commentsService : CommentsService,
+    private commentsRepository : CommentsRepository) {
   }
   async canActivate(
     context: ExecutionContext
@@ -77,8 +79,9 @@ export class CommentCheckForSameUser implements CanActivate {
     if (!userId) throw new UnauthorizedException();
     const user = await this.userRepo.getFullUser(userId)
     if(!user) throw new UnauthorizedException()
-    const comment = await this.commentsService.getCommentByIdWithUser(req.params.id, userId);
+    const comment = await this.commentsRepository.getCommentById(req.params.id);
     if (!comment) throw new NotFoundException();
+    if(comment.userId !== userId ) throw new ForbiddenException();
     else if (comment.userId !== userId) throw new ForbiddenException();
     return true
   }
@@ -165,7 +168,7 @@ export class CheckForSameDevice implements CanActivate {
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const title: string = req.headers["user-agent"] || "unknown";
-    const user: UserModel | null = await this.authService.authFindUser(req.body.loginOrEmail);
+    const user: UserModel = await this.authService.authFindUser(req.body.loginOrEmail);
     if (!user) {
       throw new UnauthorizedException();
       return false;

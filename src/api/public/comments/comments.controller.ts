@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Put,
 import { CommentsDto } from "./comments dto";
 import { CheckIfUserExist, CommentCheckForSameUser } from "../../../auth.guard";
 import { CommentsService } from "./comments.service";
-import { CommentModel } from "./comments.schema";
+import { CommentModel, CommentViewModel } from "./comments.schema";
 import { JwtService } from "../../../jwt.service";
 import { LikesDto } from "../../../likes/likes.dto";
 
@@ -16,7 +16,7 @@ export class CommentsController {
                    @Req() req: any){
     const token = req.headers.authorization
     if (!token){
-      const comment : CommentModel | null = await this.commentsService.getCommentById(req.params.id)
+      const comment : CommentViewModel = await this.commentsService.getCommentById(req.params.id)
       if (!comment) {
         throw new NotFoundException()
       } else {

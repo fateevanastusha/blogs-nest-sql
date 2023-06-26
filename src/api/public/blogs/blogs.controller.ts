@@ -11,6 +11,7 @@ import { BlogsService } from "./blogs.service";
 import { PostsService } from "../../public/posts/posts.service";
 import { BlogModel, PaginatedClass } from "./blogs.schema";
 import { Request } from "express";
+import { type } from "os";
 
 @Controller('blogs')
 export class BlogsController{

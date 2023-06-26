@@ -144,14 +144,7 @@ export class PostsService {
       //change status
       await this.likesRepository.updateStatus(status)
     }
-    await this.changeTotalCount(postId)
     return true;
-  }
-
-  async changeTotalCount(postId : string) : Promise<boolean> {
-    const likesCount : number = await this.likesRepository.findLikes(postId)
-    const dislikesCount : number = await this.likesRepository.findDislikes(postId)
-    return this.postsRepository.changeLikesTotalCount(postId, likesCount, dislikesCount)
   }
   async deleteAllData() {
     await this.postsRepository.deleteAllData();

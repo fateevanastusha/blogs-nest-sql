@@ -12,10 +12,25 @@ export class UsersService {
   constructor(protected usersRepository : UsersRepository,
               protected queryRepository : QueryRepository) {}
   async getUsers(query : QueryModelUsers) : Promise<PaginatedClass>{
-    const total : number = await this.usersRepository.getUsersCount(query.searchLoginTerm, query.searchEmailTerm, query.banStatus);
+    let total : number = await this.usersRepository.getUsersCount(query.searchLoginTerm, query.searchEmailTerm, query.banStatus);
+    if(!total) total = 0
     const pageCount = Math.ceil( total / query.pageSize);
-    const items : UserViewModel[] = await this.queryRepository.paginationForUsers(query);
-    return this.queryRepository.paginationForm(pageCount, total, items, query)
+    const items : UserModel[] = await this.queryRepository.paginationForUsers(query);
+    //mapping items
+    const mappedItems = items.map(createdUser => {
+      return {
+        id : createdUser.id,
+        createdAt : createdUser.createdAt,
+        email : createdUser.email,
+        login : createdUser.login,
+        banInfo : {
+          isBanned : createdUser.isBanned,
+          banReason : createdUser.banReason,
+          banDate : createdUser.banDate
+        }
+      }
+    })
+    return this.queryRepository.paginationForm(pageCount, total, mappedItems, query)
   }
   async getUser(id : string) : Promise<UserModel | null>{
     return this.usersRepository.getFullUser(id)
@@ -27,17 +42,18 @@ export class UsersService {
   async banUser(userId : string, banInfo : BanUserDto) : Promise<boolean> {
     const user = await this.usersRepository.getFullUser(userId)
     if(!user) throw new NotFoundException()
-    let banInformation : UserBanInfo = {
-      banDate: new Date().toISOString(),
-      banReason: banInfo.banReason,
-      isBanned: banInfo.isBanned
+    let banInformation : UserBanInfo
+    if (banInfo.isBanned === true){
+      banInformation = {
+        banDate: new Date().toISOString(),
+        banReason: banInfo.banReason,
+        isBanned: true
+      }
+      return await this.usersRepository.banUser(userId, banInformation)
     }
-    if(!banInfo.isBanned) {
-      banInformation.banReason = null
-      banInformation.banDate = null
+    if (banInfo.isBanned === false){
+      return await this.usersRepository.unbanUser(userId)
     }
-    //update comments
-    return await this.usersRepository.banUser(userId, banInformation )
   }
   async deleteAllData(){
     await this.usersRepository.deleteAllData()

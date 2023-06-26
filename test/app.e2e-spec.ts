@@ -51,7 +51,6 @@ describe('AppController (e2e)', () => {
   let createResponseComment_1 : any = null
   let createResponseComment_2 : any = null
   let res : any = null
-  //SA testing
   it ('SA check empty blogs array', async  () => {
     const res = await request(server)
       .get('/sa/blogs')
@@ -96,7 +95,7 @@ describe('AppController (e2e)', () => {
       },
       "createdAt": expect.any(String),
       "email": "user1@gmail.com",
-      "id": expect.any(String),
+      "id": expect.any(Number),
       "login": "user1"
     })
   })
@@ -113,7 +112,7 @@ describe('AppController (e2e)', () => {
   })
   it('SA get 2 users with pagination', async () => {
     res = await request(server)
-      .get('/sa/users?sortBy=name&sortDirection=asc&pageSize=5')
+      .get('/sa/users?sortBy=login&sortDirection=asc&pageSize=5')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
       .expect(200)
     expect(res.body).toStrictEqual({
@@ -157,7 +156,7 @@ describe('AppController (e2e)', () => {
       })
       .expect(204)
     res = await request(server)
-      .get('/sa/users?sortBy=name&sortDirection=asc&pageSize=1')
+      .get('/sa/users?sortDirection=asc&pageSize=1')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
       .expect(200)
     expect(res.body).toStrictEqual({
@@ -180,7 +179,7 @@ describe('AppController (e2e)', () => {
       ]
     })
     res = await request(server)
-      .get('/sa/users?sortBy=name&sortDirection=asc&pageSize=1&banStatus=banned')
+      .get('/sa/users?sortBy=login&sortDirection=asc&pageSize=1&banStatus=banned')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
       .expect(200)
     expect(res.body).toStrictEqual({
@@ -211,7 +210,7 @@ describe('AppController (e2e)', () => {
       })
       .expect(204)
     res = await request(server)
-      .get('/sa/users?sortBy=name&sortDirection=asc&pageSize=1')
+      .get('/sa/users?sortBy=login&sortDirection=asc&pageSize=1')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
       .expect(200)
     expect(res.body).toStrictEqual({
@@ -266,14 +265,31 @@ describe('AppController (e2e)', () => {
     })
   })
   it ('SA create new blog', async () => {
+    await request(server)
+      .post('/sa/users')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        login: 'user1',
+        password: 'qwerty',
+        email: 'user1@gmail.com'
+      })
+      .expect(201)
+    token_1 = await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'user1',
+        password : 'qwerty'
+      })
+      .expect(200)
+    expect(token_1.body).toBeDefined()
     createResponseBlog_1 = await request(server)
-      .post('/blog')
+      .post('/blogger/blogs')
       .send({
         "name": "TEST2",
         "description": "TEST2",
         "websiteUrl": "http://www.test2.com"
       })
-      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .auth(token_1.body.accessToken, {type : 'bearer'})
       .expect(201)
     res = await request(server)
       .get('/blogs/' + createResponseBlog_1.body.id )
@@ -1605,15 +1621,13 @@ describe('AppController (e2e)', () => {
     res = await request(server)
       .get('/test-sql')
       .expect(200)
-    expect(res.body).toStrictEqual({
-      a : 1
-    })
+    expect(res.body).toStrictEqual([{"id": 1, "name": "nastya"}])
   })
   afterAll(async () => {
-    await request(server)
+    /*await request(server)
       .delete('/testing/all-data')
       .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
-      .expect(204)
+      .expect(204)*/
     await server.close()
   })
 });

@@ -12,7 +12,8 @@ export class BlogsSuperAdminService {
   constructor(protected blogsRepository : BlogsSuperAdminRepository, protected usersRepository : UsersRepository, protected queryRepository : QueryRepository) {
   }
   async getBlogs(query : QueryModelBlogs): Promise<PaginatedClass>{
-    const total = await this.blogsRepository.getBlogsCount(query.searchNameTerm)
+    let total = await this.blogsRepository.getBlogsCount(query.searchNameTerm)
+    if(!total) total = 0
     const pageCount = Math.ceil( total / +query.pageSize)
     const items : BlogModel[] = await this.queryRepository.paginationForBlogsWithAdmin(query);
     return await this.queryRepository.paginationForm(pageCount, total, items, query)

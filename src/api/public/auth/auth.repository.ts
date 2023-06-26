@@ -11,11 +11,9 @@ import { DataSource } from "typeorm";
 @Injectable()
 export class AuthRepository {
   constructor(protected usersRepository : UsersRepository,
-              @InjectModel('refresh token meta') private refreshTokensMetaModel: Model<RefreshTokensMetaDocument>,
-              @InjectModel('refresh token blocked') private refreshTokensBlocked : Model <RefreshTokensBlocked>,
               @InjectDataSource() protected dataSource : DataSource) {}
   async authRequest(loginOrEmail: string, password: string) : Promise <boolean> {
-    const user : UserModel | null = await this.usersRepository.returnUserByField(loginOrEmail)
+    const user : UserModel = await this.usersRepository.returnUserByField(loginOrEmail)
     if (user) return bcrypt.compareSync(password, user.password)
     return false
   }

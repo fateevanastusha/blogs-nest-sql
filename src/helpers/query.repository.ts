@@ -2,7 +2,6 @@ import {
   BlogModel,
   PaginatedClass,
   BlogViewModel,
-  BannedUserInfo
 } from "../api/public/blogs/blogs.schema";
 import {
   QueryCommentsUsers,
@@ -17,7 +16,7 @@ import { PostModel } from "../api/public/posts/posts.schema";
 import { UserModel, UserViewModel } from "../api/superadmin/users/users.schema";
 import { CommentModel, CommentForBloggerViewModel } from "../api/public/comments/comments.schema";
 import { LikesRepository } from "../likes/likes.repository";
-import { LikeDocument, LikeViewModel } from "../likes/likes.schema";
+import { LikeDocument } from "../likes/likes.schema";
 import { UsersRepository } from "../api/superadmin/users/users.repository";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
@@ -107,15 +106,26 @@ export class QueryRepository {
       .limit(query.pageSize)
       .lean()
   }
-  async paginationForUsers(query: QueryModelUsers): Promise<UserViewModel[]> {
+  async paginationForUsers(query: QueryModelUsers): Promise<UserModel[]> {
     const skipSize: number = query.pageSize * (query.pageNumber - 1)
-    return this.dataSource.query(`
-    SELECT id, email, login, "createdAt", "isBanned", "banDate", "banReason"
-        FROM public."Users"
-        WHERE "login" LIKE '%${query.searchLoginTerm}%' AND "email" LIKE '%${query.searchEmailTerm}%' AND "isBanned" = false
-        ORDER BY "${query.sortBy}" ${query.sortDirection}
-        OFFSET ${skipSize} LIMIT ${query.pageSize};
-    `)
+    if(query.banStatus === undefined){
+      return this.dataSource.query(`
+        SELECT "id", "email", "login", "createdAt", "isBanned", "banDate", "banReason"
+            FROM public."Users"
+            WHERE "login" LIKE '%${query.searchLoginTerm}%' AND "email" LIKE '%${query.searchEmailTerm}%' 
+            ORDER BY "${query.sortBy}" ${query.sortDirection}
+            OFFSET ${skipSize} LIMIT ${query.pageSize};
+        `)
+    }
+    else {
+      return this.dataSource.query(`
+        SELECT "id", "email", "login", "createdAt", "isBanned", "banDate", "banReason"
+            FROM public."Users"
+            WHERE "login" LIKE '%${query.searchLoginTerm}%' AND "email" LIKE '%${query.searchEmailTerm}%' AND "isBanned" = ${query.banStatus}
+            ORDER BY "${query.sortBy}" ${query.sortDirection}
+            OFFSET ${skipSize} LIMIT ${query.pageSize};
+        `)
+    }
   }
   async paginationForm(pageCount: number, total: number, items: BlogModel[] | PostModel[] | UserViewModel[] | CommentModel[] | BlogViewModel[] | any, query : QueryModelBlogs): Promise<PaginatedClass> {
     return  {
@@ -125,26 +135,6 @@ export class QueryRepository {
       totalCount: total,
       items: items
     }
-  }
-  async getLastLikesForPost(id : string): Promise<LikeViewModel[]> {
-    const newestLikes = await  this.likesModel.find(
-      {postOrCommentId: id, status: 'Like'},
-      {_id: 0, login: 'any login', userId: 1, createdAt: 1})
-      .sort({createdAt: 'desc'})
-    let likesCopy = newestLikes
-    let usersId = await Promise.all(likesCopy.map(async (item) => item.userId))
-    let listOfBanInfo = await Promise.all(
-      usersId.map(async (userId) => {
-        const user = await this.usersRepository.getFullUser(userId)
-        return user.isBanned
-      })
-    )
-    const filteredComments = newestLikes.filter((item, i) => !listOfBanInfo[i]).slice(0,3)
-    return Promise.all(filteredComments.map(async like => ({
-      addedAt : like.createdAt,
-      userId : like.userId,
-      login : await this.usersRepository.getLoginById(like.userId)
-    })))
   }
 
   async getLikesOrDislikesCount(id : string, status : 'Like' | 'Dislike' ): Promise<number> {
@@ -198,27 +188,10 @@ export class QueryRepository {
     );
   }
 
-  //PAGINATION FOR POSTS
-
-  async usersMapping(users : UserViewModel[], banInfo : BannedUserInfo[]){
-    return await users.map((a) => {
-      let userInfo = banInfo.find(item => item.userId === a.id)
-      return
-      {
-        id : a.id
-        login : a.login
-          banInfo : {
-          isBanned : userInfo.isBanned
-          banDate : userInfo.banDate
-          banReason : userInfo.banReason
-        }
-    }})
-  }
-
   async postsMapping(posts : PostModel[], userId : string) {
     return await Promise.all(
       posts.map(async (post) => {
-        let newestLikes = await this.getLastLikesForPost(post.id)
+        let newestLikes = await this.likesRepository.getLastLikes(post.id)
         let status = null;
         if (userId) {
           status = await this.likesRepository.findStatus(post.id, userId);

@@ -1,50 +1,61 @@
-import { PostDocument, PostModel } from "./posts.schema";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { PostModel } from "./posts.schema";
 import { PostsDto } from "./posts.dto";
 import { Injectable } from "@nestjs/common";
+import { InjectDataSource } from "@nestjs/typeorm";
+import { DataSource } from "typeorm";
 
 @Injectable()
 export class PostsRepository {
-  constructor(@InjectModel('posts') private postsModel: Model<PostDocument>) {
+  constructor(@InjectDataSource() protected dataSource : DataSource) {
   }
   async getPosts() : Promise<PostModel[]>{
-    return this.postsModel
-      .find({}, {_id: 0, __v: 0, 'extendedLikesInfo' : {_id : 0}})
-      .lean()
+    return this.dataSource.query(`
+    SELECT "id", "title", "shortDescription", "content", "blogName", "createdAt", "blogId"
+        FROM public."Posts";
+    `)
   }
   async getPost(id: string) : Promise<PostModel | null>{
-    return this.postsModel.findOne({id : id}, {_id: 0, __v: 0, 'extendedLikesInfo' : {_id : 0}}).lean();
+    return this.dataSource.query(`
+    SELECT "id", "title", "shortDescription", "content", "blogName", "createdAt", "blogId"
+        FROM public."Posts"
+        WHERE "id"=${id}
+    `)
   }
   async deletePost(id:string) : Promise<boolean>{
-    const result = await this.postsModel.deleteOne({id: id});
-    return result.deletedCount === 1;
+    await this.dataSource.query(`
+    DELETE FROM public."Posts"
+        WHERE "id"=${id};
+    `)
+    return true
   }
   async createPost(newPost: PostModel) : Promise <PostModel | null>{
-    await this.postsModel.insertMany(newPost)
+    await this.dataSource.query(`
+    INSERT INTO public."Posts"(
+        "title", "shortDescription", "content", "blogName", "createdAt", "blogId")
+        VALUES ('${newPost.title}','${newPost.shortDescription}','${newPost.content}','${newPost.blogName}', '${newPost.createdAt}', ${newPost.blogId});
+    `)
     return this.getPost(newPost.id)
   }
   async updatePost(post : PostsDto, postId : string) : Promise <boolean>{
-    const result = await this.postsModel.updateOne({id: postId}, {$set : post
-    })
-    return result.matchedCount === 1
+    await this.dataSource.query(`
+    UPDATE public."Posts"
+      SET "title"='${post.title}', "shortDescription"='${post.shortDescription}', "content"='${post.content}'
+      WHERE "id"=${postId};
+    `)
+    return true
   }
   async countPostsByBlogId(blogId : string) : Promise<number>{
-    return this.postsModel.countDocuments({blogId}, {projection: {_id: 0}})
-  }
-  async changeLikesTotalCount(postId: string, likesCount: number, dislikesCount: number): Promise<boolean> {
-    const status = await this.postsModel.updateOne({
-      id: postId,
-    }, {
-      $set: {
-        'extendedLikesInfo.likesCount': likesCount,
-        'extendedLikesInfo.dislikesCount': dislikesCount
-      }
-    })
-    return status.matchedCount === 1
+    const count = await this.dataSource.query(`
+      SELECT COUNT(*) AS "total"
+        FROM public."Posts"
+        WHERE "blogId"=${blogId}
+    `)
+    return count.total
   }
   async deleteAllData() {
-    await this.postsModel.deleteMany({});
-    return [];
+    this.dataSource.query(`
+    DELETE FROM public."Posts"
+    `)
+    return true
   }
 }

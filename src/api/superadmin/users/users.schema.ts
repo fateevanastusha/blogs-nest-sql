@@ -16,6 +16,20 @@ export class UserBanInfo {
 }
 
 @Schema()
+export class UserModelCreate {
+  @Prop({required : true})
+  email : string
+  @Prop({required: true})
+  login : string
+  @Prop({required: true})
+  password : string
+  @Prop({required : true})
+  createdAt : string
+  @Prop({required : true})
+  confirmedCode : string
+}
+
+@Schema()
 export class UserModel {
   @Prop({required : true})
   email : string

@@ -1,12 +1,9 @@
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-import { BlogBanInfo, BlogDocument, BlogModel, BlogOwnerModel } from "../../public/blogs/blogs.schema";
+import { BlogBanInfo, BlogModel, BlogOwnerModel } from "../../public/blogs/blogs.schema";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 
 export class BlogsSuperAdminRepository {
-  constructor(@InjectModel('bloggers') private blogsModel: Model<BlogDocument>,
-              @InjectDataSource() protected dataSource : DataSource) {
+  constructor(@InjectDataSource() protected dataSource : DataSource) {
   }
   async getBlogsCount(searchNameTerm: string): Promise<number>{
     const count = await this.dataSource.query(`

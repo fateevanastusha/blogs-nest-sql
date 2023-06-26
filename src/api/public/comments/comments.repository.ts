@@ -1,14 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { CommentDocument, CommentModel } from "./comments.schema";
-import { Model } from "mongoose";
+import { CommentModel } from "./comments.schema";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 
 @Injectable()
 export class CommentsRepository {
-  constructor(@InjectModel('comments') private commentsModel : Model<CommentDocument>,
-              @InjectDataSource() protected dataSource : DataSource) {}
+  constructor(@InjectDataSource() protected dataSource : DataSource) {}
   async getCommentById(id: string): Promise<CommentModel | null> {
     return await this.dataSource.query(`
     SELECT "id", "content", "createdAt", "blogName", "userId", "userLogin"
