@@ -56,6 +56,7 @@ import { BloggersUsersController } from "./api/blogger/users/bloggers.users.cont
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { TestRepo } from "./test.repo";
 import { CqrsModule } from "@nestjs/cqrs";
+import { BannedUsersRepository } from "./api/blogger/bloggers/bloggers.bannedUsers.repository";
 
 const repositories = [
   UsersRepository,
@@ -68,7 +69,8 @@ const repositories = [
   BloggersRepository,
   BlogsRepository,
   BlogsSuperAdminRepository,
-  TestRepo
+  TestRepo,
+  BannedUsersRepository
 ]
 const services = [
   UsersService,

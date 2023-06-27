@@ -1018,17 +1018,17 @@ describe('AppController (e2e)', () => {
     expect(res.body).toStrictEqual({
       "items": [
         {
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "content": "3 comment content for posts 1",
           "commentatorInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "alina28"
           },
           "createdAt": expect.any(String),
           "postInfo": {
-            "blogId": expect.any(String),
+            "blogId": expect.any(Number),
             "blogName": "updatedname",
-            "id": expect.any(String),
+            "id": expect.any(Number),
             "title": "updated"
           },
           likesInfo : {
@@ -1039,16 +1039,16 @@ describe('AppController (e2e)', () => {
         },
         {
           "commentatorInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "nastya1"
           },
           "content": "2 comment content for posts 1",
           "createdAt": expect.any(String),
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "postInfo": {
-            "blogId": expect.any(String),
+            "blogId": expect.any(Number),
             "blogName": "updatedname",
-            "id": expect.any(String),
+            "id": expect.any(Number),
             "title": "updated"
           },
           likesInfo : {
@@ -1059,16 +1059,16 @@ describe('AppController (e2e)', () => {
         },
         {
           "commentatorInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "nastya1"
           },
           "content": "2 comment content for posts 1",
           "createdAt": expect.any(String),
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "postInfo": {
-            "blogId": expect.any(String),
+            "blogId": expect.any(Number),
             "blogName": "updatedname",
-            "id": expect.any(String),
+            "id": expect.any(Number),
             "title": "updated"
           },
           likesInfo : {
@@ -1079,16 +1079,16 @@ describe('AppController (e2e)', () => {
         },
         {
           "commentatorInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "nastya1"
           },
           "content": "1 comment content for posts 1",
           "createdAt": expect.any(String),
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "postInfo": {
-            "blogId": expect.any(String),
+            "blogId": expect.any(Number),
             "blogName": "updatedname",
-            "id": expect.any(String),
+            "id": expect.any(Number),
             "title": "updated"
           },
           likesInfo : {
@@ -1206,12 +1206,12 @@ describe('AppController (e2e)', () => {
       .expect(200)
     expect(res.body).toStrictEqual({
       "commentatorInfo": {
-        "userId": expect.any(String),
+        "userId": expect.any(Number),
         "userLogin": "userthat"
       },
       "content": "comment of banned user that not available to see",
       "createdAt": expect.any(String),
-      "id": expect.any(String),
+      "id": expect.any(Number),
       "likesInfo": {
         "dislikesCount": 0,
         "likesCount": 0,
@@ -1269,12 +1269,12 @@ describe('AppController (e2e)', () => {
       .expect(200)
     expect(res.body).toStrictEqual({
       "commentatorInfo": {
-        "userId": expect.any(String),
+        "userId": expect.any(Number),
         "userLogin": "nastya1"
       },
       "content": "comment to check likes",
       "createdAt": expect.any(String),
-      "id": expect.any(String),
+      "id": expect.any(Number),
       "likesInfo": {
         "dislikesCount": 1,
         "likesCount": 1,
@@ -1291,12 +1291,12 @@ describe('AppController (e2e)', () => {
       "items": [
         {
           "commentatorInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "nastya1"
           },
           "content": "comment to check likes",
           "createdAt": expect.any(String),
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "likesInfo": {
             "dislikesCount": 1,
             "likesCount": 1,
@@ -1305,12 +1305,12 @@ describe('AppController (e2e)', () => {
         },
         {
           "commentatorInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "alina28"
           },
           "content": "3 comment content for posts 1",
           "createdAt": expect.any(String),
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "likesInfo": {
             "dislikesCount": 0,
             "likesCount": 0,
@@ -1319,12 +1319,12 @@ describe('AppController (e2e)', () => {
         },
         {
           "commentatorInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "nastya1"
           },
           "content": "2 comment content for posts 1",
           "createdAt": expect.any(String),
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "likesInfo": {
             "dislikesCount": 0,
             "likesCount": 0,
@@ -1333,12 +1333,12 @@ describe('AppController (e2e)', () => {
         },
         {
           "commentatorInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "nastya1"
           },
           "content": "2 comment content for posts 1",
           "createdAt": expect.any(String),
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "likesInfo": {
             "dislikesCount": 0,
             "likesCount": 0,
@@ -1347,12 +1347,12 @@ describe('AppController (e2e)', () => {
         },
         {
           "commentatorInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "nastya1"
           },
           "content": "1 comment content for posts 1",
           "createdAt": expect.any(String),
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "likesInfo": {
             "dislikesCount": 0,
             "likesCount": 0,
@@ -1536,7 +1536,7 @@ describe('AppController (e2e)', () => {
             "isBanned": true
           },
           "blogOwnerInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "nastya1"
           },
           "createdAt": expect.any(String),
@@ -1548,12 +1548,12 @@ describe('AppController (e2e)', () => {
         },
         {
           "blogOwnerInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "alina28"
           },
           "createdAt": expect.any(String),
           "description": "about me",
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "banInfo": {
             banDate : null,
             isBanned : false
@@ -1564,12 +1564,12 @@ describe('AppController (e2e)', () => {
         },
         {
           "blogOwnerInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "nastya1"
           },
           "createdAt": expect.any(String),
           "description": "about me",
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "banInfo": {
             banDate : null,
             isBanned : false
@@ -1580,12 +1580,12 @@ describe('AppController (e2e)', () => {
         },
         {
           "blogOwnerInfo": {
-            "userId": expect.any(String),
+            "userId": expect.any(Number),
             "userLogin": "nastya1"
           },
           "createdAt": expect.any(String),
           "description": "about me",
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "banInfo": {
             banDate : null,
             isBanned : false
@@ -1609,7 +1609,7 @@ describe('AppController (e2e)', () => {
         {
           "createdAt": expect.any(String),
           "description": "about me",
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "isMembership": false,
           "name": "2bloguser1",
           "websiteUrl": "http://www.nastyastar.com"
@@ -1617,7 +1617,7 @@ describe('AppController (e2e)', () => {
         {
           "createdAt": expect.any(String),
           "description": "about me",
-          "id": expect.any(String),
+          "id": expect.any(Number),
           "isMembership": false,
           "name": "updatedname",
           "websiteUrl": "http://www.nastyastar.com"

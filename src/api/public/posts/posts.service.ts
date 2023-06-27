@@ -33,14 +33,14 @@ export class PostsService {
     return await this.queryRepository.paginationForm(pageCount,total,paginatedItems,query)
   }
   async getPostsWithUser(query : QueryModelPosts, token : string) : Promise<PaginatedClass>{
-    const userId : string = await this.jwtService.getUserIdByToken(token)
+    const userId : number = await this.jwtService.getUserIdByToken(token)
     const total : number = (await this.postsRepository.getPosts()).length
     const pageCount = Math.ceil( total / query.pageSize)
     const items = await this.queryRepository.paginatorForPosts(query)
     const paginatedItems = await this.queryRepository.postsMapping(items, userId)
     return await this.queryRepository.paginationForm(pageCount,total,paginatedItems,query)
   }
-  async getPostsByBlogId (query : QueryModelPosts, blogId: string, token : string) : Promise<PaginatedClass | null>{
+  async getPostsByBlogId (query : QueryModelPosts, blogId: number, token : string) : Promise<PaginatedClass | null>{
     const userId = await this.jwtService.getUserIdByToken(token)
     const blog : BlogModel[] = await this.blogsRepository.getFullBlog(blogId)
     if(blog.length === 0 ) return null
@@ -55,7 +55,7 @@ export class PostsService {
     const paginatedPosts : PostModel[] = await this.queryRepository.postsMapping(items, userId)
     return await this.queryRepository.paginationForm(pageCount, total, paginatedPosts, query)
   }
-  async getPostWithUser(id: string, header : string) : Promise<PostViewModel> {
+  async getPostWithUser(id: number, header : string) : Promise<PostViewModel> {
     const post : PostModel[] =  await this.postsRepository.getPost(id);
     if (post.length === 0) return null
     const blog = await this.blogsRepository.getFullBlog(post[0].blogId)
@@ -80,28 +80,26 @@ export class PostsService {
       blogId : post[0].blogId,
       blogName : post[0].blogName,
       createdAt : post[0].createdAt,
-      extendedLikesInfo : {...likesInfo, newestLikes}
+      extendedLikesInfo : {...likesInfo[0], newestLikes}
     }
     return postView
   }
-  async getPost(id: string) : Promise<null | PostModel> {
+  async getPost(id: number) : Promise<null | PostModel> {
     const post : PostModel[] =  await this.postsRepository.getPost(id);
     if (post.length === 0) return null
     return post[0]
   }
-  async updatePost(post : PostsDto, postId : string, token : string) : Promise <boolean>{
-    const userId : string = await this.jwtService.getUserIdByToken(token)
+  async updatePost(post : PostsDto, postId : number, token : string) : Promise <boolean>{
+    const userId : number = await this.jwtService.getUserIdByToken(token)
     const blog : BlogModel[] = await this.blogsRepository.getFullBlog(post.blogId)
     if (blog.length ===0 ) throw new NotFoundException()
     if (blog[0].userId !== userId) throw new ForbiddenException()
     return await this.postsRepository.updatePost(post,postId)
   }
-  async getComments(query : QueryModelComments, header : string, postId : string) : Promise<PaginatedClass>{
+  async getComments(query : QueryModelComments, header : string, postId : number) : Promise<PaginatedClass>{
     const foundPost = await this.getPost(postId)
-    if (foundPost === null) {
-      throw new NotFoundException()
-      return null
-    } else {
+    if (foundPost === null) throw new NotFoundException()
+    else {
       let token
       if(header){
         token = header.split(" ")[1]
@@ -113,7 +111,7 @@ export class PostsService {
       return foundComments
     }
   }
-  async changeLikeStatus(requestType : string, postId : string, header : string) : Promise <boolean> {
+  async changeLikeStatus(requestType : string, postId : number, header : string) : Promise <boolean> {
     if(!header) throw new UnauthorizedException(401)
     const token = header.split(" ")[1]
     const post : PostModel[] = await this.postsRepository.getPost(postId)

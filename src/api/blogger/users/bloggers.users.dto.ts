@@ -11,7 +11,6 @@ export class BanUserForBlogDto {
   @IsString()
   banReason : string
   @IsString()
-  @Transform(({ value }: TransformFnParams) => value?.trim())
   @Length(5, 1000)
-  blogId : string
+  blogId : number
 }

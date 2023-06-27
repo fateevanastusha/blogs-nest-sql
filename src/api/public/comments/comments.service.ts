@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { CommentsRepository } from "./comments.repository";
 import { LikesRepository } from "../../../likes/likes.repository";
 import { UserModel } from "../../superadmin/users/users.schema";
@@ -36,14 +36,13 @@ export class CommentsService {
     return commentView
   }
 
-  async getCommentByIdWithUser (id : string, userId : string) : Promise<CommentViewModel> {
+  async getCommentByIdWithUser (id : string, userId : number) : Promise<CommentViewModel> {
     let comment : CommentModel | null = await this.commentsRepository.getCommentById(id)
     if (!comment) return null
     const user : UserModel[] | null = await this.usersRepository.getFullUser(comment.userId)
     if (user.length === 0) throw new NotFoundException()
     if (user[0].isBanned === true) throw new NotFoundException()
     const likes : LikesInfo = await this.likesRepository.getLikesInfoWithUser(userId, comment.id)
-    console.log(likes);
     const commentView : CommentViewModel = {
       id: comment.id,
       content: comment.content,
@@ -52,7 +51,7 @@ export class CommentsService {
         userLogin: comment.userLogin
       },
       createdAt: comment.createdAt,
-      likesInfo: likes
+      likesInfo: likes[0]
     }
     return commentView
   }
@@ -64,12 +63,10 @@ export class CommentsService {
   }
   async getAllCommentsByPostId(query : QueryCommentsUsers, postId: string, userId : string) : Promise<PaginatedClass> {
     const items : CommentModel[] = await this.queryRepository.paginatorForCommentsByPostId(query, postId)
-    const filteredItems : CommentModel[] = await this.queryRepository.filterCommentsOfBannedUser(items)
     let allComments : number = await this.commentsRepository.countCommentsByPostId(postId)
-    let total = allComments - (items.length - filteredItems.length)
+    let total = allComments - (items.length - items.length)
     const pageCount : number = Math.ceil( total / query.pageSize)
-    let comments = await this.queryRepository.commentsMapping(filteredItems, userId)
-    let paginatedComments = await this.queryRepository.paginationForm(pageCount, total, comments, query)
+    let paginatedComments = await this.queryRepository.paginationForm(pageCount, total, items, query)
     return paginatedComments
   }
   //change like status

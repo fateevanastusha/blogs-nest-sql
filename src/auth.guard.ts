@@ -173,7 +173,7 @@ export class CheckForSameDevice implements CanActivate {
       throw new UnauthorizedException();
       return false;
     }
-    const userId: string = user.id;
+    const userId: number = user.id;
     const status: boolean = await this.securityService.checkForSameDevice(title, userId);
     if (!status) {
       throw new ForbiddenException();

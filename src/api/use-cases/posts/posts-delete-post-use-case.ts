@@ -7,7 +7,7 @@ import { BloggersRepository } from "../../blogger/bloggers/bloggers.repository";
 import { PostsRepository } from "../../public/posts/posts.repository";
 
 export class DeletePostPostsCommand {
-  constructor(public postId : string,public blogId: string,public token : string) {
+  constructor(public postId : number,public blogId: number,public token : string) {
   }
 }
 
@@ -17,7 +17,7 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostPostsCommand
               protected blogsRepository : BloggersRepository,
               protected postsRepository : PostsRepository) {}
   async execute (command : DeletePostPostsCommand) : Promise<boolean>{
-    const userId : string = await this.jwtService.getUserIdByToken(command.token)
+    const userId : number = await this.jwtService.getUserIdByToken(command.token)
     const blog : BlogModel[] = await this.blogsRepository.getFullBlog(command.blogId)
     if (blog.length === 0) throw new NotFoundException()
     const post : PostModel[] = await this.postsRepository.getPost(command.postId)

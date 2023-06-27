@@ -38,7 +38,7 @@ export class UserModel {
   @Prop({required: true})
   password : string
   @Prop({required: true})
-  id : string
+  id : number
   @Prop({required : true})
   createdAt : string
   @Prop({required : true})

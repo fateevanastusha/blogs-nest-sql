@@ -4,14 +4,14 @@ import { JwtService } from "../../../jwt.service";
 import { PostModel } from "../../public/posts/posts.schema";
 import { PostsRepository } from "../../public/posts/posts.repository";
 import { UserModel } from "../../superadmin/users/users.schema";
-import { CommentModel, CommentViewFullModel } from "../../public/comments/comments.schema";
+import { CommentModel, CommentViewFullModel, CreateCommentModel } from "../../public/comments/comments.schema";
 import { CommentsRepository } from "../../public/comments/comments.repository";
 import { UsersRepository } from "../../superadmin/users/users.repository";
 import { BlogModel } from "../../public/blogs/blogs.schema";
 import { BlogsRepository } from "../../public/blogs/blogs.repository";
 
 export class CreateCommentCommentsCommand {
-  constructor(public postId : string,public content : string,public token : string) {
+  constructor(public postId : number,public content : string,public token : string) {
   }
 }
 
@@ -28,10 +28,12 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommen
     const foundBlog : BlogModel[] = await this.blogsRepository.getFullBlog(foundPost[0].blogId)
     if (foundBlog.length === 0) throw new NotFoundException()
     let userId = await this.jwtService.getUserIdByToken(command.token)
+
+    //check for not banned
+
     if(foundBlog[0].bannedUsers.find(a => a.userId === userId)) throw new ForbiddenException()
     const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
-    const comment : CommentModel = {
-      id : (+new Date()).toString(),
+    const comment : CreateCommentModel = {
       content : command.content,
       createdAt: new Date().toISOString(),
       postId : command.postId,

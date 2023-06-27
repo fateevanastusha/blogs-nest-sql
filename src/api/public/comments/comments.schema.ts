@@ -6,7 +6,7 @@ export type CommentDocument = HydratedDocument<CommentModel>
 @Schema()
 export class CommentatorInfo {
   @Prop({required : true})
-  userId: string
+  userId: number
   @Prop({required : true})
   userLogin: string
 }
@@ -24,45 +24,67 @@ export class LikesInfo {
 @Schema()
 export class PostInfo {
   @Prop({required : true})
-  id: string
+  id: number
   @Prop({required : true})
   title: string
   @Prop({required : true})
-  blogId: string
+  blogId: number
   @Prop({required : true})
   blogName: string
   @Prop({required : true})
-  blogOwnerId : string
+  blogOwnerId : number
 }
 
 @Schema()
 export class CommentModel {
   @Prop({required : true})
-  id : string
+  id : number
   @Prop({required : true})
   content : string
   @Prop({required : true})
-  userId: string
+  userId: number
   @Prop({required : true})
   userLogin: string
   @Prop({required : true})
   createdAt: string
   @Prop({required : true})
-  postId : string
+  postId : number
   @Prop({required : true})
   title: string
   @Prop({required : true})
-  blogId: string
+  blogId: number
   @Prop({required : true})
   blogName: string
   @Prop({required : true})
-  blogOwnerId : string
+  blogOwnerId : number
+}
+
+@Schema()
+export class CreateCommentModel {
+  @Prop({required : true})
+  content : string
+  @Prop({required : true})
+  userId: number
+  @Prop({required : true})
+  userLogin: string
+  @Prop({required : true})
+  createdAt: string
+  @Prop({required : true})
+  postId : number
+  @Prop({required : true})
+  title: string
+  @Prop({required : true})
+  blogId: number
+  @Prop({required : true})
+  blogName: string
+  @Prop({required : true})
+  blogOwnerId : number
 }
 
 @Schema()
 export class CommentViewFullModel {
   @Prop({required : true})
-  id : string
+  id : number
   @Prop({required : true})
   content : string
   @Prop({required : true})
@@ -77,7 +99,7 @@ export class CommentViewFullModel {
 @Schema()
 export class CommentViewModel {
   @Prop({required : true})
-  id : string
+  id : number
   @Prop({required : true})
   content : string
   @Prop({required : true})
@@ -91,18 +113,18 @@ export class CommentViewModel {
 @Schema()
 export class PostInfoViewModel {
   @Prop({required : true})
-  id: string
+  id: number
   @Prop({required : true})
   title: string
   @Prop({required : true})
-  blogId: string
+  blogId: number
   @Prop({required : true})
   blogName: string
 }
 
 export class CommentForBloggerViewModel {
   @Prop({required : true})
-  id : string
+  id : number
   @Prop({required : true})
   content : string
   @Prop({required : true})

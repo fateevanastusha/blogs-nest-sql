@@ -14,14 +14,14 @@ export class PostsRepository {
         FROM public."Posts";
     `)
   }
-  async getPost(id: string) : Promise<PostModel[]>{
+  async getPost(id: number) : Promise<PostModel[]>{
     return this.dataSource.query(`
     SELECT "id", "title", "shortDescription", "content", "blogName", "createdAt", "blogId"
         FROM public."Posts"
         WHERE "id"=${id}
     `)
   }
-  async deletePost(id:string) : Promise<boolean>{
+  async deletePost(id:number) : Promise<boolean>{
     await this.dataSource.query(`
     DELETE FROM public."Posts"
         WHERE "id"=${id};
@@ -40,7 +40,7 @@ export class PostsRepository {
         WHERE "createdAt"='${newPost.createdAt}'
     `))[0]
   }
-  async updatePost(post : PostsDto, postId : string) : Promise <boolean>{
+  async updatePost(post : PostsDto, postId : number) : Promise <boolean>{
     await this.dataSource.query(`
     UPDATE public."Posts"
       SET "title"='${post.title}', "shortDescription"='${post.shortDescription}', "content"='${post.content}'
@@ -48,7 +48,7 @@ export class PostsRepository {
     `)
     return true
   }
-  async countPostsByBlogId(blogId : string) : Promise<number>{
+  async countPostsByBlogId(blogId : number) : Promise<number>{
     const count = await this.dataSource.query(`
       SELECT COUNT(*) AS "total"
         FROM public."Posts"

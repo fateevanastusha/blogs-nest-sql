@@ -3,12 +3,10 @@ import { HydratedDocument } from "mongoose";
 import { PostModel } from "../../public/posts/posts.schema";
 import { UserModel } from "../../superadmin/users/users.schema";
 
-export type BlogDocument = HydratedDocument<BlogModel>
-
 @Schema()
 export class BlogOwnerModel {
   @Prop({required : true})
-  userId: string
+  userId: number
   @Prop({required : true})
   userLogin: string
 }
@@ -16,13 +14,31 @@ export class BlogOwnerModel {
 @Schema()
 export class BannedUserInfo {
   @Prop({required: true})
-  isBanned: boolean
+  id : number
+  @Prop({required: true})
+  blogId: number
   @Prop({required: true})
   banDate: string
   @Prop({required: true})
   banReason: string
   @Prop({required: true})
-  userId: string
+  userId: number
+  @Prop({required: true})
+  userLogin : string
+}
+
+@Schema()
+export class CreateBannedUserInfo {
+  @Prop({required: true})
+  blogId: number
+  @Prop({required: true})
+  banDate: string
+  @Prop({required: true})
+  banReason: string
+  @Prop({required: true})
+  userId: number
+  @Prop({required: true})
+  userLogin : string
 }
 
 @Schema()
@@ -43,17 +59,15 @@ export class BlogModel {
   @Prop({required: true})
   websiteUrl : string
   @Prop({required: true})
-  id : string
+  id : number
   @Prop({required : true})
   createdAt : string
   @Prop({required: true})
   isMembership : boolean
   @Prop({required : true})
-  userId: string
+  userId: number
   @Prop({required : true})
   userLogin: string
-  @Prop({required: true})
-  bannedUsers : BannedUserInfo[]
   @Prop({required: true})
   isBanned: boolean
   @Prop({type : String})
@@ -70,7 +84,7 @@ export class BlogViewModel {
   @Prop({required: true})
   websiteUrl : string
   @Prop({required: true})
-  id : string
+  id : number
   @Prop({required : true})
   createdAt : string
   @Prop({required: true})
@@ -88,7 +102,7 @@ export class CreateBlogModel {
   @Prop({required : true})
   createdAt : string
   @Prop({required : true})
-  userId: string
+  userId: number
   @Prop({required : true})
   userLogin: string
 }

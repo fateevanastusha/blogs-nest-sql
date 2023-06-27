@@ -1,69 +1,55 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { BanUserForBlogDto } from "./bloggers.users.dto";
 import { JwtService } from "../../../jwt.service";
 import { BloggersRepository } from "../bloggers/bloggers.repository";
 import { QueryRepository } from "../../../helpers/query.repository";
 import { QueryModelBannedUsersForBlog } from "../../../helpers/helpers.schema";
-import { BannedUserInfo, BlogModel, PaginatedClass } from "../../public/blogs/blogs.schema";
+import { BannedUserInfo, BlogModel, CreateBannedUserInfo, PaginatedClass } from "../../public/blogs/blogs.schema";
 import { UsersRepository } from "../../superadmin/users/users.repository";
 import { UserModel, UserViewModel } from "../../superadmin/users/users.schema";
-import { User } from "node-telegram-bot-api";
+import { BannedUsersRepository } from "../bloggers/bloggers.bannedUsers.repository";
 
 @Injectable()
 export class BloggersUsersService {
   constructor(protected jwtService : JwtService,
               protected bloggerRepository : BloggersRepository,
               protected queryRepository : QueryRepository,
-              protected usersRepository : UsersRepository) {}
-  async BanUserForBlog(token : string, userId : string, banInfo : BanUserForBlogDto) : Promise<boolean> {
+              protected usersRepository : UsersRepository,
+              protected banRepository : BannedUsersRepository) {}
+  async BanUserForBlog(token : string, userId : number, banInfo : BanUserForBlogDto) : Promise<boolean> {
     const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
     if(user.length === 0) throw new NotFoundException()
     const ownerId = await this.jwtService.getUserIdByToken(token)
     const blog : BlogModel[] = await this.bloggerRepository.getFullBlog(banInfo.blogId)
     if(blog.length === 0) throw new NotFoundException()
     if(blog[0].userId !== ownerId) throw new ForbiddenException()
-    const bannedUsers  = blog[0].bannedUsers
     if (banInfo.isBanned === true){
-      const bannedInfo : BannedUserInfo = {
-        isBanned : banInfo.isBanned,
+      const bannedInfo : CreateBannedUserInfo = {
         banDate : new Date().toISOString(),
         banReason : banInfo.banReason,
-        userId : userId
+        userId : userId,
+        blogId : banInfo.blogId,
+        userLogin : user[0].login
       }
-      bannedUsers.push(bannedInfo)
-      return await this.bloggerRepository.updateBlogBannedUsers(banInfo.blogId, bannedUsers)
+      return await this.banRepository.banUser(bannedInfo)
     } else {
-      const index = bannedUsers.findIndex(user => user.userId === userId);
-      if (index > -1) {
-        bannedUsers.splice(index, 1);
-      }
-      return await this.bloggerRepository.updateBlogBannedUsers(banInfo.blogId, bannedUsers)
+      return await this.banRepository.unbanUser(banInfo.blogId, userId)
     }
   }
-  async getAllBannedUsers(token : string, blogId : string, query : QueryModelBannedUsersForBlog) : Promise<PaginatedClass>{
-    const ownerId = await this.jwtService.getUserIdByToken(token)
-    const blog = await this.bloggerRepository.getFullBlog(blogId)
-    if(blog.length === 0) throw new NotFoundException()
-    if(blog[0].userId !== ownerId) throw new ForbiddenException()
-    const banInfo = [...blog[0].bannedUsers]
-    const bannedId  = []
-    for(let i = 0; i < blog[0].bannedUsers.length; i++){
-      bannedId.push(blog[0].bannedUsers[i].userId)
-    }
-    const total : number = blog[0].bannedUsers.length
-    const pageCount : number = Math.ceil( total / query.pageSize);
-    const items : UserViewModel[] = await this.queryRepository.paginationForBlogBannedUsers(query, bannedId)
-    const mappedItems = items.map((a) => {
-      let userInfo = banInfo.find(item => item.userId === a.id)
+  async getAllBannedUsers(token : string, blogId : number, query : QueryModelBannedUsersForBlog) : Promise<PaginatedClass>{
+    const total: number = await this.banRepository.getBannedUsersCount(blogId)
+    const pageCount = Math.ceil( total / +query.pageSize)
+    const bannedUsers : BannedUserInfo[] = await this.queryRepository.paginationForBlogBannedUsers(query, blogId)
+    const mappedUsers = bannedUsers.map((a) => {
       return  {
-        id : a.id,
-        login : a.login,
+        id : a.userId,
+        login : a.userLogin,
         banInfo : {
-          isBanned : userInfo.isBanned,
-          banDate : userInfo.banDate,
-          banReason : userInfo.banReason
+          isBanned : true,
+          banDate : a.banDate,
+          banReason : a.banReason
         }
       }})
-    return await this.queryRepository.paginationForm(pageCount,total,mappedItems,query)
+    return await this.queryRepository.paginationForm(pageCount,total,mappedUsers,query)
   }
 }

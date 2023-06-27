@@ -24,7 +24,7 @@ export class SecurityService {
   async deleteOneSession(deviceId : string) : Promise<boolean> {
     return await this.securityRepository.deleteOneSessions(deviceId)
   }
-  async checkForSameDevice(title : string, userId : string) : Promise<boolean> {
+  async checkForSameDevice(title : string, userId : number) : Promise<boolean> {
     const status : boolean = await this.securityRepository.checkSameDevice(title,userId)
     if(!status) throw new NotFoundException()
     return true

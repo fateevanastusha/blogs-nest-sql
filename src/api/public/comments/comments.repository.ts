@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { CommentModel } from "./comments.schema";
+import { CommentModel, CreateCommentModel } from "./comments.schema";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 
@@ -21,7 +21,7 @@ export class CommentsRepository {
       FROM public."Comments"
       WHERE "blogOwnerId" = ${userId}
     `)
-    return count.total
+    return +count[0].total
   }
   async deleteCommentById(id: string): Promise<boolean> {
     await this.dataSource.query(`
@@ -38,7 +38,7 @@ export class CommentsRepository {
     `)
     return true
   }
-  async createNewComment(comment: CommentModel): Promise<CommentModel | null> {
+  async createNewComment(comment: CreateCommentModel): Promise<CommentModel | null> {
     await this.dataSource.query(`
     INSERT INTO public."Comments"(
         "content","blogOwnerId", "blogId", "postId", "blogName", "userId", "userLogin", "createdAt")
@@ -58,7 +58,7 @@ export class CommentsRepository {
       FROM public."Comments"
       WHERE "postId" = ${postId}
     `)
-    return count.total
+    return +count[0].total
   }
   async deleteAllData() {
     this.dataSource.query(`

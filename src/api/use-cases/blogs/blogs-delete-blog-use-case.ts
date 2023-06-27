@@ -6,7 +6,7 @@ import { BloggersRepository } from "../../blogger/bloggers/bloggers.repository";
 
 
 export class DeleteBlogBlogsCommand {
-  constructor(public blogId: string, public token : string) {
+  constructor(public blogId: number, public token : string) {
   }
 }
 

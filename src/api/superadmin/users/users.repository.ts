@@ -30,7 +30,7 @@ export class UsersRepository {
     }
     return Number(count[0].total);
   }
-  async getFullUser (id : string) : Promise<UserModel[] | null>{
+  async getFullUser (id : number) : Promise<UserModel[] | null>{
     return await this.dataSource.query(`
     SELECT *
     FROM public."Users"

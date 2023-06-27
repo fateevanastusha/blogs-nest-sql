@@ -17,7 +17,7 @@ import { LikesRepository } from "./likes/likes.repository";
 import { CommentsRepository } from "./api/public/comments/comments.repository";
 import { AuthGuard, CheckIfUserExist } from "./auth.guard";
 import { BlogDto } from "./api/public/blogs/blogs.dto";
-import { BlogModel } from "./api/public/blogs/blogs.schema";
+import { BlogModel, CreateBlogModel } from "./api/public/blogs/blogs.schema";
 import { BloggersService } from "./api/blogger/bloggers/bloggers.service";
 import { TestRepo } from "./test.repo";
 import { InjectDataSource } from "@nestjs/typeorm";
@@ -52,18 +52,13 @@ export class AppController {
   }
   @Post('/blog')
   async createBlog(@Body() blog : BlogDto){
-    const newBlog : BlogModel = {
-      id: (+new Date()).toString(),
+    const newBlog : CreateBlogModel = {
       name: blog.name,
       description: blog.description,
       websiteUrl: blog.websiteUrl,
       createdAt: new Date().toISOString(),
-      isMembership: true,
-      userId: 'userId',
-      userLogin: 'userLogin',
-      bannedUsers : [],
-      isBanned : false,
-      banDate : null
+      userId: 1,
+      userLogin: 'userLogin'
     }
     const createdBlog : BlogModel | null = await this.blogsRepository.createBlog(newBlog)
     if(!createdBlog) throw new BadRequestException()

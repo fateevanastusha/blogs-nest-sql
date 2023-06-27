@@ -13,7 +13,7 @@ export class PostsDto {
   content: string;
   @Length(1, 20)
   @Transform(({ value }: TransformFnParams) => value?.trim())
-  blogId: string;
+  blogId: number;
 }
 
 export class CommentsDto {

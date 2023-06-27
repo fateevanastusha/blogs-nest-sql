@@ -3,7 +3,6 @@ import { Injectable } from "@nestjs/common";
 import { BlogModel, PaginatedClass } from "./blogs.schema";
 import { BlogsRepository } from "./blogs.repository";
 import { QueryRepository } from "../../../helpers/query.repository";
-import { loginURI } from "../../../test-utils/test.strings";
 
 @Injectable()
 export class BlogsService {

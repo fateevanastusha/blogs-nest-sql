@@ -5,40 +5,41 @@ import { LikesInfo } from "../api/public/comments/comments.schema";
 
 export class LikesRepository {
   constructor(@InjectDataSource() protected dataSource : DataSource) {}
-  async getLikesInfoWithUser(userId: string, postOrCommentId : string) : Promise<LikesInfo>{
+  async getLikesInfoWithUser(userId: number, postOrCommentId : number) : Promise<LikesInfo>{
     return await this.dataSource.query(`
-    SELECT likes."likesCount", dislikes."dislikesCount", myStatus."myStatus"
-      FROM 
-        (SELECT COUNT(*) AS "likesCount"
-         FROM public."Likes"
-         WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Like') likes,
-               
-        (SELECT COUNT(*) AS "dislikesCount"
-         FROM public."Likes"
-         WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Dislike') dislikes,
-            
-        (SELECT status AS "myStatus"
-         FROM public."Likes"
-         WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "userId" = ${userId}) myStatus;
+    SELECT
+      (SELECT COALESCE(COUNT(*), 0)::integer
+       FROM public."Likes"
+       WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Like') AS "likesCount",
+      
+      (SELECT COALESCE(COUNT(*), 0)::integer
+       FROM public."Likes"
+       WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Dislike') AS "dislikesCount",
+      
+      COALESCE((SELECT "status"::text
+            FROM public."Likes"
+            WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "userId" = ${userId}), 'None') AS "myStatus";
     `)
+
   }
 
-  async getLikesInfo(postOrCommentId : string) : Promise<LikesInfo>{
+  async getLikesInfo(postOrCommentId : number) : Promise<LikesInfo>{
     return await this.dataSource.query(`
-    SELECT likes."likesCount", dislikes."dislikesCount", myStatus."myStatus"
-      FROM 
-        (SELECT COUNT(*) AS "likesCount"
-         FROM public."Likes"
-         WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Like') likes,
-         
-        (SELECT COUNT(*) AS "dislikesCount"
-         FROM public."Likes"
-         WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Dislike') dislikes,
+    SELECT 
+    
+    (SELECT COALESCE(COUNT(*), 0)::integer
+       FROM public."Likes"
+       WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Like') AS "likesCount",
       
-        (SELECT 'None' AS "myStatus") myStatus;
+    (SELECT COALESCE(COUNT(*), 0)::integer
+       FROM public."Likes"
+       WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Dislike') AS "dislikesCount",
+      
+    (SELECT COALESCE(status, 'None')::text
+       FROM public."Likes") AS "myStatus";
     `)
   }
-  async getLastLikes(postOrCommentId : string) : Promise<LikeViewModel[]>{
+  async getLastLikes(postOrCommentId : number) : Promise<LikeViewModel[]>{
     return await this.dataSource.query(`
       SELECT l."createdAt" AS "addedAt", l."userId", u."login"
         FROM public."Likes" l
@@ -61,14 +62,14 @@ export class LikesRepository {
     `)
     return true
   }
-  async findStatus(postOrCommentId : string, userId : string) : Promise<LikeModel | null> {
+  async findStatus(postOrCommentId : number, userId : number) : Promise<LikeModel | null> {
     return await this.dataSource.query(`
     SELECT *
         FROM public."Likes"
         WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "userId" = ${userId}
     `)
   }
-  async deleteStatus(commentId : string, userId : string) : Promise<boolean> {
+  async deleteStatus(commentId : number, userId : number) : Promise<boolean> {
     await this.dataSource.query(`
     DELETE FROM public."Likes"
         WHERE "commentId" = ${commentId} AND "userId" = ${userId}
@@ -81,22 +82,6 @@ export class LikesRepository {
         SET status='${status.status}'
         WHERE ("postId" = ${status.postOrCommentId} OR "commentId" = ${status.postOrCommentId}) AND "userId" = ${status.userId};`)
     return true;
-  }
-  async findLikes(commentId: string) : Promise<number>{
-    const count =  await this.dataSource.query(`
-    SELECT COUNT(*) as "total"
-        FROM public."Likes"
-        WHERE ("postId" = ${commentId} OR "commentId" = ${commentId}) AND "status" = 'Like'
-    `)
-    return count.total
-  }
-  async findDislikes(commentId: string) : Promise<number>{
-    const count = await this.dataSource.query(`
-    SELECT COUNT(*) as "total"
-        FROM public."Likes"
-        WHERE ("postId" = ${commentId} OR "commentId" = ${commentId}) AND "status" = 'Dislike'
-    `)
-    return count.total
   }
   async deleteAllData(){
     this.dataSource.query(`

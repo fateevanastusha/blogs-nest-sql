@@ -81,7 +81,7 @@ export class BloggersController {
   }
   @UseGuards(CheckIfUserExist)
   @Post(':id/posts')
-  async createPost(@Param('id') blogId : string,
+  async createPost(@Param('id') blogId : number,
                    @Body() post : PostsBlogDto,
                    @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
@@ -100,7 +100,7 @@ export class BloggersController {
   @Put(':id')
   async updateBlog(
     @Body() blog : BlogDto,
-    @Param('id') blogId : string,
+    @Param('id') blogId : number,
     @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
     const status : boolean = await this.bloggersService.updateBlog(blog, blogId, token);
@@ -111,8 +111,8 @@ export class BloggersController {
   @UseGuards(CheckIfUserExist)
   @Put(':blogId/posts/:postId')
   async updatePost(
-    @Param('blogId') blogId : string,
-    @Param('postId') postId : string,
+    @Param('blogId') blogId : number,
+    @Param('postId') postId : number,
     @Body() post : PostsBlogDto,
     @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
@@ -120,14 +120,15 @@ export class BloggersController {
         title : post.title,
         content : post.content,
         shortDescription : post.shortDescription,
-        blogId : blogId }, postId, token)
+        blogId : blogId
+    }, postId, token)
     if (!status) throw new NotFoundException()
     return
   }
   @HttpCode(204)
   @UseGuards(CheckIfUserExist)
   @Delete(':id')
-  async deleteBlog(@Param('id') blogId : string,
+  async deleteBlog(@Param('id') blogId : number,
                    @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
     await this.commandBus.execute(new DeleteBlogBlogsCommand(blogId, token))
@@ -135,8 +136,8 @@ export class BloggersController {
   }
   @UseGuards(CheckIfUserExist)
   @Delete(':blogId/posts/:postId')
-  async deletePost(@Param('blogId') blogId : string,
-                   @Param('postId') postId : string,
+  async deletePost(@Param('blogId') blogId : number,
+                   @Param('postId') postId : number,
                    @Res() res : Response,
                    @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]

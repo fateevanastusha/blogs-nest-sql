@@ -14,14 +14,14 @@ export class BlogsRepository{
     `)
     return +(count[0].total)
   }
-  async getBlog(id : string) : Promise<BlogModel | null>{
+  async getBlog(id : number) : Promise<BlogModel | null>{
     return this.dataSource.query(`
     SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
     FROM public."Blogs"
     WHERE id = ${id}
     `)
   }
-  async getFullBlog(id : string) : Promise<BlogModel[]>{
+  async getFullBlog(id : number) : Promise<BlogModel[]>{
     return this.dataSource.query(`
     SELECT *
     FROM public."Blogs"
