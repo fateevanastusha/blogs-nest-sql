@@ -23,6 +23,14 @@ export class PostsRepository {
   }
   async deletePost(id:number) : Promise<boolean>{
     await this.dataSource.query(`
+    DELETE 
+        FROM public."Likes" l 
+        USING public."Comments" c
+        WHERE c."postId" = ${id} AND l."commentId" = c."id";
+    DELETE FROM public."Likes"
+        WHERE "postId"=${id};
+    DELETE FROM public."Comments"
+        WHERE "postId"=${id};
     DELETE FROM public."Posts"
         WHERE "id"=${id};
     `)
