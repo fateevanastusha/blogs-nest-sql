@@ -57,6 +57,8 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { TestRepo } from "./test.repo";
 import { CqrsModule } from "@nestjs/cqrs";
 import { BannedUsersRepository } from "./api/blogger/bloggers/bloggers.bannedUsers.repository";
+import { DeleteCommentUseCase } from "./api/use-cases/comments/comments-delete-comment-use-case";
+import { UpdateCommentUseCase } from "./api/use-cases/comments/comments-update-comment-use-case";
 
 const repositories = [
   UsersRepository,
@@ -94,7 +96,9 @@ const useCases = [
   DeleteBlogUseCase,
   CreatePostUseCase,
   DeletePostUseCase,
-  CreateCommentUseCase
+  CreateCommentUseCase,
+  DeleteCommentUseCase,
+  UpdateCommentUseCase
 ]
 
 @Module({

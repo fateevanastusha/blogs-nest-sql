@@ -39,15 +39,16 @@ export class AppController {
 
   @Delete('/testing/all-data')
   async deleteAllData(@Res() res : Response) {
-    await this.banRepository.deleteAllData();
-    await this.securityRepository.deleteAllData();
-    await this.likesRepository.deleteAllData();
-    await this.commentsRepository.deleteAllData();
-    await this.postsRepository.deleteAllData();
-    await this.blogsRepository.deleteAllData();
-    await this.usersRepository.deleteAllData();
+    await this.dataSource.query(`
+      DELETE FROM public."BannedForBlogUser";
+      DELETE FROM public."RefreshTokens";
+      DELETE FROM public."Likes";
+      DELETE FROM public."Comments";
+      DELETE FROM public."Posts";
+      DELETE FROM public."Blogs";
+      DELETE FROM public."Users";
+    `)
     res.sendStatus(204)
-    return;
   }
   @Get('/likes')
   async getAllLikes(){

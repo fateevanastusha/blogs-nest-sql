@@ -62,9 +62,6 @@ export class CommentsService {
   async deleteCommentById (id: number) : Promise<boolean> {
     return this.commentsRepository.deleteCommentById(id)
   }
-  async updateCommentById (content: string, id: number) : Promise <boolean> {
-    return await this.commentsRepository.updateCommentById(content, id)
-  }
   //change like status
   async changeLikeStatus(requestType : string, commentId : number, userId : number) : Promise <boolean> {
     const comment : CommentModel | null = await this.commentsRepository.getCommentById(commentId)
