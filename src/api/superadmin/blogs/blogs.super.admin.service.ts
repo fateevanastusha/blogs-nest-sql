@@ -36,14 +36,14 @@ export class BlogsSuperAdminService {
     })
     return await this.queryRepository.paginationForm(pageCount, total, mappedItems, query)
   }
-  async banBlog(blogId : string, request : BanBlogDto) : Promise<boolean> {
+  async banBlog(blogId : number, request : BanBlogDto) : Promise<boolean> {
     const banInfo : BlogBanInfo = {
       isBanned : request.isBanned,
       banDate : new Date().toISOString()
     }
     return await this.blogsRepository.banBlog(blogId, banInfo)
   }
-  async bindBlog(blogId : string, userId : string) : Promise <boolean>{
+  async bindBlog(blogId : number, userId : number) : Promise <boolean>{
     const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
     if (user.length === 0) throw new NotFoundException()
     const blog : BlogModel | null = await this.blogsRepository.getBlog(blogId)

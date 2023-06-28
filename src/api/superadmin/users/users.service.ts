@@ -32,14 +32,14 @@ export class UsersService {
     })
     return this.queryRepository.paginationForm(pageCount, total, mappedItems, query)
   }
-  async getUser(id : string) : Promise<UserModel[] | null>{
+  async getUser(id : number) : Promise<UserModel[] | null>{
     return this.usersRepository.getFullUser(id)
   }
   async changeUserPassword(code : string, password : string) : Promise<boolean>{
     const hash = bcrypt.hashSync(password, 10, )
     return await this.usersRepository.changeUserPassword(code, hash)
   }
-  async banUser(userId : string, banInfo : BanUserDto) : Promise<boolean> {
+  async banUser(userId : number, banInfo : BanUserDto) : Promise<boolean> {
     const user = await this.usersRepository.getFullUser(userId)
     if(!user) throw new NotFoundException()
     let banInformation : UserBanInfo

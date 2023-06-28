@@ -9,6 +9,7 @@ import { CommentsRepository } from "../../public/comments/comments.repository";
 import { UsersRepository } from "../../superadmin/users/users.repository";
 import { BlogModel } from "../../public/blogs/blogs.schema";
 import { BlogsRepository } from "../../public/blogs/blogs.repository";
+import { BannedUsersRepository } from "../../blogger/bloggers/bloggers.bannedUsers.repository";
 
 export class CreateCommentCommentsCommand {
   constructor(public postId : number,public content : string,public token : string) {
@@ -21,17 +22,16 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommen
               protected postsRepository : PostsRepository,
               protected commentsRepository : CommentsRepository,
               protected usersRepository : UsersRepository,
-              protected blogsRepository : BlogsRepository) {}
+              protected blogsRepository : BlogsRepository,
+              protected banRepository : BannedUsersRepository) {}
   async execute (command : CreateCommentCommentsCommand) : Promise<CommentViewFullModel | null>{
     const foundPost : PostModel[] = await this.postsRepository.getPost(command.postId)
     if (foundPost.length === 0 ) throw new NotFoundException()
     const foundBlog : BlogModel[] = await this.blogsRepository.getFullBlog(foundPost[0].blogId)
     if (foundBlog.length === 0) throw new NotFoundException()
     let userId = await this.jwtService.getUserIdByToken(command.token)
-
-    //check for not banned
-
-    if(foundBlog[0].bannedUsers.find(a => a.userId === userId)) throw new ForbiddenException()
+    const status : boolean = await this.banRepository.findBan(userId, foundBlog[0].id)
+    if(status) throw new ForbiddenException()
     const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
     const comment : CreateCommentModel = {
       content : command.content,

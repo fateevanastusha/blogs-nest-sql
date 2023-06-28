@@ -32,14 +32,14 @@ export class BlogsController{
     })
   }
   @Get(':id')
-  async getBlog(@Param('id') blogId : string
+  async getBlog(@Param('id') blogId : number
   ){
     const blog : BlogModel | null = await this.blogsService.getBlog(blogId)
     if(!blog) throw new NotFoundException()
     return blog
   }
   @Get(':id/posts')
-  async getPosts(@Param('id') blogId : string,
+  async getPosts(@Param('id') blogId : number,
                  @Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
                  @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,

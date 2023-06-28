@@ -1,6 +1,7 @@
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 import { BannedUserInfo, CreateBannedUserInfo } from "../../public/blogs/blogs.schema";
+import { LikeModel } from "../../../likes/likes.schema";
 
 export class BannedUsersRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {
@@ -39,5 +40,20 @@ export class BannedUsersRepository {
           WHERE "blogId" = ${blogId}
     `)
     return +count[0].total
+  }
+  async findBan(userId : number, blogId : number) : Promise <boolean>{
+    const ban = await this.dataSource.query(`
+      SELECT *
+        FROM public."BannedForBlogUser"
+        WHERE "blogId" = ${blogId} AND "userId" = ${userId}
+    `)
+    if(ban.length > 0) return true
+    return false
+  }
+  async deleteAllData(){
+    this.dataSource.query(`
+    DELETE FROM public."BannedForBlogUser"
+    `)
+    return true
   }
 }

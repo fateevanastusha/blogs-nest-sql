@@ -18,8 +18,6 @@ import { AuthGuard } from "../../../auth.guard";
 import { CommandBus } from "@nestjs/cqrs";
 import { CreateUserUsersCommand } from "../../use-cases/users/users-create-user-use-case";
 import { DeleteUserUsersCommand } from "../../use-cases/users/users-delete-user-use-case";
-import { UserModel, UserViewModel } from "./users.schema";
-
 @UseGuards(AuthGuard)
 @Controller('sa/users')
 export class UsersController{
@@ -56,7 +54,7 @@ export class UsersController{
   }
   @HttpCode(204)
   @Put('/:id/ban')
-  async banUser(@Param('id') userId : string,
+  async banUser(@Param('id') userId : number,
                 @Body() banInfo : BanUserDto){
     const status : boolean = await this.usersService.banUser(userId, banInfo)
     if(!status) throw new NotFoundException()
@@ -64,7 +62,7 @@ export class UsersController{
   }
   @HttpCode(204)
   @Delete(':id')
-  async deleteUser(@Param('id') userId : string){
+  async deleteUser(@Param('id') userId : number){
     const status : boolean = await this.commandBus.execute(
       new DeleteUserUsersCommand(userId)
     )

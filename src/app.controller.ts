@@ -22,6 +22,7 @@ import { BloggersService } from "./api/blogger/bloggers/bloggers.service";
 import { TestRepo } from "./test.repo";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
+import { BannedUsersRepository } from "./api/blogger/bloggers/bloggers.bannedUsers.repository";
 
 @Controller()
 export class AppController {
@@ -32,11 +33,13 @@ export class AppController {
               protected likesRepository : LikesRepository,
               protected commentsRepository : CommentsRepository,
               protected appRepository : TestRepo,
+              protected banRepository : BannedUsersRepository,
               @InjectDataSource() protected dataSource : DataSource
               ) {}
 
   @Delete('/testing/all-data')
   async deleteAllData(@Res() res : Response) {
+    await this.banRepository.deleteAllData();
     await this.securityRepository.deleteAllData();
     await this.likesRepository.deleteAllData();
     await this.commentsRepository.deleteAllData();

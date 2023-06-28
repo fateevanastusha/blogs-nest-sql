@@ -23,14 +23,14 @@ export class BlogsSuperAdminRepository {
     }
     return Number(count[0].total)
   }
-  async getBlog(blogId : string) : Promise<BlogModel | null>{
+  async getBlog(blogId : number) : Promise<BlogModel | null>{
     return await this.dataSource.query(`
     SELECT *
         FROM public."Blogs"
         WHERE "id" = ${blogId} 
     `)
   }
-  async banBlog(blogId : string, status : BlogBanInfo) : Promise<boolean>{
+  async banBlog(blogId : number, status : BlogBanInfo) : Promise<boolean>{
     await this.dataSource.query(`
     UPDATE public."Blogs"
         SET "isBanned"=${status.isBanned}, "banDate"='${status.banDate}'
@@ -38,7 +38,7 @@ export class BlogsSuperAdminRepository {
     `)
     return true
   }
-  async bindUser(blogId : string, userInfo : BlogOwnerModel) : Promise <boolean>{
+  async bindUser(blogId : number, userInfo : BlogOwnerModel) : Promise <boolean>{
     await this.dataSource.query(`
     UPDATE public."Blogs"
         SET "userId"='${userInfo.userId}', "userLogin"='${userInfo.userLogin}'

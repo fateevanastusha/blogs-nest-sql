@@ -8,9 +8,9 @@ export class LikeModel {
   @Prop({required : true})
   status : string
   @Prop({required : true})
-  userId : string
+  userId : number
   @Prop({required : true})
-  postOrCommentId : string
+  postOrCommentId : number
   @Prop({required : true})
   createdAt : string
 }

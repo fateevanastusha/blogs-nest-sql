@@ -12,7 +12,8 @@ import { LikesRepository } from "../../../likes/likes.repository";
 import { LikesHelpers } from "../../../helpers/likes.helper";
 import { LikeViewModel } from "../../../likes/likes.schema";
 import { UsersRepository } from "../../superadmin/users/users.repository";
-import { LikesInfo } from "../comments/comments.schema";
+import { CommentModel, LikesInfo } from "../comments/comments.schema";
+import { CommentsRepository } from "../comments/comments.repository";
 
 @Injectable()
 export class PostsService {
@@ -20,7 +21,7 @@ export class PostsService {
               protected blogsRepository : BloggersRepository,
               protected queryRepository : QueryRepository,
               protected jwtService : JwtService,
-              protected commentsService : CommentsService,
+              protected commentsRepository : CommentsRepository,
               protected likesRepository : LikesRepository,
               protected likesHelper : LikesHelpers,
               protected usersRepository : UsersRepository) {
@@ -64,12 +65,12 @@ export class PostsService {
     //with user
     if(header){
       const token = header.split(" ")[1];
-      const userId : string = await this.jwtService.getUserIdByToken(token)
-      likesInfo = await this.likesRepository.getLikesInfoWithUser(userId,id)
+      const userId : number = await this.jwtService.getUserIdByToken(token)
+      likesInfo = (await this.likesRepository.getLikesInfoWithUser(userId,id))[0]
     }
     //without user
     else {
-      likesInfo = await this.likesRepository.getLikesInfo(id)
+      likesInfo = (await this.likesRepository.getLikesInfo(id))[0]
     }
     const newestLikes : LikeViewModel[] = await this.likesRepository.getLastLikes(id)
     const postView : PostViewModel = {
@@ -80,7 +81,12 @@ export class PostsService {
       blogId : post[0].blogId,
       blogName : post[0].blogName,
       createdAt : post[0].createdAt,
-      extendedLikesInfo : {...likesInfo[0], newestLikes}
+      extendedLikesInfo : {
+        likesCount : likesInfo.likesCount,
+        dislikesCount : likesInfo.dislikesCount,
+        myStatus : likesInfo.myStatus,
+        newestLikes : newestLikes
+      }
     }
     return postView
   }
@@ -99,17 +105,19 @@ export class PostsService {
   async getComments(query : QueryModelComments, header : string, postId : number) : Promise<PaginatedClass>{
     const foundPost = await this.getPost(postId)
     if (foundPost === null) throw new NotFoundException()
-    else {
-      let token
-      if(header){
-        token = header.split(" ")[1]
-      } else {
-        token = 'null'
-      }
+    const items : CommentModel[] = await this.queryRepository.paginatorForCommentsByPostId(query, postId)
+    let mappedComments
+    if(header){
+      let token = header.split(" ")[1]
       let userId = await this.jwtService.getUserIdByToken(token)
-      const foundComments = await this.commentsService.getAllCommentsByPostId(query, postId, userId)
-      return foundComments
-    }
+      mappedComments = await this.queryRepository.commentsMappingWithUser(items, userId)
+      } else {
+      mappedComments = await this.queryRepository.commentsMapping(items)
+      }
+    let total : number = await this.commentsRepository.countCommentsByPostId(postId)
+    const pageCount : number = Math.ceil( total / query.pageSize)
+    let paginatedComments = await this.queryRepository.paginationForm(pageCount, total, mappedComments, query)
+    return paginatedComments
   }
   async changeLikeStatus(requestType : string, postId : number, header : string) : Promise <boolean> {
     if(!header) throw new UnauthorizedException(401)
@@ -118,7 +126,7 @@ export class PostsService {
     if (post.length === 0) return false
     let userId = await this.jwtService.getUserIdByToken(token)
     const status1 = await this.likesRepository.findStatus(postId, userId)
-    const currentStatus = await this.likesHelper.requestType(status1)
+    const currentStatus = await this.likesHelper.requestType(status1[0])
     if (currentStatus === requestType) {
       return true
     }
@@ -131,7 +139,7 @@ export class PostsService {
     //if no status
     if (currentStatus === "None"){
       //add new like or dislike
-      await this.likesRepository.createNewStatus(status)
+      await this.likesRepository.createNewStatusForPost(status)
     }
     else if (requestType === "None"){
       //delete status

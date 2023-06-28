@@ -14,7 +14,7 @@ export class BloggersUsersController {
   @HttpCode(204)
   @UseGuards(CheckIfUserExist)
   @Put(':userId/ban')
-  async BanUserForBlog(@Param('userId') userId : string,
+  async BanUserForBlog(@Param('userId') userId : number,
                        @Body() banInfo : BanUserForBlogDto,
                        @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
@@ -25,11 +25,11 @@ export class BloggersUsersController {
   @HttpCode(200)
   @UseGuards(CheckIfUserExist)
   @Get('blog/:blogId')
-  async GetAllBannedUsersForBlog(@Param('blogId') blogId : string,
+  async GetAllBannedUsersForBlog(@Param('blogId') blogId : number,
                                  @Req() req: Request,
                                  @Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
-                                 @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
+                                 @Query('sortBy', new DefaultValuePipe('banDate')) sortBy : string,
                                  @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                                  @Query('searchLoginTerm', new DefaultValuePipe('')) searchLoginTerm : string,){
     const token = req.headers.authorization!.split(" ")[1]

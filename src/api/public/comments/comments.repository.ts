@@ -6,16 +6,16 @@ import { DataSource } from "typeorm";
 @Injectable()
 export class CommentsRepository {
   constructor(@InjectDataSource() protected dataSource : DataSource) {}
-  async getCommentById(id: string): Promise<CommentModel | null> {
+  async getCommentById(id: number): Promise<CommentModel | null> {
     const comment = await this.dataSource.query(`
     SELECT *
-        FROM public."Comments"
-        WHERE "id" = ${id}
+    FROM "public"."Comments"
+    WHERE "id" = ${id}
     `)
     if (comment.length === 0) return null
     return comment[0]
   }
-  async getCommentsCountByBlogOwnerId(userId : string) : Promise<number>{
+  async getCommentsCountByBlogOwnerId(userId : number) : Promise<number>{
     const count = await this.dataSource.query(`
     SELECT COUNT(*) as "total"
       FROM public."Comments"
@@ -23,14 +23,14 @@ export class CommentsRepository {
     `)
     return +count[0].total
   }
-  async deleteCommentById(id: string): Promise<boolean> {
+  async deleteCommentById(id: number): Promise<boolean> {
     await this.dataSource.query(`
       DELETE FROM public."Comments"
          WHERE "id" = ${id};
     `)
     return true
   }
-  async updateCommentById(content: string, id: string): Promise<boolean> {
+  async updateCommentById(content: string, id: number): Promise<boolean> {
     await this.dataSource.query(`
     UPDATE public."Comments"
       SET "content"='${content}'
@@ -52,11 +52,12 @@ export class CommentsRepository {
     if (createdComment.length === 0) return null
     return createdComment[0]
   }
-  async countCommentsByPostId(postId: string): Promise<number> {
+  async countCommentsByPostId(postId: number): Promise<number> {
     const count = await this.dataSource.query(`
     SELECT COUNT(*) as "total"
-      FROM public."Comments"
-      WHERE "postId" = ${postId}
+      FROM public."Comments" c
+      JOIN public."Users" u ON c."userId" = u."id"
+      WHERE c."postId" = ${postId} AND u."isBanned" = false;
     `)
     return +count[0].total
   }

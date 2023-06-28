@@ -30,7 +30,7 @@ export class UsersRepository {
     }
     return Number(count[0].total);
   }
-  async getFullUser (id : number) : Promise<UserModel[] | null>{
+  async getFullUser (id : number) : Promise<UserModel[]>{
     return await this.dataSource.query(`
     SELECT *
     FROM public."Users"
@@ -123,7 +123,7 @@ export class UsersRepository {
     `)
     return true
   }
-  async banUser(userId : string, banInfo : UserBanInfo) : Promise<boolean>{
+  async banUser(userId : number, banInfo : UserBanInfo) : Promise<boolean>{
     await this.dataSource.query(`
         UPDATE public."Users" 
         SET "isBanned" = ${banInfo.isBanned}, "banDate" = '${banInfo.banDate}', "banReason" = '${banInfo.banReason}'
@@ -131,7 +131,7 @@ export class UsersRepository {
     `)
     return true
   }
-  async unbanUser(userId : string) : Promise<boolean>{
+  async unbanUser(userId : number) : Promise<boolean>{
     await this.dataSource.query(`
         UPDATE public."Users" 
         SET "isBanned" = false, "banDate" = null, "banReason" = null
@@ -139,7 +139,7 @@ export class UsersRepository {
     `)
     return true
   }
-  async deleteUser(id: string) : Promise<boolean>{
+  async deleteUser(id: number) : Promise<boolean>{
     await this.dataSource.query(`
     DELETE FROM public."Users"
         WHERE id = ${id};

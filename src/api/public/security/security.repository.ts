@@ -64,7 +64,7 @@ export class SecurityRepository {
         FROM public."RefreshTokens"
         WHERE "title" = '${title}' AND "userId" = ${userId}
     `)
-    if (result.length > 0) return true
+    if (result.length === 0) return true
     return false
   }
   async deleteAllData() {

@@ -6,13 +6,13 @@ import { LikesInfo } from "../api/public/comments/comments.schema";
 export class LikesRepository {
   constructor(@InjectDataSource() protected dataSource : DataSource) {}
   async getLikesInfoWithUser(userId: number, postOrCommentId : number) : Promise<LikesInfo>{
-    return await this.dataSource.query(`
+    const likes = await this.dataSource.query(`
     SELECT
-      (SELECT COALESCE(COUNT(*), 0)::integer
+      (SELECT COALESCE(COUNT(*))::integer
        FROM public."Likes"
        WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Like') AS "likesCount",
       
-      (SELECT COALESCE(COUNT(*), 0)::integer
+      (SELECT COALESCE(COUNT(*))::integer
        FROM public."Likes"
        WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Dislike') AS "dislikesCount",
       
@@ -20,46 +20,61 @@ export class LikesRepository {
             FROM public."Likes"
             WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "userId" = ${userId}), 'None') AS "myStatus";
     `)
-
+    return likes
   }
 
   async getLikesInfo(postOrCommentId : number) : Promise<LikesInfo>{
     return await this.dataSource.query(`
     SELECT 
-    
-    (SELECT COALESCE(COUNT(*), 0)::integer
-       FROM public."Likes"
-       WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Like') AS "likesCount",
+      (SELECT COALESCE(COUNT(*))::integer
+       FROM public."Likes" l
+       INNER JOIN public."Users" u ON l."userId" = u."id"
+       WHERE (l."postId" = ${postOrCommentId} OR l."commentId" = ${postOrCommentId}) AND l."status" = 'Like' AND u."isBanned" = false) AS "likesCount",
       
-    (SELECT COALESCE(COUNT(*), 0)::integer
-       FROM public."Likes"
-       WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "status" = 'Dislike') AS "dislikesCount",
+      (SELECT COALESCE(COUNT(*))::integer
+       FROM public."Likes" l
+       INNER JOIN public."Users" u ON l."userId" = u."id"
+       WHERE (l."postId" = ${postOrCommentId} OR l."commentId" = ${postOrCommentId}) AND l."status" = 'Dislike' AND u."isBanned" = false) AS "dislikesCount",
       
-    (SELECT COALESCE(status, 'None')::text
-       FROM public."Likes") AS "myStatus";
-    `)
+      COALESCE((SELECT 'None')) AS "myStatus";
+  `)
   }
   async getLastLikes(postOrCommentId : number) : Promise<LikeViewModel[]>{
     return await this.dataSource.query(`
       SELECT l."createdAt" AS "addedAt", l."userId", u."login"
         FROM public."Likes" l
         JOIN public."Users" u ON l."userId" = u."id"
-        WHERE l."status" = 'Like' AND (l."postId" = ${postOrCommentId} OR l."commentId" = ${postOrCommentId})
+        WHERE l."status" = 'Like' AND (l."postId" = ${postOrCommentId} OR l."commentId" = ${postOrCommentId}) AND u."isBanned" = false
         ORDER BY l."createdAt" DESC
         LIMIT 3;
     `)
   }
-  async createNewStatus(status : LikeModel) : Promise<boolean> {
+  async createNewStatusForComment(status : LikeModel) : Promise<boolean> {
     await this.dataSource.query(`
     INSERT INTO public."Likes"(
-        "createdAt", "status", "userId", "postId", "commentId")
-        VALUES ('
-        ${status.createdAt}', 
-        '${status.status}', 
-        ${status.userId}, 
-        ${status.postOrCommentId}, 
-        ${status.postOrCommentId});
+        "createdAt", "status", "userId","commentId")
+        VALUES ($1, $2, $3, $4);
+    `, [status.createdAt, status.status, status.userId, status.postOrCommentId])
+    const findStatus = await this.dataSource.query(`
+    SELECT *
+        FROM public."Likes"
+        WHERE "createdAt" = '${status.createdAt}'
     `)
+    if (findStatus.length === 0) return false
+    return true
+  }
+  async createNewStatusForPost(status : LikeModel) : Promise<boolean> {
+    await this.dataSource.query(`
+    INSERT INTO public."Likes"(
+        "createdAt", "status", "userId", "postId")
+        VALUES ($1, $2, $3, $4);
+    `, [status.createdAt, status.status, status.userId, status.postOrCommentId])
+    const findStatus = await this.dataSource.query(`
+    SELECT *
+        FROM public."Likes"
+        WHERE "createdAt" = '${status.createdAt}'
+    `)
+    if (findStatus.length === 0) return false
     return true
   }
   async findStatus(postOrCommentId : number, userId : number) : Promise<LikeModel | null> {

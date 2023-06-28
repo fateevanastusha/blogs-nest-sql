@@ -32,7 +32,7 @@ export class BlogsService {
     })
     return await this.queryRepository.paginationForm(pageCount, total, mappedItems, query)
   }
-  async getBlog(id: string) : Promise<BlogModel | null>{
+  async getBlog(id: number) : Promise<BlogModel | null>{
     return (await this.blogsRepository.getBlog(id))[0]
   }
   async deleteAllData(){

@@ -100,8 +100,8 @@ export class QueryModelBannedUsersForBlog {
   pageNumber?: number = 1
 
   @IsOptional()
-  @Prop({ default: "createdAt" })
-  sortBy?: string = 'createdAt'
+  @Prop({ default: "banDate" })
+  sortBy?: string = 'banDate'
 
   @IsOptional()
   @Prop({ default: 'asc'})

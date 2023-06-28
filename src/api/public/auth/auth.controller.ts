@@ -36,10 +36,8 @@ export class AuthController {
       res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: true, secure: true})
       res.send(token)
       return
-    } else {
-      throw new UnauthorizedException()
-      return
-    }
+    } throw new UnauthorizedException()
+
   }
 
   @Post('/password-recovery')

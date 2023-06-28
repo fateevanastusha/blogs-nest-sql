@@ -45,14 +45,14 @@ export class PostsController{
     }
   }
   @Get(':id')
-  async getPost(@Param('id') postId : string,
+  async getPost(@Param('id') postId : number,
                 @Req() req: Request){
     const post : PostModel | null =  await this.postsService.getPostWithUser(postId, req.headers.authorization)
     if (!post) throw new NotFoundException()
     return post
   }
   @Get(':id/comments')
-  async getComments(@Param('id') postId : string,
+  async getComments(@Param('id') postId : number,
                     @Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                     @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
                     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
@@ -67,7 +67,7 @@ export class PostsController{
   }
   @UseGuards(CheckIfUserExist)
   @Post(':postId/comments')
-  async postComment(@Param('postId') postId : string,
+  async postComment(@Param('postId') postId : number,
                     @Body() comment : CommentsDto,
                     @Req() req: any){
     const token = req.headers.authorization!.split(" ")[1]
@@ -76,7 +76,7 @@ export class PostsController{
   @UseGuards(CheckIfUserExist)
   @HttpCode(204)
   @Put(':id/like-status')
-  async setLike(@Param('id') postId : string,
+  async setLike(@Param('id') postId : number,
                 @Body() like : LikesDto,
                 @Req() req: any){
     const status : boolean = await this.postsService.changeLikeStatus(like.likeStatus, postId, req.headers.authorization)

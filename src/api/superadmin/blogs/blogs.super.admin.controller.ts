@@ -32,7 +32,7 @@ export class BlogsSuperAdminController {
   }
   @HttpCode(204)
   @Put(':blogId/ban')
-  async banBlog(@Param('blogId') blogId : string,
+  async banBlog(@Param('blogId') blogId : number,
                 @Body() request : BanBlogDto){
     const status : boolean = await this.blogsService.banBlog(blogId, request)
     if(!status) throw new NotFoundException()

@@ -1,6 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from "@nestjs/common";
 import {Response, Request} from "express";
-const TelegramBot = require('node-telegram-bot-api')
 
 
 @Catch(HttpException)

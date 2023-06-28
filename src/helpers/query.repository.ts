@@ -81,9 +81,10 @@ export class QueryRepository {
   async paginatorForCommentsByPostId(query : QueryCommentsUsers, postId : number): Promise<CommentModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.dataSource.query(`
-    SELECT "id", "content", "createdAt", "blogOwnerId", "blogId", "postId", "blogName", "userId", "userLogin"
-        FROM public."Comments"
-        WHERE "postId" = ${postId}
+      SELECT c.*
+        FROM public."Comments" c
+        JOIN public."Users" u ON c."userId" = u."id"
+        WHERE c."postId" = ${postId} AND u."isBanned" = false
         ORDER BY "${query.sortBy}" ${query.sortDirection}
         OFFSET ${skipSize} LIMIT ${query.pageSize};
     `)
@@ -137,6 +138,46 @@ export class QueryRepository {
       totalCount: total,
       items: items
     }
+  }
+
+  async commentsMappingWithUser(comments : CommentModel[], userId : number){
+    return await Promise.all(
+      comments.map(async (comment) => {
+        let likesInfo = await this.likesRepository.getLikesInfoWithUser(userId, comment.id)
+        return {
+          commentatorInfo : {
+            userId : comment.userId,
+            userLogin : comment.userLogin
+          },
+          content : comment.content,
+          createdAt : comment.createdAt,
+          id : comment.id,
+          likesInfo : { ...likesInfo[0] }
+        }
+      })
+    )
+  }
+
+  async commentsMapping(comments : CommentModel[]){
+    return await Promise.all(
+      comments.map(async (comment) => {
+        let likesInfo = (await this.likesRepository.getLikesInfo(comment.id))[0]
+        return {
+          commentatorInfo : {
+            userId : comment.userId,
+            userLogin : comment.userLogin
+          },
+          content : comment.content,
+          createdAt : comment.createdAt,
+          id : comment.id,
+          likesInfo : {
+            likesCount : likesInfo.likesCount,
+            dislikesCount : likesInfo.dislikesCount,
+            myStatus : 'None'
+          }
+        }
+      })
+    )
   }
 
   async postsMapping(posts : PostModel[], userId : number) {
