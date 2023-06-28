@@ -6,7 +6,7 @@ import { QueryRepository } from "../../../helpers/query.repository";
 import { QueryModelBannedUsersForBlog } from "../../../helpers/helpers.schema";
 import { BannedUserInfo, BlogModel, CreateBannedUserInfo, PaginatedClass } from "../../public/blogs/blogs.schema";
 import { UsersRepository } from "../../superadmin/users/users.repository";
-import { UserModel, UserViewModel } from "../../superadmin/users/users.schema";
+import { UserModel } from "../../superadmin/users/users.schema";
 import { BannedUsersRepository } from "../bloggers/bloggers.bannedUsers.repository";
 
 @Injectable()

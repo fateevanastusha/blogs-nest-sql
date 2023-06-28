@@ -9,7 +9,6 @@ import {
 import { Observable } from "rxjs";
 import { Request } from "express";
 import { JwtService } from "./jwt.service";
-import { CommentsService } from "./api/public/comments/comments.service";
 import { AuthRepository } from "./api/public/auth/auth.repository";
 import { RefreshTokensMetaModel } from "./api/public/security/security.schema";
 import { SecurityRepository } from "./api/public/security/security.repository";
@@ -40,7 +39,7 @@ export class AuthGuard implements CanActivate {
 export class CheckIfUserExist implements CanActivate {
   constructor(
     protected jwtService: JwtService,
-    private userRepo: UsersRepository) {}
+    protected usersRepository: UsersRepository) {}
   async canActivate(
     context: ExecutionContext
   ): Promise<boolean> {
@@ -51,7 +50,7 @@ export class CheckIfUserExist implements CanActivate {
     if (authType !== 'Bearer') throw new UnauthorizedException()
     const userId = await this.jwtService.getUserIdByToken(token)
     if(!userId) throw new UnauthorizedException()
-    const user = await this.userRepo.getFullUser(userId)
+    const user = await this.usersRepository.getFullUser(userId)
     if(user.length === 0) throw new UnauthorizedException()
     if (user[0].isBanned === true) throw new UnauthorizedException()
     return true
@@ -63,7 +62,6 @@ export class CommentCheckForSameUser implements CanActivate {
   constructor(
     protected jwtService: JwtService,
     private userRepo: UsersRepository,
-    private commentsService : CommentsService,
     private commentsRepository : CommentsRepository) {
   }
   async canActivate(

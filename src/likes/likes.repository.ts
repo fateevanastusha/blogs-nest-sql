@@ -77,7 +77,7 @@ export class LikesRepository {
     if (findStatus.length === 0) return false
     return true
   }
-  async findStatus(postOrCommentId : number, userId : number) : Promise<LikeModel | null> {
+  async findStatus(postOrCommentId : number, userId : number) : Promise<LikeModel[]> {
     return await this.dataSource.query(`
     SELECT *
         FROM public."Likes"

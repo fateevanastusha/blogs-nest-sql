@@ -24,7 +24,6 @@ import { AttemptsSchema } from "./attempts/attempts.schema";
 import { AttemptsRepository } from "./attempts/attempts.repository";
 import { AuthRepository } from "./api/public/auth/auth.repository";
 import { AuthController } from "./api/public/auth/auth.controller";
-import { CommentsService } from "./api/public/comments/comments.service";
 import { CommentsRepository } from "./api/public/comments/comments.repository";
 import { LikesRepository } from "./likes/likes.repository";
 import { SecurityService } from "./api/public/security/security.service";
@@ -59,6 +58,9 @@ import { CqrsModule } from "@nestjs/cqrs";
 import { BannedUsersRepository } from "./api/blogger/bloggers/bloggers.bannedUsers.repository";
 import { DeleteCommentUseCase } from "./api/use-cases/comments/comments-delete-comment-use-case";
 import { UpdateCommentUseCase } from "./api/use-cases/comments/comments-update-comment-use-case";
+import { GetCommentWithUserUseCase } from "./api/use-cases/comments/comments-get-comment-with-user-use-case";
+import { GetCommentUseCase } from "./api/use-cases/comments/comments-get-comment-use-case";
+import { LikeCommentUseCase } from "./api/use-cases/comments/comments-like-comment-use-case";
 
 const repositories = [
   UsersRepository,
@@ -79,7 +81,6 @@ const services = [
   BloggersUsersService,
   SecurityService,
   PostsService,
-  CommentsService,
   BloggersService,
   BlogsService,
   BlogsSuperAdminService,
@@ -93,12 +94,15 @@ const useCases = [
   CreateUserUseCase,
   DeleteUserUseCase,
   CreateBlogUseCase,
-  DeleteBlogUseCase,
+  DeleteBlogUseCase, 
   CreatePostUseCase,
   DeletePostUseCase,
   CreateCommentUseCase,
   DeleteCommentUseCase,
-  UpdateCommentUseCase
+  UpdateCommentUseCase,
+  GetCommentUseCase,
+  GetCommentWithUserUseCase,
+  LikeCommentUseCase
 ]
 
 @Module({

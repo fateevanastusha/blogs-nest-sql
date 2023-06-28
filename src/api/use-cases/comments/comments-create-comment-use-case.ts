@@ -4,7 +4,7 @@ import { JwtService } from "../../../jwt.service";
 import { PostModel } from "../../public/posts/posts.schema";
 import { PostsRepository } from "../../public/posts/posts.repository";
 import { UserModel } from "../../superadmin/users/users.schema";
-import { CommentModel, CommentViewFullModel, CreateCommentModel } from "../../public/comments/comments.schema";
+import { CommentViewModel, CreateCommentModel } from "../../public/comments/comments.schema";
 import { CommentsRepository } from "../../public/comments/comments.repository";
 import { UsersRepository } from "../../superadmin/users/users.repository";
 import { BlogModel } from "../../public/blogs/blogs.schema";
@@ -24,7 +24,7 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommen
               protected usersRepository : UsersRepository,
               protected blogsRepository : BlogsRepository,
               protected banRepository : BannedUsersRepository) {}
-  async execute (command : CreateCommentCommentsCommand) : Promise<CommentViewFullModel | null>{
+  async execute (command : CreateCommentCommentsCommand) : Promise<CommentViewModel | null>{
     const foundPost : PostModel[] = await this.postsRepository.getPost(command.postId)
     if (foundPost.length === 0 ) throw new NotFoundException()
     const foundBlog : BlogModel[] = await this.blogsRepository.getFullBlog(foundPost[0].blogId)
@@ -46,7 +46,7 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommen
     }
     const createdComment = await this.commentsRepository.createNewComment(comment);
     if (!createdComment) throw new UnauthorizedException()
-    const mappedComment : CommentViewFullModel = {
+    const mappedComment : CommentViewModel = {
       "id": createdComment.id,
       "content": createdComment.content,
       "commentatorInfo": {
