@@ -9,7 +9,7 @@ import { CommentsRepository } from "../../public/comments/comments.repository";
 import { UsersRepository } from "../../superadmin/users/users.repository";
 import { BlogModel } from "../../public/blogs/blogs.schema";
 import { BlogsRepository } from "../../public/blogs/blogs.repository";
-import { BannedUsersRepository } from "../../blogger/bloggers/bloggers.bannedUsers.repository";
+import { BannedUsersRepository } from "../../../banned-users/bloggers.banned.users.repository";
 
 export class CreateCommentCommentsCommand {
   constructor(public postId : number,public content : string,public token : string) {
@@ -25,14 +25,19 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommen
               protected blogsRepository : BlogsRepository,
               protected banRepository : BannedUsersRepository) {}
   async execute (command : CreateCommentCommentsCommand) : Promise<CommentViewModel | null>{
-    const foundPost : PostModel[] = await this.postsRepository.getPost(command.postId)
-    if (foundPost.length === 0 ) throw new NotFoundException()
+
+    const foundPost = await this.postsRepository.getPost(command.postId)//astring | null
+    this.validateBlogAndPost(foundPost)
+
+
     const foundBlog : BlogModel[] = await this.blogsRepository.getFullBlog(foundPost[0].blogId)
     if (foundBlog.length === 0) throw new NotFoundException()
-    let userId = await this.jwtService.getUserIdByToken(command.token)
-    const status : boolean = await this.banRepository.findBan(userId, foundBlog[0].id)
+
+    const userId = await this.jwtService.getUserIdByToken(command.token)
+    const status = await this.banRepository.findBan(userId, foundBlog[0].id)
     if(status) throw new ForbiddenException()
-    const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
+
+    const user = await this.usersRepository.getFullUser(userId)
     const comment : CreateCommentModel = {
       content : command.content,
       createdAt: new Date().toISOString(),
@@ -46,6 +51,7 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommen
     }
     const createdComment = await this.commentsRepository.createNewComment(comment);
     if (!createdComment) throw new UnauthorizedException()
+
     const mappedComment : CommentViewModel = {
       "id": createdComment.id,
       "content": createdComment.content,
@@ -62,4 +68,10 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommen
     }
     return mappedComment
   }
+
+  private validateBlogAndPost (foundPost:PostModel[] | []):asserts foundPost is PostModel[] {
+  if (foundPost.length === 0 ) throw new NotFoundException()
+}
+
+
 }

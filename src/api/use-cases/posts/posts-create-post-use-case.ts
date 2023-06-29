@@ -3,11 +3,11 @@ import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CreatePostModel, PostModel } from "../../public/posts/posts.schema";
 import { BlogModel } from "../../public/blogs/blogs.schema";
 import { UserModel } from "../../superadmin/users/users.schema";
-import { ForbiddenException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
 import { PostsRepository } from "../../public/posts/posts.repository";
 import { JwtService } from "../../../jwt.service";
 import { UsersRepository } from "../../superadmin/users/users.repository";
-import { BloggersRepository } from "../../blogger/bloggers/bloggers.repository";
+import { BlogsRepository } from "../../public/blogs/blogs.repository";
 
 export class CreatePostPostsCommand {
   constructor(public post: PostsDto, public token : string) {
@@ -17,15 +17,17 @@ export class CreatePostPostsCommand {
 @CommandHandler(CreatePostPostsCommand)
 export class CreatePostUseCase implements ICommandHandler<CreatePostPostsCommand>{
   constructor(private postsRepository : PostsRepository,
-              protected blogsRepository : BloggersRepository,
+              protected blogsRepository : BlogsRepository,
               protected jwtService : JwtService,
               protected usersRepository : UsersRepository) {}
-  async execute (command : CreatePostPostsCommand) : Promise<PostModel | null>{
+  async execute (command : CreatePostPostsCommand) : Promise<PostModel>{
     const blog : BlogModel[] = await this.blogsRepository.getFullBlog(command.post.blogId)
-    if (blog.length === 0) return null
+    if (blog.length === 0) throw new NotFoundException()
+
     const userId : number = await this.jwtService.getUserIdByToken(command.token)
     const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
     if (user[0].id !== blog[0].userId) throw new ForbiddenException()
+
     const newPost : CreatePostModel = {
       title : command.post.title,
       shortDescription: command.post.shortDescription,
@@ -35,7 +37,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostPostsCommand
       createdAt : new Date().toISOString()
     };
     const createdPost = await this.postsRepository.createPost(newPost);
-    if (!createdPost) return null
+    if (!createdPost) throw new BadRequestException();
     const mappedPost = {
       "id": createdPost.id,
       "title": createdPost.title,

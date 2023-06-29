@@ -19,6 +19,7 @@ import { CheckIfUserExist } from "../../../auth.guard";
 import { LikesDto } from "../../../likes/likes.dto";
 import { CommandBus } from "@nestjs/cqrs";
 import { CreateCommentCommentsCommand } from "../../use-cases/comments/comments-create-comment-use-case";
+import { GetPostPostsCommand } from "../../use-cases/posts/posts-get-post-use-case";
 
 @Controller('posts')
 export class PostsController{
@@ -46,10 +47,8 @@ export class PostsController{
   }
   @Get(':id')
   async getPost(@Param('id') postId : number,
-                @Req() req: Request){
-    const post : PostModel | null =  await this.postsService.getPostWithUser(postId, req.headers.authorization)
-    if (!post) throw new NotFoundException()
-    return post
+                @Req() req: Request) {
+    return await this.commandBus.execute(new GetPostPostsCommand(postId, req.headers.authorization))
   }
   @Get(':id/comments')
   async getComments(@Param('id') postId : number,

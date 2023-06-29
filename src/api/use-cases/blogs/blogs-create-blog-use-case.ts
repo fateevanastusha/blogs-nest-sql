@@ -1,20 +1,16 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { BlogModel, CreateBlogModel } from "../../public/blogs/blogs.schema";
+import { BlogModel, BlogViewModel, CreateBlogModel } from "../../public/blogs/blogs.schema";
 import { JwtService } from "../../../jwt.service";
 import { UsersRepository } from "../../superadmin/users/users.repository";
 import { BlogDto } from "../../public/blogs/blogs.dto";
 import { BlogsRepository } from "../../public/blogs/blogs.repository";
 
-
-export class CreateBlogBlogsCommand {
-  constructor(public blog: BlogDto, public token : string) {
-  }
-}
+export class CreateBlogBlogsCommand {constructor(public blog: BlogDto, public token : string) {}}
 
 @CommandHandler(CreateBlogBlogsCommand)
 export class CreateBlogUseCase implements ICommandHandler<CreateBlogBlogsCommand>{
   constructor(private jwtService : JwtService, private usersRepository : UsersRepository, private blogsRepository : BlogsRepository) {}
-  async execute (command : CreateBlogBlogsCommand) : Promise<BlogModel | null>{
+  async execute (command : CreateBlogBlogsCommand) : Promise<BlogViewModel>{
     const userId = await this.jwtService.getUserIdByToken(command.token)
     const user = await this.usersRepository.getFullUser(userId)
     const newBlog : CreateBlogModel = {
@@ -25,6 +21,6 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogBlogsCommand
       userId: userId,
       userLogin: user[0].login
     }
-    return await this.blogsRepository.createBlog(newBlog);
+    return (await this.blogsRepository.createBlog(newBlog))[0];
   }
 }

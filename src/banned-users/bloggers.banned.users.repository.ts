@@ -1,7 +1,6 @@
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
-import { BannedUserInfo, CreateBannedUserInfo } from "../../public/blogs/blogs.schema";
-import { LikeModel } from "../../../likes/likes.schema";
+import { CreateBannedUserInfo } from "../api/public/blogs/blogs.schema";
 
 export class BannedUsersRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {

@@ -27,6 +27,8 @@ import { CreateBlogBlogsCommand } from "../../use-cases/blogs/blogs-create-blog-
 import { CreatePostPostsCommand } from "../../use-cases/posts/posts-create-post-use-case";
 import { DeletePostPostsCommand } from "../../use-cases/posts/posts-delete-post-use-case";
 import { DeleteBlogBlogsCommand } from "../../use-cases/blogs/blogs-delete-blog-use-case";
+import { UpdateBlogBlogsCommand } from "../../use-cases/blogs/blogs-update-blog-use-case";
+import { UpdatePostPostsCommand } from "../../use-cases/posts/posts-update-post-use-case";
 
 @Controller('blogger/blogs/')
 export class BloggersController {
@@ -73,9 +75,7 @@ export class BloggersController {
     @Body() blog : BlogDto,
     @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    const createdBlog : BlogModel | null = await this.commandBus.execute(
-      new CreateBlogBlogsCommand(blog, token)
-    )
+    const createdBlog : BlogModel | null = await this.commandBus.execute(new CreateBlogBlogsCommand(blog, token))
     if (!createdBlog) throw new BadRequestException()
     return createdBlog
   }
@@ -95,6 +95,7 @@ export class BloggersController {
     if (!createdPost) throw new NotFoundException()
     return createdPost
   }
+
   @HttpCode(204)
   @UseGuards(CheckIfUserExist)
   @Put(':id')
@@ -103,10 +104,9 @@ export class BloggersController {
     @Param('id') blogId : number,
     @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    const status : boolean = await this.bloggersService.updateBlog(blog, blogId, token);
-    if(!status) throw new NotFoundException();
-    return;
+    return await this.commandBus.execute(new UpdateBlogBlogsCommand(blog, blogId, token))
   }
+
   @HttpCode(204)
   @UseGuards(CheckIfUserExist)
   @Put(':blogId/posts/:postId')
@@ -116,23 +116,17 @@ export class BloggersController {
     @Body() post : PostsBlogDto,
     @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    const status : boolean = await this.postsService.updatePost({
-        title : post.title,
-        content : post.content,
-        shortDescription : post.shortDescription,
-        blogId : blogId
-    }, postId, token)
-    if (!status) throw new NotFoundException()
-    return
+    return await this.commandBus.execute(new UpdatePostPostsCommand({... post, blogId : blogId}, postId, token))
   }
+
   @HttpCode(204)
   @UseGuards(CheckIfUserExist)
   @Delete(':id')
   async deleteBlog(@Param('id') blogId : number,
                    @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    await this.commandBus.execute(new DeleteBlogBlogsCommand(blogId, token))
-    return
+    return await this.commandBus.execute(new DeleteBlogBlogsCommand(blogId, token))
+
   }
   @UseGuards(CheckIfUserExist)
   @Delete(':blogId/posts/:postId')

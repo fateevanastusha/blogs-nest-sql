@@ -10,7 +10,7 @@ import {
 } from "@nestjs/common";
 import { BlogsSuperAdminService } from "./blogs.super.admin.service";
 import { AuthGuard } from "../../../auth.guard";
-import { BanBlogDto } from "./blogs.super.admin.dto";
+import { BanBlogDto } from "../../public/blogs/blogs.dto";
 
 @UseGuards(AuthGuard)
 @Controller('sa/blogs')

@@ -14,7 +14,7 @@ export class PostsRepository {
         FROM public."Posts";
     `)
   }
-  async getPost(id: number) : Promise<PostModel[]>{
+  async getPost(id: number) : Promise<PostModel[] | []>{
     return this.dataSource.query(`
     SELECT "id", "title", "shortDescription", "content", "blogName", "createdAt", "blogId"
         FROM public."Posts"

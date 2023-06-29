@@ -1,18 +1,18 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { BanUserForBlogDto } from "./bloggers.users.dto";
 import { JwtService } from "../../../jwt.service";
-import { BloggersRepository } from "../bloggers/bloggers.repository";
 import { QueryRepository } from "../../../helpers/query.repository";
 import { QueryModelBannedUsersForBlog } from "../../../helpers/helpers.schema";
 import { BannedUserInfo, BlogModel, CreateBannedUserInfo, PaginatedClass } from "../../public/blogs/blogs.schema";
 import { UsersRepository } from "../../superadmin/users/users.repository";
 import { UserModel } from "../../superadmin/users/users.schema";
-import { BannedUsersRepository } from "../bloggers/bloggers.bannedUsers.repository";
+import { BannedUsersRepository } from "../../../banned-users/bloggers.banned.users.repository";
+import { BlogsRepository } from "../../public/blogs/blogs.repository";
+import { BanUserForBlogDto } from "../../superadmin/users/users.dto";
 
 @Injectable()
 export class BloggersUsersService {
   constructor(protected jwtService : JwtService,
-              protected bloggerRepository : BloggersRepository,
+              protected bloggerRepository : BlogsRepository,
               protected queryRepository : QueryRepository,
               protected usersRepository : UsersRepository,
               protected banRepository : BannedUsersRepository) {}

@@ -9,13 +9,16 @@ import {
 } from "@nestjs/common";
 import { BlogsService } from "./blogs.service";
 import { PostsService } from "../../public/posts/posts.service";
-import { BlogModel, PaginatedClass } from "./blogs.schema";
+import { PaginatedClass } from "./blogs.schema";
 import { Request } from "express";
+import { CommandBus } from "@nestjs/cqrs";
+import { GetBlogBlogsCommand } from "../../use-cases/blogs/blogs-get-blog-use-case";
 
 @Controller('blogs')
 export class BlogsController{
   constructor(protected blogsService : BlogsService,
-              protected postsService : PostsService
+              protected postsService : PostsService,
+              protected commandBus : CommandBus
   ) {}
   @Get()
   async getBlogs(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
@@ -32,11 +35,8 @@ export class BlogsController{
     })
   }
   @Get(':id')
-  async getBlog(@Param('id') blogId : number
-  ){
-    const blog : BlogModel | null = await this.blogsService.getBlog(blogId)
-    if(!blog) throw new NotFoundException()
-    return blog
+  async getBlog(@Param('id') blogId : number){
+    return await this.commandBus.execute(new GetBlogBlogsCommand(blogId))
   }
   @Get(':id/posts')
   async getPosts(@Param('id') blogId : number,

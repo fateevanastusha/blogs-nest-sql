@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { BlogModel } from "../../public/blogs/blogs.schema";
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { JwtService } from "../../../jwt.service";
-import { BloggersRepository } from "../../blogger/bloggers/bloggers.repository";
+import { BlogsRepository } from "../../public/blogs/blogs.repository";
 
 
 export class DeleteBlogBlogsCommand {
@@ -12,7 +12,7 @@ export class DeleteBlogBlogsCommand {
 
 @CommandHandler(DeleteBlogBlogsCommand)
 export class DeleteBlogUseCase implements ICommandHandler<DeleteBlogBlogsCommand>{
-  constructor(protected jwtService : JwtService, protected blogsRepository : BloggersRepository) {}
+  constructor(protected jwtService : JwtService, protected blogsRepository : BlogsRepository) {}
   async execute (command : DeleteBlogBlogsCommand) : Promise<boolean>{
     const userId = await this.jwtService.getUserIdByToken(command.token)
     const blogForDelete : BlogModel[] = await this.blogsRepository.getFullBlog(command.blogId)

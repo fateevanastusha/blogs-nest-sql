@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {MongooseModule} from "@nestjs/mongoose";
 import { BloggersController } from "./api/blogger/bloggers/bloggers.controller";
-import { BloggersRepository } from "./api/blogger/bloggers/bloggers.repository";
 import { BloggersService } from "./api/blogger/bloggers/bloggers.service";
 import { QueryRepository } from "./helpers/query.repository";
 import { MongoModule } from "./db/mongo.module";
@@ -39,7 +38,6 @@ import { SecurityController } from "./api/public/security/security.controller";
 import { BlogSchema } from "./api/public/blogs/blogs.schema";
 import { BlogsController } from "./api/public/blogs/blogs.controller";
 import { BlogsSuperAdminController } from "./api/superadmin/blogs/blogs.super.admin.controller";
-import { BlogsSuperAdminRepository } from "./api/superadmin/blogs/blogs.super.admin.repository";
 import { BlogsRepository } from "./api/public/blogs/blogs.repository";
 import { BlogsService } from "./api/public/blogs/blogs.service";
 import { BlogsSuperAdminService } from "./api/superadmin/blogs/blogs.super.admin.service";
@@ -55,12 +53,15 @@ import { BloggersUsersController } from "./api/blogger/users/bloggers.users.cont
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { TestRepo } from "./test.repo";
 import { CqrsModule } from "@nestjs/cqrs";
-import { BannedUsersRepository } from "./api/blogger/bloggers/bloggers.bannedUsers.repository";
+import { BannedUsersRepository } from "./banned-users/bloggers.banned.users.repository";
 import { DeleteCommentUseCase } from "./api/use-cases/comments/comments-delete-comment-use-case";
 import { UpdateCommentUseCase } from "./api/use-cases/comments/comments-update-comment-use-case";
 import { GetCommentWithUserUseCase } from "./api/use-cases/comments/comments-get-comment-with-user-use-case";
 import { GetCommentUseCase } from "./api/use-cases/comments/comments-get-comment-use-case";
 import { LikeCommentUseCase } from "./api/use-cases/comments/comments-like-comment-use-case";
+import { UpdateBlogUseCase } from "./api/use-cases/blogs/blogs-update-blog-use-case";
+import { GetBlogUseCase } from "./api/use-cases/blogs/blogs-get-blog-use-case";
+import { UpdatePostUseCase } from "./api/use-cases/posts/posts-update-post-use-case";
 
 const repositories = [
   UsersRepository,
@@ -70,9 +71,7 @@ const repositories = [
   CommentsRepository,
   AuthRepository,
   AttemptsRepository,
-  BloggersRepository,
   BlogsRepository,
-  BlogsSuperAdminRepository,
   TestRepo,
   BannedUsersRepository
 ]
@@ -94,9 +93,12 @@ const useCases = [
   CreateUserUseCase,
   DeleteUserUseCase,
   CreateBlogUseCase,
-  DeleteBlogUseCase, 
+  DeleteBlogUseCase,
+  UpdateBlogUseCase,
+  GetBlogUseCase,
   CreatePostUseCase,
   DeletePostUseCase,
+  UpdatePostUseCase,
   CreateCommentUseCase,
   DeleteCommentUseCase,
   UpdateCommentUseCase,

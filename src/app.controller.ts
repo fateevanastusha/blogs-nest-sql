@@ -6,34 +6,29 @@ import {
   Get, HttpCode,
   Post,
   Res,
-  UseGuards
 } from "@nestjs/common";
-import { BloggersRepository } from "./api/blogger/bloggers/bloggers.repository";
 import { PostsRepository } from "./api/public/posts/posts.repository";
 import { UsersRepository } from "./api/superadmin/users/users.repository";
 import { Response} from "express";
 import { SecurityRepository } from "./api/public/security/security.repository";
 import { LikesRepository } from "./likes/likes.repository";
 import { CommentsRepository } from "./api/public/comments/comments.repository";
-import { AuthGuard, CheckIfUserExist } from "./auth.guard";
 import { BlogDto } from "./api/public/blogs/blogs.dto";
-import { BlogModel, CreateBlogModel } from "./api/public/blogs/blogs.schema";
-import { BloggersService } from "./api/blogger/bloggers/bloggers.service";
+import { BlogModel, BlogViewModel, CreateBlogModel } from "./api/public/blogs/blogs.schema";
 import { TestRepo } from "./test.repo";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
-import { BannedUsersRepository } from "./api/blogger/bloggers/bloggers.bannedUsers.repository";
+import { BlogsRepository } from "./api/public/blogs/blogs.repository";
 
 @Controller()
 export class AppController {
-  constructor(protected blogsRepository : BloggersRepository,
+  constructor(protected blogsRepository : BlogsRepository,
               protected postsRepository : PostsRepository,
               protected usersRepository : UsersRepository,
               protected securityRepository : SecurityRepository,
               protected likesRepository : LikesRepository,
               protected commentsRepository : CommentsRepository,
               protected appRepository : TestRepo,
-              protected banRepository : BannedUsersRepository,
               @InjectDataSource() protected dataSource : DataSource
               ) {}
 
@@ -64,9 +59,9 @@ export class AppController {
       userId: 1,
       userLogin: 'userLogin'
     }
-    const createdBlog : BlogModel | null = await this.blogsRepository.createBlog(newBlog)
-    if(!createdBlog) throw new BadRequestException()
-    return createdBlog
+    const createdBlog : BlogViewModel[] = await this.blogsRepository.createBlog(newBlog)
+    if(createdBlog.length === 0) throw new BadRequestException()
+    return createdBlog[0]
   }
   @HttpCode(200)
   @Get('/test-sql')

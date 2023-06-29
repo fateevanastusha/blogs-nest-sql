@@ -3,7 +3,6 @@ import { QueryModelComments, QueryModelPosts } from "../../../helpers/helpers.sc
 import { QueryRepository } from "../../../helpers/query.repository";
 import { PostModel, PostViewModel } from "./posts.schema";
 import { BlogModel, PaginatedClass } from "../blogs/blogs.schema";
-import { BloggersRepository } from "../../blogger/bloggers/bloggers.repository";
 import { PostsDto } from "./posts.dto";
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "../../../jwt.service";
@@ -13,11 +12,12 @@ import { LikeViewModel } from "../../../likes/likes.schema";
 import { UsersRepository } from "../../superadmin/users/users.repository";
 import { CommentModel, LikesInfo } from "../comments/comments.schema";
 import { CommentsRepository } from "../comments/comments.repository";
+import { BlogsRepository } from "../blogs/blogs.repository";
 
 @Injectable()
 export class PostsService {
   constructor(protected postsRepository : PostsRepository,
-              protected blogsRepository : BloggersRepository,
+              protected blogsRepository : BlogsRepository,
               protected queryRepository : QueryRepository,
               protected jwtService : JwtService,
               protected commentsRepository : CommentsRepository,
@@ -55,40 +55,6 @@ export class PostsService {
     const paginatedPosts : PostModel[] = await this.queryRepository.postsMapping(items, userId)
     return await this.queryRepository.paginationForm(pageCount, total, paginatedPosts, query)
   }
-  async getPostWithUser(id: number, header : string) : Promise<PostViewModel> {
-    const post : PostModel[] =  await this.postsRepository.getPost(id);
-    if (post.length === 0) return null
-    const blog = await this.blogsRepository.getFullBlog(post[0].blogId)
-    if(blog[0].isBanned) throw new NotFoundException()
-    let likesInfo : LikesInfo
-    //with user
-    if(header){
-      const token = header.split(" ")[1];
-      const userId : number = await this.jwtService.getUserIdByToken(token)
-      likesInfo = (await this.likesRepository.getLikesInfoWithUser(userId,id))[0]
-    }
-    //without user
-    else {
-      likesInfo = (await this.likesRepository.getLikesInfo(id))[0]
-    }
-    const newestLikes : LikeViewModel[] = await this.likesRepository.getLastLikes(id)
-    const postView : PostViewModel = {
-      id : post[0].id,
-      title : post[0].title,
-      shortDescription : post[0].shortDescription,
-      content : post[0].content,
-      blogId : post[0].blogId,
-      blogName : post[0].blogName,
-      createdAt : post[0].createdAt,
-      extendedLikesInfo : {
-        likesCount : likesInfo.likesCount,
-        dislikesCount : likesInfo.dislikesCount,
-        myStatus : likesInfo.myStatus,
-        newestLikes : newestLikes
-      }
-    }
-    return postView
-  }
   async getPost(id: number) : Promise<null | PostModel> {
     const post : PostModel[] =  await this.postsRepository.getPost(id);
     if (post.length === 0) return null
@@ -102,8 +68,8 @@ export class PostsService {
     return await this.postsRepository.updatePost(post,postId)
   }
   async getComments(query : QueryModelComments, header : string, postId : number) : Promise<PaginatedClass>{
-    const foundPost = await this.getPost(postId)
-    if (foundPost === null) throw new NotFoundException()
+    const foundPost = await this.postsRepository.getPost(postId);
+    if (foundPost.length === 0) throw new NotFoundException()
     const items : CommentModel[] = await this.queryRepository.paginatorForCommentsByPostId(query, postId)
     let mappedComments
     if(header){

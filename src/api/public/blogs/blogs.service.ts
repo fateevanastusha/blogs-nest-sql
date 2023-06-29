@@ -18,24 +18,18 @@ export class BlogsService {
           userId: a.userId,
           userLogin: a.userLogin
         },
-        "createdAt": a.createdAt,
-        "description": a.description,
-        "id": a.id,
-        "isMembership": a.isMembership,
-        "name": a.name,
-        "banInfo": {
+        createdAt: a.createdAt,
+        description: a.description,
+        id: a.id,
+        isMembership: a.isMembership,
+        name: a.name,
+        banInfo: {
           banDate : a.banDate,
           isBanned : a.isBanned
         },
-        "websiteUrl": a.websiteUrl
+        websiteUrl: a.websiteUrl
       }
     })
     return await this.queryRepository.paginationForm(pageCount, total, mappedItems, query)
-  }
-  async getBlog(id: number) : Promise<BlogModel | null>{
-    return (await this.blogsRepository.getBlog(id))[0]
-  }
-  async deleteAllData(){
-    await this.blogsRepository.deleteAllData()
   }
 }

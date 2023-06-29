@@ -1,19 +1,17 @@
 import { QueryModelBlogs, QueryModelComments } from "../../../helpers/helpers.schema";
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { BlogModel, BlogViewModel, PaginatedClass } from "../../public/blogs/blogs.schema";
-import { BloggersRepository } from "./bloggers.repository";
+import { Injectable } from "@nestjs/common";
+import { BlogViewModel, PaginatedClass } from "../../public/blogs/blogs.schema";
 import { QueryRepository } from "../../../helpers/query.repository";
-import { BlogDto } from "../../public/blogs/blogs.dto";
 import { JwtService } from "../../../jwt.service";
 import { CommentsRepository } from "../../public/comments/comments.repository";
 import { CommentModel } from "../../public/comments/comments.schema";
 import { LikesRepository } from "../../../likes/likes.repository";
-import { log } from "util";
 import { PostsRepository } from "../../public/posts/posts.repository";
+import { BlogsRepository } from "../../public/blogs/blogs.repository";
 
 @Injectable()
 export class BloggersService {
-  constructor(protected blogsRepository : BloggersRepository,
+  constructor(protected blogsRepository : BlogsRepository,
               protected queryRepository : QueryRepository,
               protected likesRepository : LikesRepository,
               protected commentsRepository : CommentsRepository,
@@ -21,7 +19,7 @@ export class BloggersService {
               protected postsRepository : PostsRepository) {}
   async getBlogs(query : QueryModelBlogs, token : string): Promise<PaginatedClass>{
     const userId = await this.jwtService.getUserIdByToken(token)
-    const total = await this.blogsRepository.getBlogsCount(query.searchNameTerm, userId)
+    const total = await this.blogsRepository.getBlogsCountWithUser(query.searchNameTerm, userId)
     const pageCount = Math.ceil( total / +query.pageSize)
     const items : BlogViewModel[] = await this.queryRepository.paginationForBlogsWithUser(query, userId);
     return await this.queryRepository.paginationForm(pageCount, total, items, query)
@@ -52,15 +50,5 @@ export class BloggersService {
       }
     }))
     return await this.queryRepository.paginationForm(pageCount,total,mappedItems,query)
-  }
-  async updateBlog(blog : BlogDto, id: number, token : string) : Promise <boolean>{
-    const userId = await this.jwtService.getUserIdByToken(token)
-    const blogForUpdate : BlogModel[] = await this.blogsRepository.getFullBlog(id)
-    if (blogForUpdate.length === 0 ) throw new NotFoundException();
-    if (blogForUpdate[0].userId !== userId) throw new ForbiddenException()
-    return await this.blogsRepository.updateBlog(blog, id)
-  }
-  async deleteAllData(){
-    await this.blogsRepository.deleteAllData()
   }
 }

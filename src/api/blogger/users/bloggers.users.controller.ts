@@ -3,9 +3,9 @@ import {
   Controller, DefaultValuePipe, Get, HttpCode, NotFoundException, Param, Put, Query, Req, UseGuards
 } from "@nestjs/common";
 import { CheckIfUserExist } from "../../../auth.guard";
-import { BanUserForBlogDto } from "./bloggers.users.dto";
 import { BloggersUsersService } from "./bloggers.users.service";
 import { Request } from "express";
+import { BanUserForBlogDto } from "../../superadmin/users/users.dto";
 
 
 @Controller('blogger/users/')

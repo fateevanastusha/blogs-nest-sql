@@ -1,15 +1,15 @@
 import { QueryModelBlogs } from "../../../helpers/helpers.schema";
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { BlogsSuperAdminRepository } from "./blogs.super.admin.repository";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { BlogBanInfo, BlogModel, BlogOwnerModel, PaginatedClass } from "../../public/blogs/blogs.schema";
 import { UsersRepository } from "../users/users.repository";
 import { QueryRepository } from "../../../helpers/query.repository";
 import { UserModel } from "../users/users.schema";
-import { BanBlogDto } from "./blogs.super.admin.dto";
+import {BanBlogDto} from "../../public/blogs/blogs.dto";
+import { BlogsRepository } from "../../public/blogs/blogs.repository";
 
 @Injectable()
 export class BlogsSuperAdminService {
-  constructor(protected blogsRepository : BlogsSuperAdminRepository, protected usersRepository : UsersRepository, protected queryRepository : QueryRepository) {
+  constructor(protected blogsRepository : BlogsRepository, protected usersRepository : UsersRepository, protected queryRepository : QueryRepository) {
   }
   async getBlogs(query : QueryModelBlogs): Promise<PaginatedClass>{
     let total = await this.blogsRepository.getBlogsCount(query.searchNameTerm)
@@ -24,7 +24,7 @@ export class BlogsSuperAdminService {
         id: a.id,
         createdAt: a.createdAt,
         isMembership: a.isMembership,
-        "banInfo": {
+        banInfo: {
           banDate : a.banDate,
           isBanned : a.isBanned
         },
@@ -46,8 +46,8 @@ export class BlogsSuperAdminService {
   async bindBlog(blogId : number, userId : number) : Promise <boolean>{
     const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
     if (user.length === 0) throw new NotFoundException()
-    const blog : BlogModel | null = await this.blogsRepository.getBlog(blogId)
-    if(!blog) throw new NotFoundException()
+    const blog : BlogModel[] = await this.blogsRepository.getFullBlog(blogId)
+    if(blog.length === 0) throw new NotFoundException()
     const userInfo : BlogOwnerModel = {
       userId : userId,
       userLogin : user[0].login
