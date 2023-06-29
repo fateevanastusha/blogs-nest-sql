@@ -111,14 +111,16 @@ const useCases = [
   imports: [
     CqrsModule,
       TypeOrmModule.forRoot({
-        type : 'postgres',
-        host : 'localhost',
-        port : 5432,
-        username : 'nodejs',
-        password : 'nodejs',
-        database : 'BlogsNestApi',
+        url : process.env.POSTGRES_CONNECTION_STRING || 'postgres://fateevanastusha:qzMDJ0ZXEam4@ep-still-star-556812.eu-central-1.aws.neon.tech/blogsapi',
+      type : 'postgres' as const,
+        /*        host : 'localhost',
+                port : 5432,
+                username : 'nodejs',
+                password : 'nodejs',
+                database : 'BlogsNestApi',*/
         autoLoadEntities : false,
-        synchronize : false
+        synchronize : false,
+        ssl:  {rejectUnauthorized: false}
       }),
      PassportModule,
      MongoModule,
