@@ -3,10 +3,10 @@ import {
   Body,
   Controller,
   Delete,
-  Get, HttpCode,
+  Get, HttpCode, OnModuleInit,
   Post,
   Res,
-} from "@nestjs/common";
+} from '@nestjs/common';
 import { PostsRepository } from "./api/public/posts/posts.repository";
 import { UsersRepository } from "./api/superadmin/users/users.repository";
 import { Response} from "express";
@@ -21,7 +21,7 @@ import { DataSource } from "typeorm";
 import { BlogsRepository } from "./api/public/blogs/blogs.repository";
 
 @Controller()
-export class AppController {
+export class AppController{
   constructor(protected blogsRepository : BlogsRepository,
               protected postsRepository : PostsRepository,
               protected usersRepository : UsersRepository,

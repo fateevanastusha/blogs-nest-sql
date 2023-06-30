@@ -1650,12 +1650,6 @@ describe('AppController (e2e)', () => {
       .get('/posts/' + createResponsePost_1.body.id)
       .expect(200)
   })
-  it('TEST FOR SQL', async () => {
-    res = await request(server)
-      .get('/test-sql')
-      .expect(200)
-    expect(res.body).toStrictEqual([{"id": 1, "name": "nastya"}])
-  })
   afterAll(async () => {
     /*await request(server)
       .delete('/testing/all-data')
