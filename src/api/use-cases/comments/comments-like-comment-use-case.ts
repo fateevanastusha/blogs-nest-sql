@@ -5,7 +5,7 @@ import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { LikesRepository } from "../../../likes/likes.repository";
 
 export class LikeCommentCommentsCommand {
-  constructor(public requestType : string,public commentId : number,public userId : number) {}
+  constructor(public requestType : string,public commentId : string,public userId : string) {}
 }
 @CommandHandler(LikeCommentCommentsCommand)
 export class LikeCommentUseCase implements ICommandHandler<LikeCommentCommentsCommand>{

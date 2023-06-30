@@ -54,7 +54,7 @@ export class UsersController{
   }
   @HttpCode(204)
   @Put('/:id/ban')
-  async banUser(@Param('id') userId : number,
+  async banUser(@Param('id') userId : string,
                 @Body() banInfo : BanUserDto){
     const status : boolean = await this.usersService.banUser(userId, banInfo)
     if(!status) throw new NotFoundException()
@@ -62,7 +62,7 @@ export class UsersController{
   }
   @HttpCode(204)
   @Delete(':id')
-  async deleteUser(@Param('id') userId : number){
+  async deleteUser(@Param('id') userId : string){
     const status : boolean = await this.commandBus.execute(
       new DeleteUserUsersCommand(userId)
     )

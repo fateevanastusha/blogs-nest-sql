@@ -58,7 +58,7 @@ export class SecurityRepository {
     `)
     return true
   }
-  async checkSameDevice(title : string, userId : number) : Promise<boolean> {
+  async checkSameDevice(title : string, userId : string) : Promise<boolean> {
     const result = await this.dataSource.query(`
         SELECT *
         FROM public."RefreshTokens"
@@ -66,11 +66,5 @@ export class SecurityRepository {
     `)
     if (result.length === 0) return true
     return false
-  }
-  async deleteAllData() {
-    this.dataSource.query(`
-    DELETE FROM public."RefreshTokens"
-    `)
-    return true
   }
 }

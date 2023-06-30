@@ -22,7 +22,17 @@ export class BloggersService {
     const total = await this.blogsRepository.getBlogsCountWithUser(query.searchNameTerm, userId)
     const pageCount = Math.ceil( total / +query.pageSize)
     const items : BlogViewModel[] = await this.queryRepository.paginationForBlogsWithUser(query, userId);
-    return await this.queryRepository.paginationForm(pageCount, total, items, query)
+    const mappedItems : BlogViewModel[]= items.map(a => {
+      return {
+        createdAt : a.createdAt,
+        isMembership : a.isMembership,
+        description : a.description,
+        name : a.name,
+        websiteUrl : a.websiteUrl,
+        id : a.id + ''
+      }
+    })
+    return await this.queryRepository.paginationForm(pageCount, total, mappedItems, query)
   }
   async getComments(query : QueryModelComments, token : string): Promise<PaginatedClass>{
     const userId = await this.jwtService.getUserIdByToken(token)
@@ -33,17 +43,17 @@ export class BloggersService {
       let likes = (await this.likesRepository.getLikesInfoWithUser(userId, a.id))[0]
       let postTitle = (await this.postsRepository.getPost(a.postId))[0].title
       return {
-        id: a.id,
+        id: a.id + '',
         content: a.content,
         commentatorInfo: {
-          userId: a.userId,
+          userId: a.userId + '',
           userLogin: a.userLogin
         },
         createdAt: a.createdAt,
         postInfo: {
-          blogId: a.blogId,
+          blogId: a.blogId + '',
           blogName: a.blogName,
-          id: a.postId,
+          id: a.postId + '',
           title: postTitle
         },
         likesInfo : {...likes}

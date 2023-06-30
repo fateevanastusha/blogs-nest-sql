@@ -7,7 +7,7 @@ import { UsersRepository } from "../../superadmin/users/users.repository";
 import { LikesRepository } from "../../../likes/likes.repository";
 
 export class GetCommentWithUserCommentsCommand {
-  constructor(public userId : number, public commentId : number) {}
+  constructor(public userId : string, public commentId : string) {}
 }
 @CommandHandler(GetCommentWithUserCommentsCommand)
 export class GetCommentWithUserUseCase implements ICommandHandler<GetCommentWithUserCommentsCommand>{
@@ -22,10 +22,10 @@ export class GetCommentWithUserUseCase implements ICommandHandler<GetCommentWith
     if (user[0].isBanned === true) throw new NotFoundException()
     const likes : LikesInfo = await this.likesRepository.getLikesInfoWithUser(command.userId, command.commentId)
     const mappedComment : CommentViewModel = {
-      id: comment.id,
+      id: comment.id + '',
       content: comment.content,
       commentatorInfo: {
-        userId: comment.userId,
+        userId: comment.userId + '',
         userLogin: comment.userLogin
       },
       createdAt: comment.createdAt,

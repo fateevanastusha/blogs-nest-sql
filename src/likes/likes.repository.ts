@@ -5,7 +5,7 @@ import { LikesInfo } from "../api/public/comments/comments.schema";
 
 export class LikesRepository {
   constructor(@InjectDataSource() protected dataSource : DataSource) {}
-  async getLikesInfoWithUser(userId: number, postOrCommentId : number) : Promise<LikesInfo>{
+  async getLikesInfoWithUser(userId: string, postOrCommentId : string) : Promise<LikesInfo>{
     const likes = await this.dataSource.query(`
     SELECT
       (SELECT COALESCE(COUNT(*))::integer
@@ -23,7 +23,7 @@ export class LikesRepository {
     return likes
   }
 
-  async getLikesInfo(postOrCommentId : number) : Promise<LikesInfo>{
+  async getLikesInfo(postOrCommentId : string) : Promise<LikesInfo>{
     return await this.dataSource.query(`
     SELECT 
       (SELECT COALESCE(COUNT(*))::integer
@@ -39,7 +39,7 @@ export class LikesRepository {
       COALESCE((SELECT 'None')) AS "myStatus";
   `)
   }
-  async getLastLikes(postOrCommentId : number) : Promise<LikeViewModel[]>{
+  async getLastLikes(postOrCommentId : string) : Promise<LikeViewModel[]>{
     return await this.dataSource.query(`
       SELECT l."createdAt" AS "addedAt", l."userId", u."login"
         FROM public."Likes" l
@@ -77,14 +77,14 @@ export class LikesRepository {
     if (findStatus.length === 0) return false
     return true
   }
-  async findStatus(postOrCommentId : number, userId : number) : Promise<LikeModel[]> {
+  async findStatus(postOrCommentId : string, userId : string) : Promise<LikeModel[]> {
     return await this.dataSource.query(`
     SELECT *
         FROM public."Likes"
         WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "userId" = ${userId}
     `)
   }
-  async deleteStatus(commentId : number, userId : number) : Promise<boolean> {
+  async deleteStatus(commentId : string, userId : string) : Promise<boolean> {
     await this.dataSource.query(`
     DELETE FROM public."Likes"
         WHERE "commentId" = ${commentId} AND "userId" = ${userId}
@@ -97,12 +97,6 @@ export class LikesRepository {
         SET status='${status.status}'
         WHERE ("postId" = ${status.postOrCommentId} OR "commentId" = ${status.postOrCommentId}) AND "userId" = ${status.userId};`)
     return true;
-  }
-  async deleteAllData(){
-    this.dataSource.query(`
-    DELETE FROM public."Likes"
-    `)
-    return true
   }
   async getAllLikes() : Promise <LikeModel[]>{
     return await this.dataSource.query(`

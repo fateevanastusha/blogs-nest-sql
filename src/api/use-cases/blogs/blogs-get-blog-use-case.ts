@@ -5,7 +5,7 @@ import { NotFoundException } from "@nestjs/common";
 
 
 export class GetBlogBlogsCommand {
-  constructor(public blogId: number) {}
+  constructor(public blogId: string) {}
 }
 @CommandHandler(GetBlogBlogsCommand)
 export class GetBlogUseCase implements ICommandHandler<GetBlogBlogsCommand>{
@@ -15,7 +15,7 @@ export class GetBlogUseCase implements ICommandHandler<GetBlogBlogsCommand>{
     if(findBlog.length === 0) throw new NotFoundException();
     const blog : BlogModel = findBlog[0];
     const mappedBlog : BlogViewModel = {
-      id : blog.id,
+      id : blog.id + '',
       name : blog.name,
       description : blog.description,
       websiteUrl : blog.websiteUrl,

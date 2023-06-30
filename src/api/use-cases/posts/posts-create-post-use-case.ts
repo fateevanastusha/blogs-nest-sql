@@ -24,8 +24,8 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostPostsCommand
     const blog : BlogModel[] = await this.blogsRepository.getFullBlog(command.post.blogId)
     if (blog.length === 0) throw new NotFoundException()
 
-    const userId : number = await this.jwtService.getUserIdByToken(command.token)
-    const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
+    const userId : string = await this.jwtService.getUserIdByToken(command.token)
+    const user : UserModel[] = await this.usersRepository.getFullUser(userId)
     if (user[0].id !== blog[0].userId) throw new ForbiddenException()
 
     const newPost : CreatePostModel = {
@@ -39,11 +39,11 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostPostsCommand
     const createdPost = await this.postsRepository.createPost(newPost);
     if (!createdPost) throw new BadRequestException();
     const mappedPost = {
-      "id": createdPost.id,
+      "id": createdPost.id + '',
       "title": createdPost.title,
       "shortDescription": createdPost.shortDescription,
       "content": createdPost.content,
-      "blogId": createdPost.blogId,
+      "blogId": createdPost.blogId + '',
       "blogName": createdPost.blogName,
       "createdAt": createdPost.createdAt,
       "extendedLikesInfo": {

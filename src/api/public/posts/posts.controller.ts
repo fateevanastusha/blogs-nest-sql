@@ -13,7 +13,6 @@ import {
 } from "@nestjs/common";
 import { PostsService } from "./posts.service";
 import { CommentsDto } from "./posts.dto";
-import { PostModel } from "./posts.schema";
 import { Request } from "express";
 import { CheckIfUserExist } from "../../../auth.guard";
 import { LikesDto } from "../../../likes/likes.dto";
@@ -46,12 +45,12 @@ export class PostsController{
     }
   }
   @Get(':id')
-  async getPost(@Param('id') postId : number,
+  async getPost(@Param('id') postId : string,
                 @Req() req: Request) {
     return await this.commandBus.execute(new GetPostPostsCommand(postId, req.headers.authorization))
   }
   @Get(':id/comments')
-  async getComments(@Param('id') postId : number,
+  async getComments(@Param('id') postId : string,
                     @Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                     @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
                     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
@@ -66,7 +65,7 @@ export class PostsController{
   }
   @UseGuards(CheckIfUserExist)
   @Post(':postId/comments')
-  async postComment(@Param('postId') postId : number,
+  async postComment(@Param('postId') postId : string,
                     @Body() comment : CommentsDto,
                     @Req() req: any){
     const token = req.headers.authorization!.split(" ")[1]
@@ -75,7 +74,7 @@ export class PostsController{
   @UseGuards(CheckIfUserExist)
   @HttpCode(204)
   @Put(':id/like-status')
-  async setLike(@Param('id') postId : number,
+  async setLike(@Param('id') postId : string,
                 @Body() like : LikesDto,
                 @Req() req: any){
     const status : boolean = await this.postsService.changeLikeStatus(like.likeStatus, postId, req.headers.authorization)

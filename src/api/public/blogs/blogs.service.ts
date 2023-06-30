@@ -15,12 +15,12 @@ export class BlogsService {
     const mappedItems = items.map(a => {
       return {
         blogOwnerInfo: {
-          userId: a.userId,
+          userId: a.userId + '',
           userLogin: a.userLogin
         },
         createdAt: a.createdAt,
         description: a.description,
-        id: a.id,
+        id: a.id + '',
         isMembership: a.isMembership,
         name: a.name,
         banInfo: {

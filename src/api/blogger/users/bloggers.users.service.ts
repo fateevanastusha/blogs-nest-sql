@@ -16,7 +16,7 @@ export class BloggersUsersService {
               protected queryRepository : QueryRepository,
               protected usersRepository : UsersRepository,
               protected banRepository : BannedUsersRepository) {}
-  async BanUserForBlog(token : string, userId : number, banInfo : BanUserForBlogDto) : Promise<boolean> {
+  async BanUserForBlog(token : string, userId : string, banInfo : BanUserForBlogDto) : Promise<boolean> {
     const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
     if(user.length === 0) throw new NotFoundException()
     const ownerId = await this.jwtService.getUserIdByToken(token)
@@ -36,7 +36,7 @@ export class BloggersUsersService {
       return await this.banRepository.unbanUser(banInfo.blogId, userId)
     }
   }
-  async getAllBannedUsers(token : string, blogId : number, query : QueryModelBannedUsersForBlog) : Promise<PaginatedClass>{
+  async getAllBannedUsers(token : string, blogId : string, query : QueryModelBannedUsersForBlog) : Promise<PaginatedClass>{
     const total: number = await this.banRepository.getBannedUsersCount(blogId)
     const pageCount = Math.ceil( total / +query.pageSize)
     const bannedUsers : BannedUserInfo[] = await this.queryRepository.paginationForBlogBannedUsers(query, blogId)

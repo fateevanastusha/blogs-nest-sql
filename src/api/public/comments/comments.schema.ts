@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 @Schema()
 export class CommentatorInfo {
   @Prop({required : true})
-  userId: number
+  userId: string
   @Prop({required : true})
   userLogin: string
 }
@@ -21,39 +21,39 @@ export class LikesInfo {
 @Schema()
 export class PostInfo {
   @Prop({required : true})
-  id: number
+  id: string
   @Prop({required : true})
   title: string
   @Prop({required : true})
-  blogId: number
+  blogId: string
   @Prop({required : true})
   blogName: string
   @Prop({required : true})
-  blogOwnerId : number
+  blogOwnerId : string
 }
 
 @Schema()
 export class CommentModel {
   @Prop({required : true})
-  id : number
+  id : string
   @Prop({required : true})
   content : string
   @Prop({required : true})
-  userId: number
+  userId: string
   @Prop({required : true})
   userLogin: string
   @Prop({required : true})
   createdAt: string
   @Prop({required : true})
-  postId : number
+  postId : string
   @Prop({required : true})
   title: string
   @Prop({required : true})
-  blogId: number
+  blogId: string
   @Prop({required : true})
   blogName: string
   @Prop({required : true})
-  blogOwnerId : number
+  blogOwnerId : string
 }
 
 @Schema()
@@ -61,27 +61,27 @@ export class CreateCommentModel {
   @Prop({required : true})
   content : string
   @Prop({required : true})
-  userId: number
+  userId: string
   @Prop({required : true})
   userLogin: string
   @Prop({required : true})
   createdAt: string
   @Prop({required : true})
-  postId : number
+  postId : string
   @Prop({required : true})
   title: string
   @Prop({required : true})
-  blogId: number
+  blogId: string
   @Prop({required : true})
   blogName: string
   @Prop({required : true})
-  blogOwnerId : number
+  blogOwnerId : string
 }
 
 @Schema()
 export class CommentViewModel {
   @Prop({required : true})
-  id : number
+  id : string
   @Prop({required : true})
   content : string
   @Prop({required : true})
@@ -95,18 +95,18 @@ export class CommentViewModel {
 @Schema()
 export class PostInfoViewModel {
   @Prop({required : true})
-  id: number
+  id: string
   @Prop({required : true})
   title: string
   @Prop({required : true})
-  blogId: number
+  blogId: string
   @Prop({required : true})
   blogName: string
 }
 
 export class CommentForBloggerViewModel {
   @Prop({required : true})
-  id : number
+  id : string
   @Prop({required : true})
   content : string
   @Prop({required : true})

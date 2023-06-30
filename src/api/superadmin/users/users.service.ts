@@ -19,7 +19,7 @@ export class UsersService {
     //mapping items
     const mappedItems = items.map(createdUser => {
       return {
-        id : createdUser.id,
+        id : createdUser.id + '',
         createdAt : createdUser.createdAt,
         email : createdUser.email,
         login : createdUser.login,
@@ -32,14 +32,14 @@ export class UsersService {
     })
     return this.queryRepository.paginationForm(pageCount, total, mappedItems, query)
   }
-  async getUser(id : number) : Promise<UserModel[] | null>{
+  async getUser(id : string) : Promise<UserModel[] | null>{
     return this.usersRepository.getFullUser(id)
   }
   async changeUserPassword(code : string, password : string) : Promise<boolean>{
     const hash = bcrypt.hashSync(password, 10, )
     return await this.usersRepository.changeUserPassword(code, hash)
   }
-  async banUser(userId : number, banInfo : BanUserDto) : Promise<boolean> {
+  async banUser(userId : string, banInfo : BanUserDto) : Promise<boolean> {
     const user = await this.usersRepository.getFullUser(userId)
     if(!user) throw new NotFoundException()
     let banInformation : UserBanInfo
@@ -54,8 +54,5 @@ export class UsersService {
     if (banInfo.isBanned === false){
       return await this.usersRepository.unbanUser(userId)
     }
-  }
-  async deleteAllData(){
-    await this.usersRepository.deleteAllData()
   }
 }

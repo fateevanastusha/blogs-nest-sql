@@ -35,11 +35,11 @@ export class BlogsController{
     })
   }
   @Get(':id')
-  async getBlog(@Param('id') blogId : number){
+  async getBlog(@Param('id') blogId : string){
     return await this.commandBus.execute(new GetBlogBlogsCommand(blogId))
   }
   @Get(':id/posts')
-  async getPosts(@Param('id') blogId : number,
+  async getPosts(@Param('id') blogId : string,
                  @Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
                  @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,

@@ -15,21 +15,21 @@ export class BlogsRepository{
       WHERE "createdAt" = '${newBlog.createdAt}'
     `)
   }
-  async getFullBlog(blogId : number) : Promise<BlogModel[]>{
+  async getFullBlog(blogId : string) : Promise<BlogModel[]>{
     return this.dataSource.query(`
       SELECT *
       FROM public."Blogs"
       WHERE "id" = ${blogId}
     `)
   }
-  async updateBlog(blog : BlogDto, id: number) : Promise<boolean>{
+  async updateBlog(blog : BlogDto, id: string) : Promise<boolean>{
     await this.dataSource.query(`
     UPDATE public."Blogs"
         SET name='${blog.name}', description='${blog.description}', "websiteUrl"='${blog.websiteUrl}'
         WHERE "id" = ${id};`)
     return true
   }
-  async deleteBlog(id : number) : Promise<boolean>{
+  async deleteBlog(id : string) : Promise<boolean>{
     await this.dataSource.query(`
     DELETE FROM public."Blogs"
         WHERE id = ${id};
@@ -45,7 +45,7 @@ export class BlogsRepository{
     `)
     return +(count[0].total)
   }
-  async getBlogsCountWithUser(searchNameTerm: string, userId : number): Promise<number>{
+  async getBlogsCountWithUser(searchNameTerm: string, userId : string): Promise<number>{
     const count = await this.dataSource.query(`
     SELECT COUNT(*) AS "total"
         FROM public."Blogs"
@@ -53,25 +53,7 @@ export class BlogsRepository{
     `)
     return +(count[0].total)
   }
-  async getBlogsCountForBanned(searchNameTerm: string): Promise<number>{
-    let count
-    if (searchNameTerm = '') {
-      count = await this.dataSource.query(`
-        SELECT COUNT(*) AS "total"
-          FROM public."Blogs"
-          WHERE "name" LIKE '%' || CASE WHEN '${searchNameTerm}' = '' THEN '' ELSE '${searchNameTerm}' END || '%'
-          AND "isBanned" = false
-        `)
-    } else {
-      count = await this.dataSource.query(`
-        SELECT COUNT(*) AS "total"
-          FROM public."Blogs"
-          WHERE "isBanned" = false
-        `)
-    }
-    return Number(count[0].total)
-  }
-  async banBlog(blogId : number, status : BlogBanInfo) : Promise<boolean>{
+  async banBlog(blogId : string, status : BlogBanInfo) : Promise<boolean>{
     await this.dataSource.query(`
     UPDATE public."Blogs"
         SET "isBanned"=${status.isBanned}, "banDate"='${status.banDate}'
@@ -79,7 +61,7 @@ export class BlogsRepository{
     `)
     return true
   }
-  async bindUser(blogId : number, userInfo : BlogOwnerModel) : Promise <boolean>{
+  async bindUser(blogId : string, userInfo : BlogOwnerModel) : Promise <boolean>{
     await this.dataSource.query(`
     UPDATE public."Blogs"
         SET "userId"='${userInfo.userId}', "userLogin"='${userInfo.userLogin}'

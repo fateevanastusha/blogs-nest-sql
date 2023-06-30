@@ -5,7 +5,7 @@ import { UserModel } from "../../superadmin/users/users.schema";
 @Schema()
 export class BlogOwnerModel {
   @Prop({required : true})
-  userId: number
+  userId: string
   @Prop({required : true})
   userLogin: string
 }
@@ -13,7 +13,7 @@ export class BlogOwnerModel {
 @Schema()
 export class BannedUserInfo {
   @Prop({required: true})
-  id : number
+  id : string
   @Prop({required: true})
   blogId: number
   @Prop({required: true})
@@ -21,7 +21,7 @@ export class BannedUserInfo {
   @Prop({required: true})
   banReason: string
   @Prop({required: true})
-  userId: number
+  userId: string
   @Prop({required: true})
   userLogin : string
 }
@@ -29,13 +29,13 @@ export class BannedUserInfo {
 @Schema()
 export class CreateBannedUserInfo {
   @Prop({required: true})
-  blogId: number
+  blogId: string
   @Prop({required: true})
   banDate: string
   @Prop({required: true})
   banReason: string
   @Prop({required: true})
-  userId: number
+  userId: string
   @Prop({required: true})
   userLogin : string
 }
@@ -58,13 +58,13 @@ export class BlogModel {
   @Prop({required: true})
   websiteUrl : string
   @Prop({required: true})
-  id : number
+  id : string
   @Prop({required : true})
   createdAt : string
   @Prop({required: true})
   isMembership : boolean
   @Prop({required : true})
-  userId: number
+  userId: string
   @Prop({required : true})
   userLogin: string
   @Prop({required: true})
@@ -83,7 +83,7 @@ export class BlogViewModel {
   @Prop({required: true})
   websiteUrl : string
   @Prop({required: true})
-  id : number
+  id : string
   @Prop({required : true})
   createdAt : string
   @Prop({required: true})
@@ -101,7 +101,7 @@ export class CreateBlogModel {
   @Prop({required : true})
   createdAt : string
   @Prop({required : true})
-  userId: number
+  userId: string
   @Prop({required : true})
   userLogin: string
 }

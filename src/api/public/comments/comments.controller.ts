@@ -17,7 +17,7 @@ export class CommentsController {
               protected commandBus : CommandBus) {}
   @HttpCode(200)
   @Get(':id')
-  async getComment(@Param('id') commentId : number,
+  async getComment(@Param('id') commentId : string,
                    @Req() req: any){
     const token = req.headers.authorization;
     if (!token){
@@ -25,7 +25,7 @@ export class CommentsController {
       return comment;
     } else {
       const token = req.headers.authorization!.split(" ")[1];
-      let userId : number = await this.jwtService.getUserIdByToken(token);
+      let userId : string = await this.jwtService.getUserIdByToken(token);
       const comment : CommentViewModel = await this.commandBus.execute(new GetCommentWithUserCommentsCommand(userId, commentId));
       return comment;
     }
@@ -33,13 +33,13 @@ export class CommentsController {
   @HttpCode(204)
   @UseGuards(CommentCheckForSameUser)
   @Delete(':id')
-  async deleteComment(@Param('id') commentId : number){
+  async deleteComment(@Param('id') commentId : string){
     return await this.commandBus.execute(new DeleteCommentCommentsCommand(commentId))
   }
   @HttpCode(204)
   @UseGuards(CommentCheckForSameUser)
   @Put(':id')
-  async updateComment(@Param('id') commentId : number,
+  async updateComment(@Param('id') commentId : string,
                       @Body() comment : CommentsDto){
     return await this.commandBus.execute(new UpdateCommentCommentsCommand(comment.content, commentId))
   }
@@ -47,11 +47,11 @@ export class CommentsController {
   @HttpCode(204)
   @UseGuards(CheckIfUserExist)
   @Put(':id/like-status')
-  async changeLikeStatus(@Param('id') commentId : number,
+  async changeLikeStatus(@Param('id') commentId : string,
                          @Body() requestType : LikesDto,
                          @Req() req: any){
     const token = req.headers.authorization!.split(" ")[1]
-    const userId : number = await this.jwtService.getUserIdByToken(token);
+    const userId : string = await this.jwtService.getUserIdByToken(token);
     return await this.commandBus.execute(new LikeCommentCommentsCommand(requestType.likeStatus, commentId, userId))
   }
 }

@@ -16,7 +16,7 @@ export class ExtendedLikesInfo {
 @Schema()
 export class PostModel {
   @Prop({required : true})
-  id: number
+  id: string
   @Prop({required : true})
   title: string
   @Prop({required : true})
@@ -24,7 +24,7 @@ export class PostModel {
   @Prop({required : true})
   content: string
   @Prop({required : true})
-  blogId: number
+  blogId: string
   @Prop({required : true})
   blogName: string
   @Prop({required : true})
@@ -40,7 +40,7 @@ export class CreatePostModel {
   @Prop({required : true})
   content: string
   @Prop({required : true})
-  blogId: number
+  blogId: string
   @Prop({required : true})
   blogName: string
   @Prop({required : true})
@@ -50,7 +50,7 @@ export class CreatePostModel {
 @Schema()
 export class PostViewModel {
   @Prop({required : true})
-  id: number
+  id: string
   @Prop({required : true})
   title: string
   @Prop({required : true})
@@ -58,7 +58,7 @@ export class PostViewModel {
   @Prop({required : true})
   content: string
   @Prop({required : true})
-  blogId: number
+  blogId: string
   @Prop({required : true})
   blogName: string
   @Prop({required : true})

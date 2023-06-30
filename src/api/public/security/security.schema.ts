@@ -30,7 +30,7 @@ export class TokenList {
 
 export class RefreshTokensMetaModel {
   @Prop({required : true})
-  userId : number
+  userId : string
   @Prop({required : true})
   ip: string
   @Prop({required : true})

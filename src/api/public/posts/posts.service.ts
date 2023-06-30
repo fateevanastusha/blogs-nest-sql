@@ -33,14 +33,14 @@ export class PostsService {
     return await this.queryRepository.paginationForm(pageCount,total,paginatedItems,query)
   }
   async getPostsWithUser(query : QueryModelPosts, token : string) : Promise<PaginatedClass>{
-    const userId : number = await this.jwtService.getUserIdByToken(token)
+    const userId : string = await this.jwtService.getUserIdByToken(token)
     const total : number = (await this.postsRepository.getPosts()).length
     const pageCount = Math.ceil( total / query.pageSize)
     const items = await this.queryRepository.paginatorForPosts(query)
     const paginatedItems = await this.queryRepository.postsMapping(items, userId)
     return await this.queryRepository.paginationForm(pageCount,total,paginatedItems,query)
   }
-  async getPostsByBlogId (query : QueryModelPosts, blogId: number, token : string) : Promise<PaginatedClass | null>{
+  async getPostsByBlogId (query : QueryModelPosts, blogId: string, token : string) : Promise<PaginatedClass | null>{
     const userId = await this.jwtService.getUserIdByToken(token)
     const blog : BlogModel[] = await this.blogsRepository.getFullBlog(blogId)
     if(blog.length === 0 ) return null
@@ -55,19 +55,7 @@ export class PostsService {
     const paginatedPosts : PostModel[] = await this.queryRepository.postsMapping(items, userId)
     return await this.queryRepository.paginationForm(pageCount, total, paginatedPosts, query)
   }
-  async getPost(id: number) : Promise<null | PostModel> {
-    const post : PostModel[] =  await this.postsRepository.getPost(id);
-    if (post.length === 0) return null
-    return post[0]
-  }
-  async updatePost(post : PostsDto, postId : number, token : string) : Promise <boolean>{
-    const userId : number = await this.jwtService.getUserIdByToken(token)
-    const blog : BlogModel[] = await this.blogsRepository.getFullBlog(post.blogId)
-    if (blog.length ===0 ) throw new NotFoundException()
-    if (blog[0].userId !== userId) throw new ForbiddenException()
-    return await this.postsRepository.updatePost(post,postId)
-  }
-  async getComments(query : QueryModelComments, header : string, postId : number) : Promise<PaginatedClass>{
+  async getComments(query : QueryModelComments, header : string, postId : string) : Promise<PaginatedClass>{
     const foundPost = await this.postsRepository.getPost(postId);
     if (foundPost.length === 0) throw new NotFoundException()
     const items : CommentModel[] = await this.queryRepository.paginatorForCommentsByPostId(query, postId)
@@ -84,7 +72,7 @@ export class PostsService {
     let paginatedComments = await this.queryRepository.paginationForm(pageCount, total, mappedComments, query)
     return paginatedComments
   }
-  async changeLikeStatus(requestType : string, postId : number, header : string) : Promise <boolean> {
+  async changeLikeStatus(requestType : string, postId : string, header : string) : Promise <boolean> {
     if(!header) throw new UnauthorizedException(401)
     const token = header.split(" ")[1]
     const post : PostModel[] = await this.postsRepository.getPost(postId)
@@ -114,8 +102,5 @@ export class PostsService {
       await this.likesRepository.updateStatus(status)
     }
     return true;
-  }
-  async deleteAllData() {
-    await this.postsRepository.deleteAllData();
   }
 }

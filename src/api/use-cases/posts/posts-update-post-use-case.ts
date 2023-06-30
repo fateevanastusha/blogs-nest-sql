@@ -7,7 +7,7 @@ import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { PostsDto } from "../../public/posts/posts.dto";
 
 export class UpdatePostPostsCommand {
-  constructor(public post : PostsDto,public postId : number,public token : string) {
+  constructor(public post : PostsDto,public postId : string,public token : string) {
   }
 }
 
@@ -17,7 +17,7 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostPostsCommand
               protected blogsRepository : BlogsRepository,
               protected postsRepository : PostsRepository) {}
   async execute (command : UpdatePostPostsCommand) : Promise<boolean>{
-    const userId : number = await this.jwtService.getUserIdByToken(command.token)
+    const userId : string = await this.jwtService.getUserIdByToken(command.token)
     const blog : BlogModel[] = await this.blogsRepository.getFullBlog(command.post.blogId)
     if (blog.length ===0 ) throw new NotFoundException()
     if (blog[0].userId !== userId) throw new ForbiddenException()

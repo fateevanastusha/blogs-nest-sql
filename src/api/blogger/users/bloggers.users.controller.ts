@@ -14,7 +14,7 @@ export class BloggersUsersController {
   @HttpCode(204)
   @UseGuards(CheckIfUserExist)
   @Put(':userId/ban')
-  async BanUserForBlog(@Param('userId') userId : number,
+  async BanUserForBlog(@Param('userId') userId : string,
                        @Body() banInfo : BanUserForBlogDto,
                        @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
@@ -25,7 +25,7 @@ export class BloggersUsersController {
   @HttpCode(200)
   @UseGuards(CheckIfUserExist)
   @Get('blog/:blogId')
-  async GetAllBannedUsersForBlog(@Param('blogId') blogId : number,
+  async GetAllBannedUsersForBlog(@Param('blogId') blogId : string,
                                  @Req() req: Request,
                                  @Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,

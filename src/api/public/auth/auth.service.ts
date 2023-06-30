@@ -32,7 +32,7 @@ export class AuthService {
     //CREATE DEVICE ID
     const deviceId : string = (+new Date()).toString();
     //GET USER ID
-    const userId : number = user.id;
+    const userId : string = user.id;
     //GET TOKENS
     const refreshToken : RefreshToken = await this.jwtService.createJWTRefresh(userId, deviceId);
     const accessToken = await this.jwtService.createJWTAccess(userId)
@@ -73,7 +73,7 @@ export class AuthService {
     const session : RefreshTokensMetaModel | null = await this.securityRepository.findSessionByIp(ip)
     if (!session) return null
     const deviceId : string = session.deviceId
-    const userId : number = await this.jwtService.getUserIdByToken(refreshToken)
+    const userId : string = await this.jwtService.getUserIdByToken(refreshToken)
     const user = await this.usersService.getUser(userId)
     if (user === null) return null
     const accessToken : AccessToken = await this.jwtService.createJWTAccess(userId)
@@ -95,7 +95,7 @@ export class AuthService {
   //GET USER BY TOKEN
 
   async getUserByToken (token : string) : Promise<UserModel | null> {
-    const userId : number = await this.jwtService.getUserIdByToken(token)
+    const userId : string = await this.jwtService.getUserIdByToken(token)
     const user : UserModel[] = await this.usersService.getUser(userId)
     if(user.length > 0) return user[0]
     return null

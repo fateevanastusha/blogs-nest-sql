@@ -7,7 +7,7 @@ import { BlogsRepository } from "../../public/blogs/blogs.repository";
 
 
 export class UpdateBlogBlogsCommand {
-  constructor(public blog : BlogDto,public blogId: number,public token : string) {}
+  constructor(public blog : BlogDto,public blogId: string,public token : string) {}
 }
 @CommandHandler(UpdateBlogBlogsCommand)
 export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogBlogsCommand>{

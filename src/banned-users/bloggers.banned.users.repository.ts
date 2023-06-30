@@ -19,7 +19,7 @@ export class BannedUsersRepository {
     if(ban.length === 0) return false
     return true
   }
-  async unbanUser(blogId : number, userId : number) : Promise<boolean>{
+  async unbanUser(blogId : string, userId : string) : Promise<boolean>{
     await this.dataSource.query(`
     DELETE FROM public."BannedForBlogUser"
         WHERE "blogId" = ${blogId} AND "userId" = ${userId};
@@ -32,7 +32,7 @@ export class BannedUsersRepository {
     if(ban.length > 0) return false
     return true
   }
-  async getBannedUsersCount(blogId : number) : Promise<number>{
+  async getBannedUsersCount(blogId : string) : Promise<number>{
     const count = await this.dataSource.query(`
         SELECT COUNT(*) AS "total"
           FROM public."BannedForBlogUser"
@@ -40,7 +40,7 @@ export class BannedUsersRepository {
     `)
     return +count[0].total
   }
-  async findBan(userId : number, blogId : number) : Promise <boolean>{
+  async findBan(userId : string, blogId : string) : Promise <boolean>{
     const ban = await this.dataSource.query(`
       SELECT *
         FROM public."BannedForBlogUser"
@@ -48,11 +48,5 @@ export class BannedUsersRepository {
     `)
     if(ban.length > 0) return true
     return false
-  }
-  async deleteAllData(){
-    this.dataSource.query(`
-    DELETE FROM public."BannedForBlogUser"
-    `)
-    return true
   }
 }

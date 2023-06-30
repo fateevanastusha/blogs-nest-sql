@@ -133,7 +133,7 @@ export class AuthController {
       const currentUser = {
         email: user.email,
         login : user.login,
-        userId : user.id
+        userId : user.id + ''
       }
       return currentUser
     } else {

@@ -81,7 +81,7 @@ export class BloggersController {
   }
   @UseGuards(CheckIfUserExist)
   @Post(':id/posts')
-  async createPost(@Param('id') blogId : number,
+  async createPost(@Param('id') blogId : string,
                    @Body() post : PostsBlogDto,
                    @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
@@ -101,7 +101,7 @@ export class BloggersController {
   @Put(':id')
   async updateBlog(
     @Body() blog : BlogDto,
-    @Param('id') blogId : number,
+    @Param('id') blogId : string,
     @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
     return await this.commandBus.execute(new UpdateBlogBlogsCommand(blog, blogId, token))
@@ -111,8 +111,8 @@ export class BloggersController {
   @UseGuards(CheckIfUserExist)
   @Put(':blogId/posts/:postId')
   async updatePost(
-    @Param('blogId') blogId : number,
-    @Param('postId') postId : number,
+    @Param('blogId') blogId : string,
+    @Param('postId') postId : string,
     @Body() post : PostsBlogDto,
     @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
@@ -122,7 +122,7 @@ export class BloggersController {
   @HttpCode(204)
   @UseGuards(CheckIfUserExist)
   @Delete(':id')
-  async deleteBlog(@Param('id') blogId : number,
+  async deleteBlog(@Param('id') blogId : string,
                    @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
     return await this.commandBus.execute(new DeleteBlogBlogsCommand(blogId, token))
@@ -130,8 +130,8 @@ export class BloggersController {
   }
   @UseGuards(CheckIfUserExist)
   @Delete(':blogId/posts/:postId')
-  async deletePost(@Param('blogId') blogId : number,
-                   @Param('postId') postId : number,
+  async deletePost(@Param('blogId') blogId : string,
+                   @Param('postId') postId : string,
                    @Res() res : Response,
                    @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]

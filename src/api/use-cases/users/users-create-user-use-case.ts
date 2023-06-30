@@ -12,7 +12,7 @@ export class CreateUserUsersCommand {
 @CommandHandler(CreateUserUsersCommand)
 export class CreateUserUseCase implements ICommandHandler<CreateUserUsersCommand>{
   constructor( protected usersRepository : UsersRepository, protected businessService : BusinessService) {}
-  async execute (command : CreateUserUsersCommand) : Promise<UserViewModel | null>{
+  async execute (command : CreateUserUsersCommand) : Promise<UserViewModel>{
     let confirmationCode : string = (+new Date()).toString()
     const hash = bcrypt.hashSync(command.user.password, 10, )
     const newUser : UserModelCreate =  {

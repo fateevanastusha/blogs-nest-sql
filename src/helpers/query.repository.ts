@@ -49,7 +49,7 @@ export class QueryRepository {
         OFFSET ${skipSize} LIMIT ${query.pageSize};
     `)
   }
-  async paginationForBlogsWithUser(query : QueryModelBlogs, userId : number) : Promise <BlogViewModel[]> {
+  async paginationForBlogsWithUser(query : QueryModelBlogs, userId : string) : Promise <BlogViewModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.dataSource.query(`
     SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
@@ -68,7 +68,7 @@ export class QueryRepository {
         OFFSET ${skipSize} LIMIT ${query.pageSize};
     `)
   }
-  async paginatorForPostsWithBlog(query : QueryModelBlogs | QueryModelPosts, id : number): Promise<PostModel[]> {
+  async paginatorForPostsWithBlog(query : QueryModelBlogs | QueryModelPosts, id : string): Promise<PostModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.dataSource.query(`
     SELECT "id", "title", "shortDescription", "content", "blogName", "createdAt", "blogId"
@@ -78,7 +78,7 @@ export class QueryRepository {
         OFFSET ${skipSize} LIMIT ${query.pageSize};
     `)
   }
-  async paginatorForCommentsByPostId(query : QueryCommentsUsers, postId : number): Promise<CommentModel[]> {
+  async paginatorForCommentsByPostId(query : QueryCommentsUsers, postId : string): Promise<CommentModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.dataSource.query(`
       SELECT c.*
@@ -89,7 +89,7 @@ export class QueryRepository {
         OFFSET ${skipSize} LIMIT ${query.pageSize};
     `)
   }
-  async paginatorForCommentsByBlogOwner(query : QueryCommentsUsers, userId : number): Promise<CommentModel[]> {
+  async paginatorForCommentsByBlogOwner(query : QueryCommentsUsers, userId : string): Promise<CommentModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.dataSource.query(`
     SELECT *
@@ -99,7 +99,7 @@ export class QueryRepository {
         OFFSET ${skipSize} LIMIT ${query.pageSize};
     `)
   }
-  async paginationForBlogBannedUsers(query: QueryModelBannedUsersForBlog, blogId : number): Promise<BannedUserInfo[]> {
+  async paginationForBlogBannedUsers(query: QueryModelBannedUsersForBlog, blogId : string): Promise<BannedUserInfo[]> {
     const skipSize: number = query.pageSize * (query.pageNumber - 1)
     return this.dataSource.query(`
       SELECT *
@@ -140,18 +140,18 @@ export class QueryRepository {
     }
   }
 
-  async commentsMappingWithUser(comments : CommentModel[], userId : number){
+  async commentsMappingWithUser(comments : CommentModel[], userId : string){
     return await Promise.all(
       comments.map(async (comment) => {
         let likesInfo = await this.likesRepository.getLikesInfoWithUser(userId, comment.id)
         return {
           commentatorInfo : {
-            userId : comment.userId,
+            userId : comment.userId + '',
             userLogin : comment.userLogin
           },
           content : comment.content,
           createdAt : comment.createdAt,
-          id : comment.id,
+          id : comment.id + '',
           likesInfo : { ...likesInfo[0] }
         }
       })
@@ -164,12 +164,12 @@ export class QueryRepository {
         let likesInfo = (await this.likesRepository.getLikesInfo(comment.id))[0]
         return {
           commentatorInfo : {
-            userId : comment.userId,
+            userId : comment.userId + '',
             userLogin : comment.userLogin
           },
           content : comment.content,
           createdAt : comment.createdAt,
-          id : comment.id,
+          id : comment.id + '',
           likesInfo : {
             likesCount : likesInfo.likesCount,
             dislikesCount : likesInfo.dislikesCount,
@@ -180,7 +180,7 @@ export class QueryRepository {
     )
   }
 
-  async postsMapping(posts : PostModel[], userId : number) {
+  async postsMapping(posts : PostModel[], userId : string) {
     return await Promise.all(
       posts.map(async (post) => {
         let newestLikes = await this.likesRepository.getLastLikes(post.id)
@@ -190,11 +190,11 @@ export class QueryRepository {
           if (status) status = status.status
         }
         return {
-          id: post.id,
+          id: post.id + '',
           title: post.title,
           shortDescription: post.shortDescription,
           content: post.content,
-          blogId: post.blogId,
+          blogId: post.blogId + '',
           blogName: post.blogName,
           createdAt: post.createdAt,
           extendedLikesInfo: {

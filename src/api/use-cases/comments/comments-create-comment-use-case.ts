@@ -12,7 +12,7 @@ import { BlogsRepository } from "../../public/blogs/blogs.repository";
 import { BannedUsersRepository } from "../../../banned-users/bloggers.banned.users.repository";
 
 export class CreateCommentCommentsCommand {
-  constructor(public postId : number,public content : string,public token : string) {
+  constructor(public postId : string,public content : string,public token : string) {
   }
 }
 
@@ -53,10 +53,10 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommen
     if (!createdComment) throw new UnauthorizedException()
 
     const mappedComment : CommentViewModel = {
-      "id": createdComment.id,
+      "id": createdComment.id + '',
       "content": createdComment.content,
       "commentatorInfo": {
-        "userId": createdComment.userId,
+        "userId": createdComment.userId + '',
         "userLogin": createdComment.userLogin
       },
       "createdAt": createdComment.createdAt,

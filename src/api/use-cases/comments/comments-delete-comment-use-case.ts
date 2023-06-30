@@ -3,7 +3,7 @@ import { CommentsRepository } from "../../public/comments/comments.repository";
 import { NotFoundException } from "@nestjs/common";
 
 export class DeleteCommentCommentsCommand {
-  constructor(public commentId : number) {}
+  constructor(public commentId : string) {}
 }
 @CommandHandler(DeleteCommentCommentsCommand)
 export class DeleteCommentUseCase implements ICommandHandler<DeleteCommentCommentsCommand>{

@@ -3,7 +3,7 @@ import { CommentsRepository } from "../../public/comments/comments.repository";
 import { NotFoundException } from "@nestjs/common";
 
 export class UpdateCommentCommentsCommand {
-  constructor(public content : string,public commentId : number) {}
+  constructor(public content : string,public commentId : string) {}
 }
 @CommandHandler(UpdateCommentCommentsCommand)
 export class UpdateCommentUseCase implements ICommandHandler<UpdateCommentCommentsCommand>{

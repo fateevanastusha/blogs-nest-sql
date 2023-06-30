@@ -25,6 +25,7 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogBlogsCommand
       userLogin: user[0].login
     }
     const result = await this.blogsRepository.createBlog(newBlog)
+    result[0].id = result[0].id + ''
     return result[0];
   }
 }

@@ -9,7 +9,7 @@ import { LikeViewModel } from "../../../likes/likes.schema";
 import { LikesRepository } from "../../../likes/likes.repository";
 
 export class GetPostPostsCommand {
-  constructor(public postId: number, public header : string) {
+  constructor(public postId: string, public header : string) {
   }
 }
 
@@ -28,26 +28,33 @@ export class GetPostUseCase implements ICommandHandler<GetPostPostsCommand>{
     let likesInfo : LikesInfo;
     if(command.header){
       const token = command.header.split(" ")[1];
-      const userId : number = await this.jwtService.getUserIdByToken(token);
+      const userId : string = await this.jwtService.getUserIdByToken(token);
       likesInfo = (await this.likesRepository.getLikesInfoWithUser(userId, command.postId))[0];
     }
     else {
       likesInfo = (await this.likesRepository.getLikesInfo(command.postId))[0];
     };
     const newestLikes : LikeViewModel[] = await this.likesRepository.getLastLikes(command.postId);
+    const mappedNewestLikes : LikeViewModel[] = newestLikes.map(a => {
+      return {
+        addedAt : a.addedAt,
+        login : a.login,
+        userId : a.userId + ''
+      }
+    })
     const mappedPost : PostViewModel = {
-      id : post.id,
+      id : post.id + '',
       title : post.title,
       shortDescription : post.shortDescription,
       content : post.content,
-      blogId : post.blogId,
+      blogId : post.blogId + '',
       blogName : post.blogName,
       createdAt : post.createdAt,
       extendedLikesInfo : {
         likesCount : likesInfo.likesCount,
         dislikesCount : likesInfo.dislikesCount,
         myStatus : likesInfo.myStatus,
-        newestLikes : newestLikes
+        newestLikes : mappedNewestLikes
       }
     };
     return mappedPost;

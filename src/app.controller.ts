@@ -56,7 +56,7 @@ export class AppController{
       description: blog.description,
       websiteUrl: blog.websiteUrl,
       createdAt: new Date().toISOString(),
-      userId: 1,
+      userId: '1',
       userLogin: 'userLogin'
     }
     const createdBlog : BlogViewModel[] = await this.blogsRepository.createBlog(newBlog)
