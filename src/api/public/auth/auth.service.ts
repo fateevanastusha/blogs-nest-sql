@@ -6,7 +6,7 @@ import { AccessToken, RefreshToken, RefreshTokensMetaModel, TokenList } from "..
 import { SecurityRepository } from "../security/security.repository";
 import { UserModel } from "../../superadmin/users/users.schema";
 import { BusinessService } from "../../../business.service";
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 @Injectable()
 export class AuthService {
   constructor(
@@ -23,12 +23,12 @@ export class AuthService {
   async authRequest (password : string, ip : string, loginOrEmail : string, title : string) : Promise<TokenList | null> {
     //CHECK FOR CORRECT PASSWORD
     const status : boolean = await this.authRepository.authRequest(loginOrEmail, password)
-    if (!status) return null
+    if (!status) throw new UnauthorizedException()
     //CHECK FOR USER
     const user : UserModel = await this.usersRepository.returnUserByField(loginOrEmail);
-    if (!user) return null;
+    if (!user) throw new UnauthorizedException();
     const isBanned = user.isBanned
-    if(isBanned === true) return null
+    if(isBanned === true) throw new UnauthorizedException()
     //CREATE DEVICE ID
     const deviceId : string = (+new Date()).toString();
     //GET USER ID
@@ -38,7 +38,7 @@ export class AuthService {
     const accessToken = await this.jwtService.createJWTAccess(userId)
     //GET DATE
     const date : string | null = await this.jwtService.getRefreshTokenDate(refreshToken.refreshToken)
-    if (!date) return null
+    if (!date) throw new UnauthorizedException()
     //CREATE REFRESH TOKENS META
     const refreshTokenMeta : RefreshTokensMetaModel = {
       userId : userId,

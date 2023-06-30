@@ -111,7 +111,7 @@ export class UsersRepository {
         FROM public."Users"
         WHERE "confirmedCode" = '${emailOrCode}' OR "email" = '${emailOrCode}'
     `)
-    return user.isConfirmed
+    return user[0].isConfirmed
   }
   async changeUserPassword(code : string, password : string) : Promise <boolean> {
     const user = await this.returnUserByField(code)

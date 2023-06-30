@@ -1107,7 +1107,7 @@ describe('AppController (e2e)', () => {
 
   it('BLOGGER ban user for blog', async () => {
     res = await request(server)
-      .put('/blogger/users/' + '0' + '/ban')
+      .put('/blogger/users/' + 'husadasdasd' + '/ban')
       .auth(token_1.body.accessToken, {type : 'bearer'})
       .send({
         "isBanned": true,

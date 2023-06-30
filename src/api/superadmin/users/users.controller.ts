@@ -64,7 +64,7 @@ export class UsersController{
   @Delete(':id')
   async deleteUser(@Param('id') userId : string){
     const status : boolean = await this.commandBus.execute(
-      new DeleteUserUsersCommand(userId)
+      new DeleteUserUsersCommand(+userId+ '')
     )
     if (!status) throw new NotFoundException()
     return

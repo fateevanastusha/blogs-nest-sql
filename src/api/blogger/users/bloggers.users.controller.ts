@@ -18,7 +18,7 @@ export class BloggersUsersController {
                        @Body() banInfo : BanUserForBlogDto,
                        @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    const status : boolean = await this.usersService.BanUserForBlog(token, userId, banInfo)
+    const status : boolean = await this.usersService.BanUserForBlog(token, +userId + '', banInfo)
     if(!status) throw new NotFoundException()
     return
   }
