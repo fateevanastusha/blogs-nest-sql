@@ -1649,6 +1649,40 @@ describe('AppController (e2e)', () => {
     await request(server)
       .get('/posts/' + createResponsePost_1.body.id)
       .expect(200)
+    res = await request(server)
+      .get('/sa/users?searchLoginTerm=na&sortDirection=asc&sortBy=login&pageSize=15&pageNumber=1&&searchEmailTerm=.ru')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      "page": 1,
+      "pageSize": 15,
+      "pagesCount": 1,
+      "totalCount": 2,
+      "items": [
+        {
+          "banInfo": {
+            "banDate": null,
+            "banReason": null,
+            "isBanned": false
+          },
+          "createdAt":  expect.any(String),
+          "email":  expect.any(String),
+          "id":  expect.any(String),
+          "login": 'alina28'
+        },
+        {
+          "banInfo": {
+            "banDate": null,
+            "banReason": null,
+            "isBanned": false
+          },
+          "createdAt":  expect.any(String),
+          "email":  expect.any(String),
+          "id":  expect.any(String),
+          "login": 'nastya1'
+        }
+      ]
+    })
   })
   afterAll(async () => {
     /*await request(server)

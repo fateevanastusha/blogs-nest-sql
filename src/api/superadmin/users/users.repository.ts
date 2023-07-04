@@ -12,20 +12,13 @@ export class UsersRepository {
       count = await this.dataSource.query(`
       SELECT COUNT(*) AS "total"
       FROM public."Users"
-      WHERE (("login" LIKE '%' || CASE WHEN '${searchLoginTerm}' = '' THEN '' ELSE '${searchLoginTerm}' END || '%'
-             OR '${searchLoginTerm}' = '')
-        OR ("email" LIKE '%' || CASE WHEN '${searchEmailTerm}' = '' THEN '' ELSE '${searchEmailTerm}' END || '%'
-             OR '${searchEmailTerm}' = ''))
+      WHERE "login" LIKE '%${searchLoginTerm}%' AND "email" LIKE '%${searchEmailTerm}%'
     `);
     } else {
       count = await this.dataSource.query(`
       SELECT COUNT(*) AS "total"
       FROM public."Users"
-      WHERE (("login" LIKE '%' || CASE WHEN '${searchLoginTerm}' = '' THEN '' ELSE '${searchLoginTerm}' END || '%'
-             OR '${searchLoginTerm}' = '')
-        OR ("email" LIKE '%' || CASE WHEN '${searchEmailTerm}' = '' THEN '' ELSE '${searchEmailTerm}' END || '%'
-             OR '${searchEmailTerm}' = ''))
-        AND "isBanned" = ${banStatus}
+      WHERE "login" LIKE '%${searchLoginTerm}%' AND "email" LIKE '%${searchEmailTerm}%'AND "isBanned" = ${banStatus}
     `);
     }
     return Number(count[0].total);
