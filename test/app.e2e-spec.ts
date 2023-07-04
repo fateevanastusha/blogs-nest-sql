@@ -233,6 +233,12 @@ describe('AppController (e2e)', () => {
       ]
     })
   })
+  it ('SA can not delete 1 user', async  () => {
+    await request(server)
+      .delete('/sa/users/' + 'notid')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .expect(404)
+  })
   it ('SA delete 1 user', async  () => {
     await request(server)
       .delete('/sa/users/' + createResponseUser_1.body.id)
