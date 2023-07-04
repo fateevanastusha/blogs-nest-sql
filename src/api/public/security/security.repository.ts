@@ -33,7 +33,7 @@ export class SecurityRepository {
         VALUES ('${refreshTokensMeta.ip}', '${refreshTokensMeta.title}', '${refreshTokensMeta.lastActiveDate}', '${refreshTokensMeta.deviceId}', ${refreshTokensMeta.userId});
     `)
     const createdSession = await this.findSessionByIp(refreshTokensMeta.ip);
-    if (createdSession) return true;
+    if (createdSession[0]) return true;
     return false;
   }
   async findSessionByIp(ip : string) : Promise<RefreshTokensMetaModel | null> {
