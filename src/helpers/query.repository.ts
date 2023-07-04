@@ -115,7 +115,7 @@ export class QueryRepository {
       return this.dataSource.query(`
         SELECT "id", "email", "login", "createdAt", "isBanned", "banDate", "banReason"
             FROM public."Users"
-            WHERE "login" LIKE '%${query.searchLoginTerm}%' OR "email" LIKE '%${query.searchEmailTerm}%' 
+            WHERE "login" ILIKE '%${query.searchLoginTerm}%' OR "email" ILIKE '%${query.searchEmailTerm}%' 
             ORDER BY "${query.sortBy}" ${query.sortDirection}
             OFFSET ${skipSize} LIMIT ${query.pageSize};
         `)
@@ -124,7 +124,7 @@ export class QueryRepository {
       return this.dataSource.query(`
         SELECT "id", "email", "login", "createdAt", "isBanned", "banDate", "banReason"
             FROM public."Users"
-            WHERE ("login" LIKE '%${query.searchLoginTerm}%' OR "email" LIKE '%${query.searchEmailTerm}%') AND "isBanned" = ${query.banStatus}
+            WHERE ("login" ILIKE '%${query.searchLoginTerm}%' OR "email" ILIKE '%${query.searchEmailTerm}%') AND "isBanned" = ${query.banStatus}
             ORDER BY "${query.sortBy}" ${query.sortDirection}
             OFFSET ${skipSize} LIMIT ${query.pageSize};
         `)
