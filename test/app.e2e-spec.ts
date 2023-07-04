@@ -525,8 +525,8 @@ describe('AppController (e2e)', () => {
     await request(server)
       .post('/auth/login')
       .send({
-        loginOrEmail : 'fateevanastushatest@yandex.ru',
-        password : 'WRONG PASSWORD'
+        loginOrEmail : 'WRONG EMAIL',
+        password : ''
       })
       .expect(401)
 
