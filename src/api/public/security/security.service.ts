@@ -1,7 +1,7 @@
 import { SecurityRepository } from "./security.repository";
 import { JwtService } from "../../../jwt.service";
 import { RefreshTokensMetaModel } from "./security.schema";
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 @Injectable()
 export class SecurityService {
   constructor(protected securityRepository : SecurityRepository,
@@ -16,9 +16,9 @@ export class SecurityService {
   }
   async deleteAllSessions(refreshToken : string) : Promise<boolean> {
     const idList = await this.jwtService.getIdByRefreshToken(refreshToken)
-    if(!idList) throw new NotFoundException()
+    if(!idList) throw new UnauthorizedException()
     const status : boolean = await this.securityRepository.deleteAllSessions(idList.deviceId, idList.userId)
-    if(!status) throw new NotFoundException()
+    if(!status) throw new UnauthorizedException()
     return true
   }
   async deleteOneSession(deviceId : string) : Promise<boolean> {
