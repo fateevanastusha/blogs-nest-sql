@@ -6,13 +6,13 @@ import { settings } from "./settings";
 @Injectable()
 export class JwtService {
   async createJWTAccess (userId : string) : Promise <AccessToken>{
-    const accessToken = jwt.sign({ userId : userId }, settings.JWT_SECRET, { expiresIn: '10s' })
+    const accessToken = jwt.sign({ userId : userId }, settings.JWT_SECRET, { expiresIn: '15s' })
     return {
       accessToken : accessToken
     }
   }
   async createJWTRefresh (userId : string, deviceId: string) : Promise <RefreshToken>{
-    const refreshToken = jwt.sign({ userId : userId, deviceId: deviceId }, settings.JWT_SECRET, { expiresIn: '20s' })
+    const refreshToken = jwt.sign({ userId : userId, deviceId: deviceId }, settings.JWT_SECRET, { expiresIn: '25s' })
     return {
       refreshToken : refreshToken
     }
