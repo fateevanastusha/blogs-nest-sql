@@ -131,7 +131,7 @@ export class CheckForSameUser implements CanActivate {
     const userId = await this.jwtService.getIdByRefreshToken(refreshToken);
     if (!userId) throw new UnauthorizedException();
     if (!req.cookies.refreshToken) throw new UnauthorizedException()
-    if(userId.userId !== session.userId) throw new ForbiddenException()
+    if(userId.userId !== Number(session.userId)) throw new ForbiddenException()
     return true
 
   }

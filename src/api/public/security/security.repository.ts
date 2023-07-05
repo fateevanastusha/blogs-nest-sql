@@ -20,6 +20,11 @@ export class SecurityRepository {
     return true
   }
   async deleteOneSessions(deviceId : string) : Promise<boolean> {
+    const status = await this.dataSource.query(`
+      SELECT * FROM public."RefreshTokens"
+          WHERE "deviceId" = '${deviceId}';
+    `)
+    if (status.length === 0) return false
     await this.dataSource.query(`
     DELETE FROM public."RefreshTokens"
         WHERE "deviceId" = '${deviceId}';
