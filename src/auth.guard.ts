@@ -127,8 +127,8 @@ export class CheckForSameUser implements CanActivate {
     if (isTokenBlocked) throw new UnauthorizedException();
     const tokenList = await this.jwtService.getIdByRefreshToken(refreshToken);
     if (!tokenList) throw new UnauthorizedException();
-    const session: RefreshTokensMetaModel[] = await this.securityRepository.findSessionByDeviceId(tokenList.deviceId);
-    if (session.length === 0 ) throw new UnauthorizedException();
+    const session: RefreshTokensMetaModel[] = await this.securityRepository.findSessionByDeviceId(req.params.id);
+    if (session.length === 0 ) throw new NotFoundException();
     const userId = await this.jwtService.getIdByRefreshToken(refreshToken);
     if (!userId) throw new UnauthorizedException();
     if (!req.cookies.refreshToken) throw new UnauthorizedException()
