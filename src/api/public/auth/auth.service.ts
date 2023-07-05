@@ -68,18 +68,18 @@ export class AuthService {
 
   //CREATE NEW TOKENS
 
-  async createNewToken (refreshToken : string, ip : string, title : string) : Promise<TokenList | null> {
+  async createNewToken (refreshToken : string, ip : string, title : string) : Promise<TokenList> {
     await this.authRepository.addRefreshTokenToBlackList(refreshToken)
     const session : RefreshTokensMetaModel | null = await this.securityRepository.findSessionByIp(ip)
-    if (!session) return null
+    if (!session[0]) throw new UnauthorizedException()
     const deviceId : string = session.deviceId
     const userId : string = await this.jwtService.getUserIdByToken(refreshToken)
     const user = await this.usersService.getUser(userId)
-    if (user === null) return null
+    if (user[0] === null) throw new UnauthorizedException()
     const accessToken : AccessToken = await this.jwtService.createJWTAccess(userId)
     const newRefreshToken : RefreshToken = await this.jwtService.createJWTRefresh(userId, deviceId)
     const date : string | null = await this.jwtService.getRefreshTokenDate(newRefreshToken.refreshToken)
-    if (!date) return null
+    if (!date) throw new UnauthorizedException()
     await this.securityRepository.updateSession(ip, title, date, deviceId)
     return {
       accessToken : accessToken.accessToken,

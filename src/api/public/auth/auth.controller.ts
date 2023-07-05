@@ -33,7 +33,7 @@ export class AuthController {
       let token: AccessToken = {
         accessToken: tokenList.accessToken
       }
-      res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: true, secure: true})
+      res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: false, secure: false})
       res.send(token)
       return
     } throw new UnauthorizedException()
@@ -104,17 +104,10 @@ export class AuthController {
   async refreshTokenRequest(@Req() req: any,
                             @Res() res: any){
     const title = req.headers["user-agent"] || "unknown"
-    const tokenList: TokenList | null = await this.authService.createNewToken(req.cookies.refreshToken, req.ip, title)
-    if (tokenList) {
-      let token: AccessToken = {
-        accessToken: tokenList.accessToken
-      }
-      res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: true, secure: true})
-      res.send(token)
-    } else {
-      throw new UnauthorizedException()
-      return
-    }
+    const tokenList: TokenList = await this.authService.createNewToken(req.cookies.refreshToken, req.ip, title)
+    let token: AccessToken = { accessToken: tokenList.accessToken }
+    res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: false, secure: false})
+    res.send(token)
   }
   @Get('/me')
   async getInformation(@Req() req: any){

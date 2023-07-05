@@ -553,6 +553,12 @@ describe('AppController (e2e)', () => {
       login : 'nastya1',
       userId : expect.any(String)
     })
+    res = await request(server)
+      .post('/auth/refresh-token/')
+      .set('Cookie', token_1.header['set-cookie'][0].split(';')[0])
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.header['set-cookie'][0].split(';')[0]).toBeDefined()
   })
   it('timer ', async () => {
     await new Promise((resolve) => setTimeout(resolve, 10000));

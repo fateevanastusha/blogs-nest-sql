@@ -20,7 +20,7 @@ export class AuthRepository {
   async checkRefreshToken(refreshToken : string) : Promise <boolean> {
     const status : RefreshToken | null =  await this.dataSource.query(`
     SELECT "refreshToken" FROM public."BlockedRefreshTokens" WHERE "refreshToken"='${refreshToken}'`)
-    if (status) return true
+    if (status[0]) return true
     return false
   }
   async addRefreshTokenToBlackList(refreshToken : string) : Promise <boolean> {
