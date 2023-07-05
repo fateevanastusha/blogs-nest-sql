@@ -57,11 +57,10 @@ export class AuthService {
   }
   async logoutRequest (refreshToken : string) : Promise<boolean> {
     //ADD REFRESH TO BLACK LIST
-    const statusBlackList : boolean = await this.addRefreshTokenToBlackList(refreshToken)
-    if (!statusBlackList) return false
+    await this.addRefreshTokenToBlackList(refreshToken)
     //GET USER ID AND DEVICE ID BY REFRESH TOKEN
     const idList = await this.jwtService.getIdByRefreshToken(refreshToken)
-    if (!idList) return false
+    if (!idList) throw new UnauthorizedException()
     return await this.securityRepository.deleteOneSessions(idList.deviceId)
 
   }

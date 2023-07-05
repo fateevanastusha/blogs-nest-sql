@@ -91,12 +91,8 @@ export class AuthController {
   @Post('/logout')
   async logoutRequest(@Req() req: any){
     const status : boolean = await this.authService.logoutRequest(req.cookies.refreshToken)
-    if (status) {
-      return
-    } else {
-      throw new UnauthorizedException()
-      return
-    }
+    if (!status) throw new UnauthorizedException()
+    return
   }
   @HttpCode(200)
   @UseGuards(CheckForRefreshToken)

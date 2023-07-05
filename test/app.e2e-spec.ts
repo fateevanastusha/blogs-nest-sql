@@ -1755,6 +1755,14 @@ describe('AppController (e2e)', () => {
         "title": "unknown"
       }
     ])
+    await request(server)
+      .post('/auth/logout')
+      .set('Cookie', token_1.header['set-cookie'][0].split(';')[0])
+      .expect(204)
+    await request(server)
+      .get('/security/devices')
+      .set('Cookie', token_1.header['set-cookie'][0].split(';')[0])
+      .expect(401)
   })
   afterAll(async () => {
     /*await request(server)
