@@ -14,7 +14,7 @@ export class SecurityRepository {
   }
   async deleteAllSessions(deviceId : string, userId : string) : Promise<boolean> {
     await this.dataSource.query(`
-    DELETE FROM refresh_tokens_meta
+    DELETE FROM public."RefreshTokens"
         WHERE "userId" = ${userId} AND NOT ("deviceId" = '${deviceId}')
     `)
     return true
@@ -62,14 +62,5 @@ export class SecurityRepository {
         WHERE "deviceId"='${deviceId}';
     `)
     return true
-  }
-  async checkSameDevice(title : string, userId : string) : Promise<boolean> {
-    const result = await this.dataSource.query(`
-        SELECT *
-        FROM public."RefreshTokens"
-        WHERE "title" = '${title}' AND "userId" = ${userId}
-    `)
-    if (result.length === 0) return true
-    return false
   }
 }

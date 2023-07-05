@@ -8,10 +8,11 @@ export class SecurityService {
               protected jwtService : JwtService) {}
   async getAllSessions(refreshToken : string) : Promise<RefreshTokensMetaModel[] | null> {
     const idList = await this.jwtService.getIdByRefreshToken(refreshToken)
-    if(!idList) return null
+    console.log(idList);
+    if(!idList) throw new NotFoundException();
     const userId = idList.userId
     const sessions : RefreshTokensMetaModel[] | null = await this.securityRepository.getAllSessions(userId)
-    if (!sessions) throw new NotFoundException();
+    if (sessions.length === 0) throw new NotFoundException();
     return sessions
   }
   async deleteAllSessions(refreshToken : string) : Promise<boolean> {

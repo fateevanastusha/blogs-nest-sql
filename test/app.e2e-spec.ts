@@ -1696,6 +1696,63 @@ describe('AppController (e2e)', () => {
       ]
     })
   })
+  it ('PUBLIC SECURITY check for devices', async () => {
+    token_1 = await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'fateevanastushatest@yandex.ru',
+        password : 'qwerty11'
+      })
+      .expect(200)
+    await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'fateevanastushatest@yandex.ru',
+        password : 'qwerty11'
+      })
+      .expect(200)
+    res = await request(server)
+      .get('/security/devices')
+      .set('Cookie', token_1.header['set-cookie'][0].split(';')[0])
+      .expect(200)
+    expect(res.body).toStrictEqual([
+      {
+        "deviceId": expect.any(String),
+        "ip": "::ffff:127.0.0.1",
+        "lastActiveDate": expect.any(String),
+        "title": "unknown"
+      },
+      {
+        "deviceId": expect.any(String),
+        "ip": "::ffff:127.0.0.1",
+        "lastActiveDate": expect.any(String),
+        "title": "unknown"
+      },
+      {
+        "deviceId": expect.any(String),
+        "ip": "::ffff:127.0.0.1",
+        "lastActiveDate": expect.any(String),
+        "title": "unknown"
+      }
+    ])
+    let date = res.body[2].lastActiveDate
+    await request(server)
+      .delete('/security/devices')
+      .set('Cookie', token_1.header['set-cookie'][0].split(';')[0])
+      .expect(204)
+    res = await request(server)
+      .get('/security/devices')
+      .set('Cookie', token_1.header['set-cookie'][0].split(';')[0])
+      .expect(200)
+    expect(res.body).toStrictEqual([
+      {
+        "deviceId": expect.any(String),
+        "ip": "::ffff:127.0.0.1",
+        "lastActiveDate": date,
+        "title": "unknown"
+      }
+    ])
+  })
   afterAll(async () => {
     /*await request(server)
       .delete('/testing/all-data')

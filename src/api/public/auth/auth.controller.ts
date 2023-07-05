@@ -33,7 +33,7 @@ export class AuthController {
       let token: AccessToken = {
         accessToken: tokenList.accessToken
       }
-      res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: true, secure: true})
+      res.cookie('refreshToken', tokenList.refreshToken, {httpOnly: false, secure: false})
       res.send(token)
       return
     } throw new UnauthorizedException()
