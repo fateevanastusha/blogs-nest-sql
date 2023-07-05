@@ -19,6 +19,7 @@ import { AuthService } from "./api/public/auth/auth.service";
 import { AttemptsModel } from "./attempts/attempts.schema";
 import { AttemptsRepository } from "./attempts/attempts.repository";
 import { CommentsRepository } from "./api/public/comments/comments.repository";
+import { loginURI } from './test-utils/test.strings';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -102,8 +103,8 @@ export class CheckForRefreshToken implements CanActivate {
     if (isTokenBlocked) throw new UnauthorizedException();
     const tokenList = await this.jwtService.getIdByRefreshToken(refreshToken);
     if (!tokenList) throw new UnauthorizedException();
-    const session: RefreshTokensMetaModel | null = await this.securityRepository.findSessionByDeviceId(tokenList.deviceId);
-    if (!session) throw new UnauthorizedException();
+    const session: RefreshTokensMetaModel[] = await this.securityRepository.findSessionByDeviceId(tokenList.deviceId);
+    if (session.length === 0) throw new UnauthorizedException();
     const userId = await this.jwtService.getIdByRefreshToken(refreshToken);
     if (!userId) throw new UnauthorizedException();
     return true
@@ -126,12 +127,12 @@ export class CheckForSameUser implements CanActivate {
     if (isTokenBlocked) throw new UnauthorizedException();
     const tokenList = await this.jwtService.getIdByRefreshToken(refreshToken);
     if (!tokenList) throw new UnauthorizedException();
-    const session: RefreshTokensMetaModel | null = await this.securityRepository.findSessionByDeviceId(tokenList.deviceId);
-    if (!session) throw new UnauthorizedException();
+    const session: RefreshTokensMetaModel[] = await this.securityRepository.findSessionByDeviceId(tokenList.deviceId);
+    if (session.length === 0 ) throw new UnauthorizedException();
     const userId = await this.jwtService.getIdByRefreshToken(refreshToken);
     if (!userId) throw new UnauthorizedException();
     if (!req.cookies.refreshToken) throw new UnauthorizedException()
-    if(userId.userId !== Number(session.userId)) throw new ForbiddenException()
+    if(userId.userId !== Number(session[0].userId)) throw new ForbiddenException()
     return true
 
   }
@@ -146,12 +147,12 @@ export class CheckDeviceId implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const deviceId = req.params.id;
     const session = await this.securityRepository.findSessionByDeviceId(deviceId)
-    if (!session) throw new NotFoundException()
+    if (session.length === 0) throw new NotFoundException()
     if (!req.cookies.refreshToken) throw new UnauthorizedException()
     const token = req.cookies.refreshToken
     const userId = await this.jwtService.getIdByRefreshToken(token)
     if (!userId) throw new UnauthorizedException()
-    if(userId.userId !== session.userId) throw new ForbiddenException()
+    if(userId.userId !== session[0].userId) throw new ForbiddenException()
     return true
   }
 }

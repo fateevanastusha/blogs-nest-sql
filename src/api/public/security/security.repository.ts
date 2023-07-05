@@ -48,7 +48,7 @@ export class SecurityRepository {
         WHERE "ip" = '${ip}'
     `)
   }
-  async findSessionByDeviceId(deviceId: string) : Promise<RefreshTokensMetaModel | null> {
+  async findSessionByDeviceId(deviceId: string) : Promise<RefreshTokensMetaModel[]> {
     return await this.dataSource.query(`
         SELECT *
         FROM public."RefreshTokens"

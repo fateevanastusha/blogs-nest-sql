@@ -8,7 +8,6 @@ export class SecurityService {
               protected jwtService : JwtService) {}
   async getAllSessions(refreshToken : string) : Promise<RefreshTokensMetaModel[] | null> {
     const idList = await this.jwtService.getIdByRefreshToken(refreshToken)
-    console.log(idList);
     if(!idList) throw new NotFoundException();
     const userId = idList.userId
     const sessions : RefreshTokensMetaModel[] | null = await this.securityRepository.getAllSessions(userId)

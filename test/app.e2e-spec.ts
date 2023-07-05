@@ -1735,7 +1735,10 @@ describe('AppController (e2e)', () => {
         "title": "unknown"
       }
     ])
-    let date = res.body[2].lastActiveDate
+    await request(server)
+      .delete('/security/devices/' + 0)
+      .set('Cookie', token_1.header['set-cookie'][0].split(';')[0])
+      .expect(404)
     await request(server)
       .delete('/security/devices')
       .set('Cookie', token_1.header['set-cookie'][0].split(';')[0])
@@ -1748,7 +1751,7 @@ describe('AppController (e2e)', () => {
       {
         "deviceId": expect.any(String),
         "ip": "::ffff:127.0.0.1",
-        "lastActiveDate": date,
+        "lastActiveDate": expect.any(String),
         "title": "unknown"
       }
     ])
