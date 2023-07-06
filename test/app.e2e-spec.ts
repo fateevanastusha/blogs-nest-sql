@@ -94,7 +94,7 @@ describe('AppController (e2e)', () => {
         "isBanned": false
       },
       "createdAt": expect.any(String),
-      "email": "user1@gmail.com",
+      "email": "user1@gmail.cm",
       "id": expect.any(String),
       "login": "user1"
     })
