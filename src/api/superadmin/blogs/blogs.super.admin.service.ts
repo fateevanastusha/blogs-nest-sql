@@ -46,8 +46,7 @@ export class BlogsSuperAdminService {
   async bindBlog(blogId : string, userId : string) : Promise <boolean>{
     const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
     if (user.length === 0) throw new NotFoundException()
-    const blog : BlogModel[] = await this.blogsRepository.getFullBlog(blogId)
-    if(blog.length === 0) throw new NotFoundException()
+    await this.blogsRepository.getFullBlog(blogId)
     const userInfo : BlogOwnerModel = {
       userId : userId,
       userLogin : user[0].login

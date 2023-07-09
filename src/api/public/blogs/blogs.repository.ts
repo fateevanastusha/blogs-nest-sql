@@ -2,6 +2,7 @@ import { BlogBanInfo, BlogModel, BlogOwnerModel, BlogViewModel, CreateBlogModel 
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 import { BlogDto } from "./blogs.dto";
+import { NotFoundException } from '@nestjs/common';
 
 export class BlogsRepository{
   constructor(@InjectDataSource() protected dataSource : DataSource) {}
@@ -15,12 +16,14 @@ export class BlogsRepository{
       WHERE "createdAt" = '${newBlog.createdAt}'
     `)
   }
-  async getFullBlog(blogId : string) : Promise<BlogModel[]>{
-    return this.dataSource.query(`
+  async getFullBlog(blogId : string) : Promise<BlogModel>{
+    const foundBlog = await this.dataSource.query(`
       SELECT *
       FROM public."Blogs"
       WHERE "id" = ${blogId}
     `)
+    if (foundBlog.length === 0) throw new NotFoundException()
+    return foundBlog[0]
   }
   async updateBlog(blog : BlogDto, id: string) : Promise<boolean>{
     await this.dataSource.query(`

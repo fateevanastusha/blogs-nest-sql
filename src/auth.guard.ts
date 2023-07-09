@@ -96,17 +96,30 @@ export class CheckForRefreshToken implements CanActivate {
     context: ExecutionContext
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    if(!req.cookies) throw new UnauthorizedException()
+    if(!req.cookies) {
+      console.log('no cookies');
+      throw new UnauthorizedException();
+    }
     const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) throw new UnauthorizedException();
+    if (!refreshToken) {
+      console.log('no refreshToken');
+      throw new UnauthorizedException();
+    }
     const isTokenBlocked: boolean = await this.authRepository.checkRefreshToken(refreshToken);
-    if (isTokenBlocked) throw new UnauthorizedException();
+    if (isTokenBlocked) {
+      console.log('isTokenBlocked');
+      throw new UnauthorizedException();
+    }
     const tokenList = await this.jwtService.getIdByRefreshToken(refreshToken);
-    if (!tokenList) throw new UnauthorizedException();
+    if (!tokenList) {
+      console.log('!tokenList');
+      throw new UnauthorizedException();
+    }
     const session: RefreshTokensMetaModel[] = await this.securityRepository.findSessionByDeviceId(tokenList.deviceId);
-    if (session.length === 0) throw new UnauthorizedException();
-    const userId = await this.jwtService.getIdByRefreshToken(refreshToken);
-    if (!userId) throw new UnauthorizedException();
+    if (session.length === 0) {
+      console.log('no sessions');
+      throw new UnauthorizedException();
+    }
     return true
   }
 }

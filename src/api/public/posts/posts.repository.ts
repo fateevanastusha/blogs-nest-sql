@@ -1,6 +1,6 @@
 import { CreatePostModel, PostModel } from "./posts.schema";
 import { PostsDto } from "./posts.dto";
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 
@@ -14,12 +14,14 @@ export class PostsRepository {
         FROM public."Posts";
     `)
   }
-  async getPost(id: string) : Promise<PostModel[] | []>{
-    return this.dataSource.query(`
+  async getPost(id: string) : Promise<PostModel>{
+    const post : PostModel[] = await this.dataSource.query(`
     SELECT "id", "title", "shortDescription", "content", "blogName", "createdAt", "blogId"
         FROM public."Posts"
         WHERE "id"=${id}
     `)
+    if (post.length === 0 ) throw new NotFoundException()
+    return post[0]
   }
   async deletePost(id:string) : Promise<boolean>{
     await this.dataSource.query(`
@@ -36,17 +38,19 @@ export class PostsRepository {
     `)
     return true
   }
-  async createPost(newPost: CreatePostModel) : Promise <PostModel | null>{
+  async createPost(newPost: CreatePostModel) : Promise <PostModel>{
     await this.dataSource.query(`
     INSERT INTO public."Posts"(
         "title", "shortDescription", "content", "blogName", "createdAt", "blogId")
         VALUES ('${newPost.title}','${newPost.shortDescription}','${newPost.content}','${newPost.blogName}', '${newPost.createdAt}', ${newPost.blogId});
     `)
-    return (await this.dataSource.query(`
+    const post = await this.dataSource.query(`
     SELECT *
         FROM public."Posts"
         WHERE "createdAt"='${newPost.createdAt}'
-    `))[0]
+    `)
+    if (post.length === 0) throw new BadRequestException()
+    return post[0]
   }
   async updatePost(post : PostsDto, postId : string) : Promise <boolean>{
     await this.dataSource.query(`
@@ -63,11 +67,5 @@ export class PostsRepository {
         WHERE "blogId"=${blogId}
     `)
     return +(count[0].total)
-  }
-  async deleteAllData() {
-    this.dataSource.query(`
-    DELETE FROM public."Posts"
-    `)
-    return true
   }
 }

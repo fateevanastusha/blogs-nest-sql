@@ -15,9 +15,8 @@ export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogBlogsCommand
               private blogsRepository : BlogsRepository) {}
   async execute (command : UpdateBlogBlogsCommand) : Promise<boolean>{
     const userId = await this.jwtService.getUserIdByToken(command.token);
-    const blogForUpdate : BlogModel[] = await this.blogsRepository.getFullBlog(command.blogId);
-    if (blogForUpdate.length === 0 ) throw new NotFoundException();
-    if (blogForUpdate[0].userId !== userId) throw new ForbiddenException();
+    const blogForUpdate = await this.blogsRepository.getFullBlog(command.blogId);
+    if (blogForUpdate.userId !== userId) throw new ForbiddenException();
     return await this.blogsRepository.updateBlog(command.blog, command.blogId)
   }
 }

@@ -11,9 +11,7 @@ export class GetBlogBlogsCommand {
 export class GetBlogUseCase implements ICommandHandler<GetBlogBlogsCommand>{
   constructor(private blogsRepository : BlogsRepository) {}
   async execute (command : GetBlogBlogsCommand) : Promise<BlogViewModel>{
-    const findBlog : BlogModel[] = await this.blogsRepository.getFullBlog(command.blogId);
-    if(findBlog.length === 0) throw new NotFoundException();
-    const blog : BlogModel = findBlog[0];
+    const blog = await this.blogsRepository.getFullBlog(command.blogId);
     const mappedBlog : BlogViewModel = {
       id : blog.id + '',
       name : blog.name,

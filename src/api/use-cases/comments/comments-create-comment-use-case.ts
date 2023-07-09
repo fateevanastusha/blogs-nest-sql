@@ -26,15 +26,10 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommen
               protected banRepository : BannedUsersRepository) {}
   async execute (command : CreateCommentCommentsCommand) : Promise<CommentViewModel | null>{
 
-    const foundPost = await this.postsRepository.getPost(command.postId)//astring | null
-    this.validateBlogAndPost(foundPost)
-
-
-    const foundBlog : BlogModel[] = await this.blogsRepository.getFullBlog(foundPost[0].blogId)
-    if (foundBlog.length === 0) throw new NotFoundException()
-
+    const foundPost = await this.postsRepository.getPost(command.postId)
+    const foundBlog = await this.blogsRepository.getFullBlog(foundPost.blogId)
     const userId = await this.jwtService.getUserIdByToken(command.token)
-    const status = await this.banRepository.findBan(userId, foundBlog[0].id)
+    const status = await this.banRepository.findBan(userId, foundBlog.id)
     if(status) throw new ForbiddenException()
 
     const user = await this.usersRepository.getFullUser(userId)
@@ -44,34 +39,29 @@ export class CreateCommentUseCase implements ICommandHandler<CreateCommentCommen
       postId : command.postId,
       userId : user[0].id,
       userLogin : user[0].login,
-      blogId : foundBlog[0].id,
-      blogName : foundBlog[0].name,
-      blogOwnerId : foundBlog[0].userId,
-      title : foundPost[0].title
+      blogId : foundBlog.id,
+      blogName : foundBlog.name,
+      blogOwnerId : foundBlog.userId,
+      title : foundPost.title
     }
     const createdComment = await this.commentsRepository.createNewComment(comment);
     if (!createdComment) throw new UnauthorizedException()
 
     const mappedComment : CommentViewModel = {
-      "id": createdComment.id + '',
-      "content": createdComment.content,
-      "commentatorInfo": {
-        "userId": createdComment.userId + '',
-        "userLogin": createdComment.userLogin
+      id: createdComment.id + '',
+      content: createdComment.content,
+      commentatorInfo: {
+        userId: createdComment.userId + '',
+        userLogin: createdComment.userLogin
       },
-      "createdAt": createdComment.createdAt,
-      "likesInfo": {
-        "likesCount": 0,
-        "dislikesCount": 0,
-        "myStatus": "None"
+      createdAt: createdComment.createdAt,
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: "None"
       }
     }
     return mappedComment
   }
-
-  private validateBlogAndPost (foundPost:PostModel[] | []):asserts foundPost is PostModel[] {
-  if (foundPost.length === 0 ) throw new NotFoundException()
-}
-
 
 }

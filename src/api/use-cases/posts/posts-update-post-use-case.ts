@@ -18,9 +18,8 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostPostsCommand
               protected postsRepository : PostsRepository) {}
   async execute (command : UpdatePostPostsCommand) : Promise<boolean>{
     const userId : string = await this.jwtService.getUserIdByToken(command.token)
-    const blog : BlogModel[] = await this.blogsRepository.getFullBlog(command.post.blogId)
-    if (blog.length ===0 ) throw new NotFoundException()
-    if (blog[0].userId !== userId) throw new ForbiddenException()
+    const blog = await this.blogsRepository.getFullBlog(command.post.blogId)
+    if (blog.userId !== userId) throw new ForbiddenException()
     return await this.postsRepository.updatePost(command.post,command.postId)
   }
 }

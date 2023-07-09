@@ -12,8 +12,7 @@ export class LikeCommentUseCase implements ICommandHandler<LikeCommentCommentsCo
   constructor(protected commentsRepository : CommentsRepository,
               protected likesRepository : LikesRepository) {}
   async execute (command : LikeCommentCommentsCommand) : Promise<boolean>{
-    const comment : CommentModel | null = await this.commentsRepository.getCommentById(command.commentId)
-    if (!comment) throw new NotFoundException();
+    await this.commentsRepository.getCommentById(command.commentId)
     const currentStatus = await this.likesRepository.findStatus(command.commentId, command.userId)
     const newStatus = {
       status : command.requestType,

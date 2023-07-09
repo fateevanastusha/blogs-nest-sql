@@ -15,9 +15,7 @@ import {
   Res,
   UseGuards
 } from "@nestjs/common";
-import { BloggersService } from "./bloggers.service";
 import { BlogDto, PostsBlogDto } from "../../public/blogs/blogs.dto";
-import { PostsService } from "../../public/posts/posts.service";
 import { BlogModel } from "../../public/blogs/blogs.schema";
 import { Response, Request } from "express";
 import { PostModel } from "../../public/posts/posts.schema";
@@ -29,12 +27,12 @@ import { DeletePostPostsCommand } from "../../use-cases/posts/posts-delete-post-
 import { DeleteBlogBlogsCommand } from "../../use-cases/blogs/blogs-delete-blog-use-case";
 import { UpdateBlogBlogsCommand } from "../../use-cases/blogs/blogs-update-blog-use-case";
 import { UpdatePostPostsCommand } from "../../use-cases/posts/posts-update-post-use-case";
+import { GetCommentsByBlogCommand } from '../../use-cases/comments/comments-get-comments-by-blog-use-case';
+import { GetBlogsByOwnerBlogsCommand } from '../../use-cases/blogs/blogs-get-blogs-by-owner-use-case';
 
 @Controller('blogger/blogs/')
 export class BloggersController {
-  constructor(protected bloggersService : BloggersService,
-              protected postsService : PostsService,
-              protected commandBus : CommandBus) {}
+  constructor(protected commandBus : CommandBus) {}
   @UseGuards(CheckIfUserExist)
   @Get()
   async getBlogs(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
@@ -44,13 +42,13 @@ export class BloggersController {
                  @Query('searchNameTerm', new DefaultValuePipe('')) searchNameTerm : string,
                  @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    return await this.bloggersService.getBlogs({
+    return await this.commandBus.execute(new GetBlogsByOwnerBlogsCommand({
       pageSize : pageSize,
       pageNumber : pageNumber,
       sortBy : sortBy,
       sortDirection : sortDirection,
       searchNameTerm : searchNameTerm
-    }, token)
+    }, token));
   }
   @HttpCode(200)
   @UseGuards(CheckIfUserExist)
@@ -62,12 +60,12 @@ export class BloggersController {
                  @Query('searchNameTerm', new DefaultValuePipe('')) searchNameTerm : string,
                  @Req() req: Request){
     const token = req.headers.authorization!.split(" ")[1]
-    return await this.bloggersService.getComments({
+    return await this.commandBus.execute(new GetCommentsByBlogCommand({
       pageSize : pageSize,
       pageNumber : pageNumber,
       sortBy : sortBy,
       sortDirection : sortDirection
-    }, token)
+    }, token))
   }
   @UseGuards(CheckIfUserExist)
   @Post()

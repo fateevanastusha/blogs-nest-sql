@@ -6,8 +6,7 @@ import { BlogDto } from "../../public/blogs/blogs.dto";
 import { BlogsRepository } from "../../public/blogs/blogs.repository";
 
 export class CreateBlogBlogsCommand {
-  constructor(public blog: BlogDto, public token : string)
-  {}}
+  constructor(public blog: BlogDto, public token : string) {}}
 
 @CommandHandler(CreateBlogBlogsCommand)
 export class CreateBlogUseCase implements ICommandHandler<CreateBlogBlogsCommand>{

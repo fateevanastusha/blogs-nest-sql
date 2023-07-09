@@ -20,11 +20,9 @@ export class GetPostUseCase implements ICommandHandler<GetPostPostsCommand>{
               protected postsRepository : PostsRepository,
               protected likesRepository : LikesRepository) {}
   async execute (command : GetPostPostsCommand) : Promise<PostViewModel>{
-    const findPost : PostModel[] =  await this.postsRepository.getPost(command.postId);
-    if (findPost.length === 0) throw new NotFoundException();
-    const post = findPost[0];
+    const post : PostModel =  await this.postsRepository.getPost(command.postId)
     const blog = await this.blogsRepository.getFullBlog(post.blogId);
-    if(blog[0].isBanned) throw new NotFoundException();
+    if(blog.isBanned) throw new NotFoundException();
     let likesInfo : LikesInfo;
     if(command.header){
       const token = command.header.split(" ")[1];

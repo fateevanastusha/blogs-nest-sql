@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BloggersController } from './api/blogger/bloggers/bloggers.controller';
-import { BloggersService } from './api/blogger/bloggers/bloggers.service';
 import { QueryRepository } from './helpers/query.repository';
 import { MongoModule } from './db/mongo.module';
 import { PostsService } from './api/public/posts/posts.service';
@@ -71,6 +70,8 @@ import { BannedForBlogUsersEntity } from './entities/banned.for.blog.users.entit
 import { BlockedTokensEntity } from './entities/blocked.tokens.entity';
 import { RefreshTokensEntity } from './entities/refresh.tokens.entity';
 import { GetPostPostsCommand, GetPostUseCase } from './api/use-cases/posts/posts-get-post-use-case';
+import { GetCommentsByBlogUseCase } from './api/use-cases/comments/comments-get-comments-by-blog-use-case';
+import { GetBlogsByOwnerUseCase } from './api/use-cases/blogs/blogs-get-blogs-by-owner-use-case';
 
 const repositories = [
   UsersRepository,
@@ -89,7 +90,6 @@ const services = [
   BloggersUsersService,
   SecurityService,
   PostsService,
-  BloggersService,
   BlogsService,
   BlogsSuperAdminService,
   AuthService,
@@ -105,6 +105,7 @@ const useCases = [
   DeleteBlogUseCase,
   UpdateBlogUseCase,
   GetBlogUseCase,
+  GetBlogsByOwnerUseCase,
   CreatePostUseCase,
   DeletePostUseCase,
   UpdatePostUseCase,
@@ -114,6 +115,7 @@ const useCases = [
   UpdateCommentUseCase,
   GetCommentUseCase,
   GetCommentWithUserUseCase,
+  GetCommentsByBlogUseCase,
   LikeCommentUseCase,
 ];
 

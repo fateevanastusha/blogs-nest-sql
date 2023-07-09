@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CommentModel, CreateCommentModel } from "./comments.schema";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
@@ -6,13 +6,13 @@ import { DataSource } from "typeorm";
 @Injectable()
 export class CommentsRepository {
   constructor(@InjectDataSource() protected dataSource : DataSource) {}
-  async getCommentById(id: string): Promise<CommentModel | null> {
+  async getCommentById(id: string): Promise<CommentModel> {
     const comment = await this.dataSource.query(`
     SELECT *
     FROM "public"."Comments"
     WHERE "id" = ${id}
     `)
-    if (comment.length === 0) return null
+    if (comment.length === 0) throw new NotFoundException()
     return comment[0]
   }
   async getCommentsCountByBlogOwnerId(userId : string) : Promise<number>{

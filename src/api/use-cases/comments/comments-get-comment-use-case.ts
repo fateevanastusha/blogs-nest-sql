@@ -15,8 +15,7 @@ export class GetCommentUseCase implements ICommandHandler<GetCommentCommentsComm
               protected usersRepository : UsersRepository,
               protected likesRepository : LikesRepository) {}
   async execute (command : GetCommentCommentsCommand) : Promise<CommentViewModel>{
-    const comment : CommentModel | null = await this.commentsRepository.getCommentById(command.commentId)
-    if (!comment) throw new NotFoundException()
+    const comment : CommentModel = await this.commentsRepository.getCommentById(command.commentId)
     const user : UserModel[] | null = await this.usersRepository.getFullUser(comment.userId)
     if (user.length === 0) throw new NotFoundException()
     if (user[0].isBanned === true) throw new NotFoundException()

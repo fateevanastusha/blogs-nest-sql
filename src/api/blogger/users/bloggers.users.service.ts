@@ -20,9 +20,8 @@ export class BloggersUsersService {
     const user : UserModel[] | null = await this.usersRepository.getFullUser(userId)
     if(user.length === 0) throw new NotFoundException()
     const ownerId = await this.jwtService.getUserIdByToken(token)
-    const blog : BlogModel[] = await this.bloggerRepository.getFullBlog(banInfo.blogId)
-    if(blog.length === 0) throw new NotFoundException()
-    if(blog[0].userId !== ownerId) throw new ForbiddenException()
+    const blog = await this.bloggerRepository.getFullBlog(banInfo.blogId)
+    if(blog.userId !== ownerId) throw new ForbiddenException()
     if (banInfo.isBanned === true){
       const bannedInfo : CreateBannedUserInfo = {
         banDate : new Date().toISOString(),

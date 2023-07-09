@@ -40,14 +40,13 @@ export class PostsService {
     const paginatedItems = await this.queryRepository.postsMapping(items, userId)
     return await this.queryRepository.paginationForm(pageCount,total,paginatedItems,query)
   }
-  async getPostsByBlogId (query : QueryModelPosts, blogId: string, token : string) : Promise<PaginatedClass | null>{
+  async getPostsByBlogId (query : QueryModelPosts, blogId: string, token : string) : Promise<PaginatedClass>{
     const userId = await this.jwtService.getUserIdByToken(token)
-    const blog : BlogModel[] = await this.blogsRepository.getFullBlog(blogId)
-    if(blog.length === 0 ) return null
+    const blog = await this.blogsRepository.getFullBlog(blogId)
     let total : number = await this.postsRepository.countPostsByBlogId(blogId)
     let pageCount = Math.ceil( total / query.pageSize)
     let items : PostModel[] = await this.queryRepository.paginatorForPostsWithBlog(query, blogId);
-    if(blog[0].isBanned) {
+    if(blog.isBanned) {
       items = [];
       total = 0
       pageCount = 0
@@ -56,8 +55,7 @@ export class PostsService {
     return await this.queryRepository.paginationForm(pageCount, total, paginatedPosts, query)
   }
   async getComments(query : QueryModelComments, header : string, postId : string) : Promise<PaginatedClass>{
-    const foundPost = await this.postsRepository.getPost(postId);
-    if (foundPost.length === 0) throw new NotFoundException()
+    await this.postsRepository.getPost(postId)
     const items : CommentModel[] = await this.queryRepository.paginatorForCommentsByPostId(query, postId)
     let mappedComments
     if(header){
@@ -75,8 +73,7 @@ export class PostsService {
   async changeLikeStatus(requestType : string, postId : string, header : string) : Promise <boolean> {
     if(!header) throw new UnauthorizedException(401)
     const token = header.split(" ")[1]
-    const post : PostModel[] = await this.postsRepository.getPost(postId)
-    if (post.length === 0) return false
+    await this.postsRepository.getPost(postId)
     let userId = await this.jwtService.getUserIdByToken(token)
     const status1 = await this.likesRepository.findStatus(postId, userId)
     const currentStatus = await this.likesHelper.requestType(status1[0])

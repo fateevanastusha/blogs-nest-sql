@@ -94,7 +94,7 @@ describe('AppController (e2e)', () => {
         "isBanned": false
       },
       "createdAt": expect.any(String),
-      "email": "user1@gmail.cm",
+      "email": "user1@gmail.com",
       "id": expect.any(String),
       "login": "user1"
     })
@@ -1662,14 +1662,14 @@ describe('AppController (e2e)', () => {
       .get('/posts/' + createResponsePost_1.body.id)
       .expect(200)
     res = await request(server)
-      .get('/sa/users?searchLoginTerm=na&sortDirection=asc&sortBy=login&pageSize=15&pageNumber=1&&searchEmailTerm=.ru')
+      .get('/sa/users?searchLoginTerm=na&sortDirection=asc&sortBy=login&pageSize=15&pageNumber=1')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
       .expect(200)
     expect(res.body).toStrictEqual({
       "page": 1,
       "pageSize": 15,
       "pagesCount": 1,
-      "totalCount": 2,
+      "totalCount": 4,
       "items": [
         {
           "banInfo": {
@@ -1692,6 +1692,28 @@ describe('AppController (e2e)', () => {
           "email":  expect.any(String),
           "id":  expect.any(String),
           "login": 'nastya1'
+        },
+        {
+          "banInfo": {
+            "banDate": null,
+            "banReason": null,
+            "isBanned": false
+          },
+          "createdAt":  expect.any(String),
+          "email":  expect.any(String),
+          "id":  expect.any(String),
+          "login": 'userforban'
+        },
+        {
+          "banInfo": {
+            "banDate": expect.any(String),
+            "banReason": "test ban for user 1 that longer 20",
+            "isBanned": true
+          },
+          "createdAt":  expect.any(String),
+          "email":  expect.any(String),
+          "id":  expect.any(String),
+          "login": 'userthat'
         }
       ]
     })
@@ -1763,6 +1785,10 @@ describe('AppController (e2e)', () => {
       .post('/auth/logout')
       .set('Cookie', token_1.header['set-cookie'][0].split(';')[0])
       .expect(204)
+    await request(server)
+      .post('/auth/logout')
+      .set('Cookie', token_1.header['set-cookie'][0].split(';')[0])
+      .expect(401)
     await request(server)
       .get('/security/devices')
       .set('Cookie', token_1.header['set-cookie'][0].split(';')[0])
