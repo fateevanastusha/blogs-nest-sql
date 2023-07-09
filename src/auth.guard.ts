@@ -40,14 +40,29 @@ export class CheckIfUserExist implements CanActivate {
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const auth = req.headers.authorization
-    if (!auth) throw new UnauthorizedException()
+    if (!auth) {
+      console.log('no auth');
+      throw new UnauthorizedException();
+    }
     const [authType, token] = auth.split(' ')
-    if (authType !== 'Bearer') throw new UnauthorizedException()
+    if (authType !== 'Bearer') {
+      console.log('no bearer');
+      throw new UnauthorizedException();
+    }
     const userId = await this.jwtService.getUserIdByToken(token)
-    if(!userId) throw new UnauthorizedException()
+    if(!userId) {
+      console.log('cant decode userid');
+      throw new UnauthorizedException();
+    }
     const user = await this.usersRepository.getFullUser(userId)
-    if(user.length === 0) throw new UnauthorizedException()
-    if (user[0].isBanned === true) throw new UnauthorizedException()
+    if(user.length === 0) {
+      console.log('not fount user');
+      throw new UnauthorizedException();
+    }
+    if (user[0].isBanned === true) {
+      console.log('user is banned')
+      throw new UnauthorizedException();
+    }
     return true
   }
 }

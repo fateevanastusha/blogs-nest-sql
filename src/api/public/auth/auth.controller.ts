@@ -106,15 +106,11 @@ export class AuthController {
   @Get('/me')
   async getInformation(@Req() req: any){
     const auth = req.headers.authorization
-    if (!auth) {
-      throw new UnauthorizedException()
-      return
-    }
+    if (!auth) throw new UnauthorizedException()
+
     const [authType, token] = auth.split(' ')
-    if (authType !== 'Bearer') {
-      throw new UnauthorizedException()
-      return
-    }
+    if (authType !== 'Bearer') throw new UnauthorizedException()
+
     const user: UserModel | null = await this.authService.getInformationAboutCurrentUser(token)
     if (user) {
       const currentUser = {
@@ -125,7 +121,7 @@ export class AuthController {
       return currentUser
     } else {
       throw new UnauthorizedException()
-      return
+
     }
   }
 }
