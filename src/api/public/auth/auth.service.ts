@@ -20,28 +20,32 @@ export class AuthService {
   ) {
   }
 
+  // TODO:
+  //  1 =>
+  //  login => придумать девайсАйди =>
+  //  зашить его вмете с юзерАйди в токен =>
+  //  взять дату когда токен был выписан (decode) === lastActiveDate у девайса
+  //  2 =>
+  //
+
   async authRequest (password : string, ip : string, loginOrEmail : string, title : string) : Promise<TokenList | null> {
     //CHECK FOR CORRECT PASSWORD
-    const status : boolean = await this.authRepository.authRequest(loginOrEmail, password)
-    if (!status) throw new UnauthorizedException()
+    await this.authRepository.authRequest(loginOrEmail, password)
     //CHECK FOR USER
     const user : UserModel = await this.usersRepository.returnUserByField(loginOrEmail);
     if (!user) throw new UnauthorizedException();
-    const isBanned = user.isBanned
-    if(isBanned === true) throw new UnauthorizedException()
+    if(user.isBanned === true) throw new UnauthorizedException()
     //CREATE DEVICE ID
     const deviceId : string = (+new Date()).toString();
-    //GET USER ID
-    const userId : string = user.id;
     //GET TOKENS
-    const refreshToken : RefreshToken = await this.jwtService.createJWTRefresh(userId, deviceId);
-    const accessToken = await this.jwtService.createJWTAccess(userId)
+    const refreshToken : RefreshToken = await this.jwtService.createJWTRefresh(user.id, deviceId);
+    const accessToken = await this.jwtService.createJWTAccess(user.id)
     //GET DATE
     const date : string | null = await this.jwtService.getRefreshTokenDate(refreshToken.refreshToken)
     if (!date) throw new UnauthorizedException()
     //CREATE REFRESH TOKENS META
     const refreshTokenMeta : RefreshTokensMetaModel = {
-      userId : userId,
+      userId : user.id,
       ip: ip,
       title: title,
       lastActiveDate: date,
@@ -65,9 +69,9 @@ export class AuthService {
 
   async createNewToken (refreshToken : string, ip : string, title : string) : Promise<TokenList> {
     await this.authRepository.addRefreshTokenToBlackList(refreshToken)
-    const session : RefreshTokensMetaModel | null = await this.securityRepository.findSessionByIp(ip)
-    if (!session[0]) throw new UnauthorizedException()
-    const deviceId : string = session.deviceId
+    const session = await this.securityRepository.findSessionByIp(ip)
+    if (session.length === 0) throw new UnauthorizedException()
+    const deviceId : string = session[0].deviceId
     const userId : string = await this.jwtService.getUserIdByToken(refreshToken)
     const user = await this.usersService.getUser(userId)
     if (user[0] === null) throw new UnauthorizedException()

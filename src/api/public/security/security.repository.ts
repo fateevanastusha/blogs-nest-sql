@@ -41,7 +41,7 @@ export class SecurityRepository {
     if (createdSession[0]) return true;
     return false;
   }
-  async findSessionByIp(ip : string) : Promise<RefreshTokensMetaModel | null> {
+  async findSessionByIp(ip : string) : Promise<RefreshTokensMetaModel[]> {
     return await this.dataSource.query(`
         SELECT *
         FROM public."RefreshTokens"
