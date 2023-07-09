@@ -1,14 +1,20 @@
-import { IsBoolean, IsUrl, Length } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsString, IsUrl, Length } from 'class-validator';
 import { Transform, TransformFnParams } from "class-transformer";
 import { Schema } from "@nestjs/mongoose";
 
 export class BlogDto {
+  @IsString()
+  @IsNotEmpty()
   @Length(1, 15)
   @Transform(({ value }: TransformFnParams) => value?.trim())
   name: string;
+  @IsString()
+  @IsNotEmpty()
   @Length(1, 500)
   @Transform(({ value }: TransformFnParams) => value?.trim())
   description: string;
+  @IsString()
+  @IsNotEmpty()
   @IsUrl()
   @Length(1, 500)
   @Transform(({ value }: TransformFnParams) => value?.trim())

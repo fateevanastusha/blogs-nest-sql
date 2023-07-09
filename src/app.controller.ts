@@ -3,7 +3,7 @@ import {
   Body,
   Controller,
   Delete,
-  Get, HttpCode, OnModuleInit,
+  Get, HttpCode,
   Post,
   Res,
 } from '@nestjs/common';

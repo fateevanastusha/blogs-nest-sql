@@ -9,7 +9,7 @@ import {
   HttpCode,
   BadRequestException, UnauthorizedException
 } from "@nestjs/common";
-import { CheckAttempts, CheckForRefreshToken, CheckForSameDevice } from "../../../auth.guard";
+import { CheckForRefreshToken } from "../../../auth.guard";
 import { AuthService } from "./auth.service";
 import { AccessToken, TokenList } from "../security/security.schema";
 import { UserModel } from "../../superadmin/users/users.schema";
@@ -18,13 +18,11 @@ import { EmailDto } from "./auth.dto";
 import { CreateUserUsersCommand } from "../../use-cases/users/users-create-user-use-case";
 import { CommandBus } from "@nestjs/cqrs";
 
-@UseGuards(CheckAttempts)
 @Controller('auth')
 export class AuthController {
   constructor(protected authService : AuthService,
               protected commandBus : CommandBus){}
   @HttpCode(200)
-  @UseGuards(CheckForSameDevice)
   @Post('/login')
   async loginRequest(@Req() req: any, @Res() res: any){
     const title = req.headers["user-agent"] || "unknown"

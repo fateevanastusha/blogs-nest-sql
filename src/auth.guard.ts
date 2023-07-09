@@ -12,14 +12,8 @@ import { JwtService } from "./jwt.service";
 import { AuthRepository } from "./api/public/auth/auth.repository";
 import { RefreshTokensMetaModel } from "./api/public/security/security.schema";
 import { SecurityRepository } from "./api/public/security/security.repository";
-import { UserModel } from "./api/superadmin/users/users.schema";
 import { UsersRepository } from "./api/superadmin/users/users.repository";
-import { SecurityService } from "./api/public/security/security.service";
-import { AuthService } from "./api/public/auth/auth.service";
-import { AttemptsModel } from "./attempts/attempts.schema";
-import { AttemptsRepository } from "./attempts/attempts.repository";
 import { CommentsRepository } from "./api/public/comments/comments.repository";
-import { loginURI } from './test-utils/test.strings';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -96,30 +90,15 @@ export class CheckForRefreshToken implements CanActivate {
     context: ExecutionContext
   ): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    if(!req.cookies) {
-      console.log('no cookies');
-      throw new UnauthorizedException();
-    }
+    if(!req.cookies) throw new UnauthorizedException();
     const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) {
-      console.log('no refreshToken');
-      throw new UnauthorizedException();
-    }
+    if (!refreshToken) throw new UnauthorizedException();
     const isTokenBlocked: boolean = await this.authRepository.checkRefreshToken(refreshToken);
-    if (isTokenBlocked) {
-      console.log('isTokenBlocked');
-      throw new UnauthorizedException();
-    }
+    if (isTokenBlocked) throw new UnauthorizedException();
     const tokenList = await this.jwtService.getIdByRefreshToken(refreshToken);
-    if (!tokenList) {
-      console.log('!tokenList');
-      throw new UnauthorizedException();
-    }
+    if (!tokenList) throw new UnauthorizedException();
     const session: RefreshTokensMetaModel[] = await this.securityRepository.findSessionByDeviceId(tokenList.deviceId);
-    if (session.length === 0) {
-      console.log('no sessions');
-      throw new UnauthorizedException();
-    }
+    if (session.length === 0) throw new UnauthorizedException();
     return true
   }
 }
@@ -167,54 +146,5 @@ export class CheckDeviceId implements CanActivate {
     if (!userId) throw new UnauthorizedException()
     if(userId.userId !== session[0].userId) throw new ForbiddenException()
     return true
-  }
-}
-@Injectable()
-export class CheckForSameDevice implements CanActivate {
-  constructor(
-    protected authService: AuthService,
-    protected securityService: SecurityService) {
-  }
-  async canActivate(
-    context: ExecutionContext
-  ): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
-    const title: string = req.headers["user-agent"] || "unknown";
-    const user: UserModel = await this.authService.authFindUser(req.body.loginOrEmail);
-    if (!user) {
-      throw new UnauthorizedException();
-      return false;
-    }
-    const userId: string = user.id;
-    /*const status: boolean = await this.securityService.checkForSameDevice(title, userId);
-    if (!status) {
-      throw new ForbiddenException();
-      return false;
-    }*/
-    return true;
-  }
-}
-@Injectable()
-export class CheckAttempts implements CanActivate {
-  constructor(
-    protected attemptsRepository: AttemptsRepository) {
-  }
-  async canActivate(
-    context: ExecutionContext
-  ): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
-    const timeLimit = new Date(new Date().getTime() - 10000);
-    const countOfAttempts = await this.attemptsRepository.countOfAttempts(req.ip, req.url, timeLimit);
-    if (countOfAttempts >= 5) {
-      throw new HttpException('Too Many Requests', HttpStatus.TOO_MANY_REQUESTS)
-      return false;
-    }
-    const attempt: AttemptsModel = {
-      userIP: req.ip,
-      url: req.url,
-      time: new Date()
-    };
-    await this.attemptsRepository.addAttempts(attempt);
-    return true;
   }
 }

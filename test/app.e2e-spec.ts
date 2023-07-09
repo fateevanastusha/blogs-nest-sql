@@ -306,7 +306,7 @@ describe('AppController (e2e)', () => {
       "description": "TEST2",
       "websiteUrl": "http://www.test2.com",
       "createdAt": expect.any(String),
-      "isMembership": true
+      "isMembership": false
     })
   })
   it('SA check for created blog', async () => {
@@ -326,8 +326,8 @@ describe('AppController (e2e)', () => {
           websiteUrl: 'http://www.test2.com',
           id: createResponseBlog_1.body.id,
           createdAt: createResponseBlog_1.body.createdAt,
-          isMembership: true,
-          "banInfo": {
+          isMembership: false,
+          banInfo: {
             banDate : null,
             isBanned : false
           },
@@ -362,7 +362,7 @@ describe('AppController (e2e)', () => {
           websiteUrl: 'http://www.test2.com',
           id: createResponseBlog_1.body.id,
           createdAt: createResponseBlog_1.body.createdAt,
-          isMembership: true,
+          isMembership: false,
           banInfo: {
             banDate : null,
             isBanned : false
@@ -615,7 +615,7 @@ describe('AppController (e2e)', () => {
       "createdAt": expect.any(String),
       "description": "about me",
       "id": expect.any(String),
-      "isMembership": true,
+      "isMembership": false,
       "name": "2bloguser2",
       "websiteUrl": "http://www.nastyastar.com"
     })
@@ -632,7 +632,7 @@ describe('AppController (e2e)', () => {
         "createdAt": expect.any(String),
         "description": "about me",
         "id": expect.any(String),
-        "isMembership": true,
+        "isMembership": false,
         "name": "2bloguser1",
         "websiteUrl": "http://www.nastyastar.com"
       },
@@ -640,7 +640,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "1bloguser1",
           "websiteUrl": "http://www.nastyastar.com"
         }]
@@ -667,7 +667,7 @@ describe('AppController (e2e)', () => {
         "createdAt": expect.any(String),
         "description": "about me",
         "id": expect.any(String),
-        "isMembership": true,
+        "isMembership": false,
         "name": "2bloguser1",
         "websiteUrl": "http://www.nastyastar.com"
       },
@@ -675,7 +675,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "1bloguser1",
           "websiteUrl": "http://www.nastyastar.com"
         }]
@@ -702,7 +702,7 @@ describe('AppController (e2e)', () => {
         "createdAt": expect.any(String),
         "description": "about me",
         "id": expect.any(String),
-        "isMembership": true,
+        "isMembership": false,
         "name": "2bloguser1",
         "websiteUrl": "http://www.nastyastar.com"
       },
@@ -710,7 +710,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "updatedname",
           "websiteUrl": "http://www.nastyastar.com"
         }]
@@ -734,7 +734,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "2bloguser2",
           "banInfo": {
             banDate : null,
@@ -750,7 +750,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "2bloguser1",
           "banInfo": {
             banDate : null,
@@ -766,7 +766,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "updatedname",
           "banInfo": {
             banDate : null,
@@ -1554,7 +1554,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "blog for ban",
           "id": createResponseBlog_1.body.id,
-          "isMembership": true,
+          "isMembership": false,
           "name": "blog for ban",
           "websiteUrl": "http://www.blogforban.com"
         },
@@ -1570,7 +1570,7 @@ describe('AppController (e2e)', () => {
             banDate : null,
             isBanned : false
           },
-          "isMembership": true,
+          "isMembership": false,
           "name": "2bloguser2",
           "websiteUrl": "http://www.nastyastar.com"
         },
@@ -1586,7 +1586,7 @@ describe('AppController (e2e)', () => {
             banDate : null,
             isBanned : false
           },
-          "isMembership": true,
+          "isMembership": false,
           "name": "2bloguser1",
           "websiteUrl": "http://www.nastyastar.com"
         },
@@ -1602,7 +1602,7 @@ describe('AppController (e2e)', () => {
             banDate : null,
             isBanned : false
           },
-          "isMembership": true,
+          "isMembership": false,
           "name": "updatedname",
           "websiteUrl": "http://www.nastyastar.com"
         }
@@ -1622,7 +1622,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "2bloguser1",
           "websiteUrl": "http://www.nastyastar.com"
         },
@@ -1630,7 +1630,7 @@ describe('AppController (e2e)', () => {
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
-          "isMembership": true,
+          "isMembership": false,
           "name": "updatedname",
           "websiteUrl": "http://www.nastyastar.com"
         }

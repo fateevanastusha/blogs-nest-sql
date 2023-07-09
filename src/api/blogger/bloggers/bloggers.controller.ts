@@ -101,6 +101,7 @@ export class BloggersController {
     @Body() blog : BlogDto,
     @Param('id') blogId : string,
     @Req() req: Request){
+    if (!blogId.match(/^\d+$/)) throw new NotFoundException()
     const token = req.headers.authorization!.split(" ")[1]
     return await this.commandBus.execute(new UpdateBlogBlogsCommand(blog, blogId, token))
   }
@@ -113,6 +114,8 @@ export class BloggersController {
     @Param('postId') postId : string,
     @Body() post : PostsBlogDto,
     @Req() req: Request){
+    if (!blogId.match(/^\d+$/)) throw new NotFoundException()
+    if (!postId.match(/^\d+$/)) throw new NotFoundException()
     const token = req.headers.authorization!.split(" ")[1]
     return await this.commandBus.execute(new UpdatePostPostsCommand({... post, blogId : blogId}, postId, token))
   }
@@ -132,6 +135,8 @@ export class BloggersController {
                    @Param('postId') postId : string,
                    @Res() res : Response,
                    @Req() req: Request){
+    if (!blogId.match(/^\d+$/)) throw new NotFoundException()
+    if (!postId.match(/^\d+$/)) throw new NotFoundException()
     const token = req.headers.authorization!.split(" ")[1]
     const status : boolean = await this.commandBus.execute(
       new DeletePostPostsCommand(postId, blogId, token))

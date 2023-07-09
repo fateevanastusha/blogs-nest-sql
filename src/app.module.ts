@@ -18,8 +18,6 @@ import { LikeSchema } from './likes/likes.schema';
 import { CommentsController } from './api/public/comments/comments.controller';
 import { SecurityRepository } from './api/public/security/security.repository';
 import { RefreshTokensBlocked, RefreshTokensMetaSchema } from './api/public/security/security.schema';
-import { AttemptsSchema } from './attempts/attempts.schema';
-import { AttemptsRepository } from './attempts/attempts.repository';
 import { AuthRepository } from './api/public/auth/auth.repository';
 import { AuthController } from './api/public/auth/auth.controller';
 import { CommentsRepository } from './api/public/comments/comments.repository';
@@ -69,9 +67,10 @@ import { LikesEntity } from './entities/likes.entity';
 import { BannedForBlogUsersEntity } from './entities/banned.for.blog.users.entity';
 import { BlockedTokensEntity } from './entities/blocked.tokens.entity';
 import { RefreshTokensEntity } from './entities/refresh.tokens.entity';
-import { GetPostPostsCommand, GetPostUseCase } from './api/use-cases/posts/posts-get-post-use-case';
+import { GetPostUseCase } from './api/use-cases/posts/posts-get-post-use-case';
 import { GetCommentsByBlogUseCase } from './api/use-cases/comments/comments-get-comments-by-blog-use-case';
 import { GetBlogsByOwnerUseCase } from './api/use-cases/blogs/blogs-get-blogs-by-owner-use-case';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 const repositories = [
   UsersRepository,
@@ -80,7 +79,6 @@ const repositories = [
   LikesRepository,
   CommentsRepository,
   AuthRepository,
-  AttemptsRepository,
   BlogsRepository,
   TestRepo,
   BannedUsersRepository,
@@ -136,15 +134,14 @@ const entities = [
     TypeOrmModule.forRoot({
       url: process.env.POSTGRES_CONNECTION_STRING || 'postgres://fateevanastusha:qzMDJ0ZXEam4@ep-still-star-556812.eu-central-1.aws.neon.tech/blogsapi',
       type: 'postgres' as const,
-      /*        host : 'localhost',
-              port : 5432,
-              username : 'nodejs',
-              password : 'nodejs',
-              database : 'BlogsNestApi',*/
       autoLoadEntities: false,
       entities,
       synchronize: true,
       ssl: { rejectUnauthorized: false },
+    }),
+    ThrottlerModule.forRoot({
+      ttl: 10,
+      limit: 5,
     }),
     TypeOrmModule.forFeature(entities),
     PassportModule,
@@ -178,10 +175,6 @@ const entities = [
         schema: RefreshTokensMetaSchema,
       },
       {
-        name: 'attempts',
-        schema: AttemptsSchema,
-      },
-      {
         name: 'refresh token blocked',
         schema: RefreshTokensBlocked,
       },
@@ -209,5 +202,4 @@ const entities = [
     LocalStrategy,
   ],
 })
-export class AppModule {
-}
+export class AppModule {}
