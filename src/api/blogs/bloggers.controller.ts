@@ -82,6 +82,7 @@ export class BloggersController {
   async createPost(@Param('id') blogId : string,
                    @Body() post : PostsBlogDto,
                    @Req() req: Request){
+    if (!blogId.match(/^\d+$/)) throw new NotFoundException()
     const token = req.headers.authorization!.split(" ")[1]
     const createdPost : PostModel | null = await this.commandBus.execute(
       new CreatePostPostsCommand({

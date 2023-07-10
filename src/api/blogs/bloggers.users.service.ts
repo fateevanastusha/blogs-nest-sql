@@ -41,7 +41,7 @@ export class BloggersUsersService {
     const bannedUsers : BannedUserInfo[] = await this.queryRepository.paginationForBlogBannedUsers(query, blogId)
     const mappedUsers = bannedUsers.map((a) => {
       return  {
-        id : a.userId,
+        id : a.userId + '',
         login : a.userLogin,
         banInfo : {
           isBanned : true,

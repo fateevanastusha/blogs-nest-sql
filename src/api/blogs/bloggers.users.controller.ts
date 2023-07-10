@@ -17,6 +17,7 @@ export class BloggersUsersController {
   async BanUserForBlog(@Param('userId') userId : string,
                        @Body() banInfo : BanUserForBlogDto,
                        @Req() req: Request){
+    if (!userId.match(/^\d+$/)) throw new NotFoundException()
     const token = req.headers.authorization!.split(" ")[1]
     const status : boolean = await this.usersService.BanUserForBlog(token, +userId + '', banInfo)
     if(!status) throw new NotFoundException()
@@ -32,6 +33,7 @@ export class BloggersUsersController {
                                  @Query('sortBy', new DefaultValuePipe('banDate')) sortBy : string,
                                  @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                                  @Query('searchLoginTerm', new DefaultValuePipe('')) searchLoginTerm : string,){
+    if (!blogId.match(/^\d+$/)) throw new NotFoundException()
     const token = req.headers.authorization!.split(" ")[1]
     return await this.usersService.getAllBannedUsers(token, blogId, {
       pageSize : pageSize,
