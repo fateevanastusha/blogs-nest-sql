@@ -44,7 +44,7 @@ export class QueryRepository {
     return this.dataSource.query(`
     SELECT *
         FROM public."Blogs"
-        WHERE "name" LIKE '%${query.searchNameTerm}%'
+        WHERE "name" LIKE '%' || CASE WHEN '${query.searchNameTerm}' = '' THEN '' ELSE '${query.searchNameTerm}' END || '%'
         ORDER BY "${query.sortBy}" ${query.sortDirection}
         OFFSET ${skipSize} LIMIT ${query.pageSize};
     `)
@@ -100,6 +100,7 @@ export class QueryRepository {
     `)
   }
   async paginationForBlogBannedUsers(query: QueryModelBannedUsersForBlog, blogId : string): Promise<BannedUserInfo[]> {
+    console.log(query);
     const skipSize: number = query.pageSize * (query.pageNumber - 1)
     return this.dataSource.query(`
       SELECT *

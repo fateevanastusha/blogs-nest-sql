@@ -36,7 +36,7 @@ export class BlogsSuperAdminController {
                 @Body() request : BanBlogDto){
     const status : boolean = await this.blogsService.banBlog(blogId, request)
     if(!status) throw new NotFoundException()
-    return
+    return status
   }
   @HttpCode(204)
   @Put(':id/bind-with-user/:userId')
