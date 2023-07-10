@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CommentsRepository } from "../../comments/comments.repository";
 import { CommentModel } from "../../comments/comments.schema";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
-import { LikesRepository } from "../../../likes/likes.repository";
+import { LikesRepository } from "../../likes/likes.repository";
 
 export class LikeCommentCommentsCommand {
   constructor(public requestType : string,public commentId : string,public userId : string) {}

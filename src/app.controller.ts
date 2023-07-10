@@ -11,7 +11,7 @@ import { PostsRepository } from "./api/posts/posts.repository";
 import { UsersRepository } from "./api/users/users.repository";
 import { Response} from "express";
 import { SecurityRepository } from "./api/security/security.repository";
-import { LikesRepository } from "./likes/likes.repository";
+import { LikesRepository } from "./api/likes/likes.repository";
 import { CommentsRepository } from "./api/comments/comments.repository";
 import { BlogDto } from "./api/blogs/blogs.dto";
 import { BlogModel, BlogViewModel, CreateBlogModel } from "./api/blogs/blogs.schema";

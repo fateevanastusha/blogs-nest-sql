@@ -4,7 +4,7 @@ import { CommentModel, CommentViewModel, LikesInfo } from "../../comments/commen
 import { UserModel } from "../../users/users.schema";
 import { NotFoundException } from "@nestjs/common";
 import { UsersRepository } from "../../users/users.repository";
-import { LikesRepository } from "../../../likes/likes.repository";
+import { LikesRepository } from "../../likes/likes.repository";
 
 export class GetCommentWithUserCommentsCommand {
   constructor(public userId : string, public commentId : string) {}

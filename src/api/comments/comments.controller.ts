@@ -3,7 +3,7 @@ import { CommentsDto } from "./comments dto";
 import { CheckIfUserExist, CommentCheckForSameUser } from "../../auth.guard";
 import { CommentViewModel } from "./comments.schema";
 import { JwtService } from "../../jwt.service";
-import { LikesDto } from "../../likes/likes.dto";
+import { LikesDto } from "../likes/likes.dto";
 import { CommandBus } from "@nestjs/cqrs";
 import { UpdateCommentCommentsCommand } from "../use-cases/comments/comments-update-comment-use-case";
 import { GetCommentCommentsCommand } from "../use-cases/comments/comments-get-comment-use-case";

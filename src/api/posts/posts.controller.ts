@@ -15,7 +15,7 @@ import { PostsService } from "./posts.service";
 import { CommentsDto } from "./posts.dto";
 import { Request } from "express";
 import { CheckIfUserExist } from "../../auth.guard";
-import { LikesDto } from "../../likes/likes.dto";
+import { LikesDto } from "../likes/likes.dto";
 import { CommandBus } from "@nestjs/cqrs";
 import { CreateCommentCommentsCommand } from "../use-cases/comments/comments-create-comment-use-case";
 import { GetPostPostsCommand } from "../use-cases/posts/posts-get-post-use-case";

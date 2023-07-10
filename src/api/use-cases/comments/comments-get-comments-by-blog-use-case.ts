@@ -5,7 +5,7 @@ import { CommentModel } from '../../comments/comments.schema';
 import { JwtService } from '../../../jwt.service';
 import { CommentsRepository } from '../../comments/comments.repository';
 import { QueryRepository } from '../../../helpers/query.repository';
-import { LikesRepository } from '../../../likes/likes.repository';
+import { LikesRepository } from '../../likes/likes.repository';
 import { PostsRepository } from '../../posts/posts.repository';
 
 export class GetCommentsByBlogCommand {

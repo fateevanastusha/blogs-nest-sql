@@ -1,4 +1,4 @@
-import { LikeModel } from "../likes/likes.schema";
+import { LikeModel } from "../api/likes/likes.schema";
 import { Injectable } from "@nestjs/common";
 @Injectable()
 export class LikesHelpers {

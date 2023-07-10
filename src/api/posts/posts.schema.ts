@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { LikeViewModel } from "../../likes/likes.schema";
+import { LikeViewModel } from "../likes/likes.schema";
 
 @Schema()
 export class ExtendedLikesInfo {

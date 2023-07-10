@@ -5,8 +5,8 @@ import { BlogsRepository } from "../../blogs/blogs.repository";
 import { PostModel, PostViewModel } from "../../posts/posts.schema";
 import { NotFoundException } from "@nestjs/common";
 import { LikesInfo } from "../../comments/comments.schema";
-import { LikeViewModel } from "../../../likes/likes.schema";
-import { LikesRepository } from "../../../likes/likes.repository";
+import { LikeViewModel } from "../../likes/likes.schema";
+import { LikesRepository } from "../../likes/likes.repository";
 
 export class GetPostPostsCommand {
   constructor(public postId: string, public header : string) {
