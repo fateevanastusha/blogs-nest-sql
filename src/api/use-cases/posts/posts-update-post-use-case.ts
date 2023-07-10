@@ -1,10 +1,10 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { JwtService } from "../../../jwt.service";
-import { PostsRepository } from "../../public/posts/posts.repository";
-import { BlogsRepository } from "../../public/blogs/blogs.repository";
-import { BlogModel } from "../../public/blogs/blogs.schema";
+import { PostsRepository } from "../../posts/posts.repository";
+import { BlogsRepository } from "../../blogs/blogs.repository";
+import { BlogModel } from "../../blogs/blogs.schema";
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
-import { PostsDto } from "../../public/posts/posts.dto";
+import { PostsDto } from "../../posts/posts.dto";
 
 export class UpdatePostPostsCommand {
   constructor(public post : PostsDto,public postId : string,public token : string) {

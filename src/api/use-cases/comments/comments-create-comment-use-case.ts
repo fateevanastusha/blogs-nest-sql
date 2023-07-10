@@ -1,15 +1,15 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { ForbiddenException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "../../../jwt.service";
-import { PostModel } from "../../public/posts/posts.schema";
-import { PostsRepository } from "../../public/posts/posts.repository";
-import { UserModel } from "../../superadmin/users/users.schema";
-import { CommentViewModel, CreateCommentModel } from "../../public/comments/comments.schema";
-import { CommentsRepository } from "../../public/comments/comments.repository";
-import { UsersRepository } from "../../superadmin/users/users.repository";
-import { BlogModel } from "../../public/blogs/blogs.schema";
-import { BlogsRepository } from "../../public/blogs/blogs.repository";
-import { BannedUsersRepository } from "../../../banned-users/bloggers.banned.users.repository";
+import { PostModel } from "../../posts/posts.schema";
+import { PostsRepository } from "../../posts/posts.repository";
+import { UserModel } from "../../users/users.schema";
+import { CommentViewModel, CreateCommentModel } from "../../comments/comments.schema";
+import { CommentsRepository } from "../../comments/comments.repository";
+import { UsersRepository } from "../../users/users.repository";
+import { BlogModel } from "../../blogs/blogs.schema";
+import { BlogsRepository } from "../../blogs/blogs.repository";
+import { BannedUsersRepository } from "../../users/bloggers.banned.users.repository";
 
 export class CreateCommentCommentsCommand {
   constructor(public postId : string,public content : string,public token : string) {

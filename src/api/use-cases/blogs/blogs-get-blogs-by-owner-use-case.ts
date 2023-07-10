@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { BlogsRepository } from "../../public/blogs/blogs.repository";
-import { BlogViewModel, PaginatedClass } from '../../public/blogs/blogs.schema';
+import { BlogsRepository } from "../../blogs/blogs.repository";
+import { BlogViewModel, PaginatedClass } from '../../blogs/blogs.schema';
 import { QueryModelBlogs } from '../../../helpers/helpers.schema';
 import { JwtService } from '../../../jwt.service';
 import { QueryRepository } from '../../../helpers/query.repository';
@@ -16,6 +16,7 @@ export class GetBlogsByOwnerUseCase implements ICommandHandler<GetBlogsByOwnerBl
               protected queryRepository : QueryRepository
               ) {}
   async execute (command : GetBlogsByOwnerBlogsCommand) : Promise<PaginatedClass>{
+    console.log(command.query.searchNameTerm);
     const userId = await this.jwtService.getUserIdByToken(command.token)
     const total = await this.blogsRepository.getBlogsCountWithUser(command.query.searchNameTerm, userId)
     const pageCount = Math.ceil( total / +command.query.pageSize)

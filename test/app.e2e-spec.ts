@@ -4,7 +4,7 @@ import request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { createApp } from "./create.app";
 import { BusinessService } from "../src/business.service";
-import { UsersRepository } from "../src/api/superadmin/users/users.repository";
+import { UsersRepository } from "../src/api/users/users.repository";
 
 describe('AppController (e2e)', () => {
   jest.setTimeout(3 * 60 * 1000)
@@ -620,12 +620,12 @@ describe('AppController (e2e)', () => {
       "websiteUrl": "http://www.nastyastar.com"
     })
     res = await request(server)
-      .get('/blogger/blogs')
+      .get('/blogger/blogs?pageSize=3&pageNumber=1')
       .auth(token_1.body.accessToken, {type : 'bearer'})
       .expect(200)
     expect(res.body).toStrictEqual({
       "page": 1,
-      "pageSize": 10,
+      "pageSize": 3,
       "pagesCount": 1,
       "totalCount": 2,
       "items": [{

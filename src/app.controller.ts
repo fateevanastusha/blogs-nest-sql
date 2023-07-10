@@ -7,18 +7,18 @@ import {
   Post,
   Res,
 } from '@nestjs/common';
-import { PostsRepository } from "./api/public/posts/posts.repository";
-import { UsersRepository } from "./api/superadmin/users/users.repository";
+import { PostsRepository } from "./api/posts/posts.repository";
+import { UsersRepository } from "./api/users/users.repository";
 import { Response} from "express";
-import { SecurityRepository } from "./api/public/security/security.repository";
+import { SecurityRepository } from "./api/security/security.repository";
 import { LikesRepository } from "./likes/likes.repository";
-import { CommentsRepository } from "./api/public/comments/comments.repository";
-import { BlogDto } from "./api/public/blogs/blogs.dto";
-import { BlogModel, BlogViewModel, CreateBlogModel } from "./api/public/blogs/blogs.schema";
+import { CommentsRepository } from "./api/comments/comments.repository";
+import { BlogDto } from "./api/blogs/blogs.dto";
+import { BlogModel, BlogViewModel, CreateBlogModel } from "./api/blogs/blogs.schema";
 import { TestRepo } from "./test.repo";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
-import { BlogsRepository } from "./api/public/blogs/blogs.repository";
+import { BlogsRepository } from "./api/blogs/blogs.repository";
 
 @Controller()
 export class AppController{

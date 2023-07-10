@@ -1,6 +1,6 @@
-import { UserModel, UserModelCreate, UserViewModel } from "../../superadmin/users/users.schema";
-import { UsersDto } from "../../superadmin/users/users.dto";
-import { UsersRepository } from "../../superadmin/users/users.repository";
+import { UserModel, UserModelCreate, UserViewModel } from "../../users/users.schema";
+import { UsersDto } from "../../users/users.dto";
+import { UsersRepository } from "../../users/users.repository";
 import * as bcrypt from 'bcrypt';
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { BusinessService } from "../../../business.service";

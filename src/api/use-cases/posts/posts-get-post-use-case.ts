@@ -1,10 +1,10 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { JwtService } from "../../../jwt.service";
-import { PostsRepository } from "../../public/posts/posts.repository";
-import { BlogsRepository } from "../../public/blogs/blogs.repository";
-import { PostModel, PostViewModel } from "../../public/posts/posts.schema";
+import { PostsRepository } from "../../posts/posts.repository";
+import { BlogsRepository } from "../../blogs/blogs.repository";
+import { PostModel, PostViewModel } from "../../posts/posts.schema";
 import { NotFoundException } from "@nestjs/common";
-import { LikesInfo } from "../../public/comments/comments.schema";
+import { LikesInfo } from "../../comments/comments.schema";
 import { LikeViewModel } from "../../../likes/likes.schema";
 import { LikesRepository } from "../../../likes/likes.repository";
 

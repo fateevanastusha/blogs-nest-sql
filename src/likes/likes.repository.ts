@@ -1,7 +1,7 @@
 import { LikeModel, LikeViewModel } from "./likes.schema";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
-import { LikesInfo } from "../api/public/comments/comments.schema";
+import { LikesInfo } from "../api/comments/comments.schema";
 
 export class LikesRepository {
   constructor(@InjectDataSource() protected dataSource : DataSource) {}

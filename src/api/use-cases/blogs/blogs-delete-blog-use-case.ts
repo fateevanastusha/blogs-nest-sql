@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { BlogModel } from "../../public/blogs/blogs.schema";
+import { BlogModel } from "../../blogs/blogs.schema";
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { JwtService } from "../../../jwt.service";
-import { BlogsRepository } from "../../public/blogs/blogs.repository";
+import { BlogsRepository } from "../../blogs/blogs.repository";
 
 
 export class DeleteBlogBlogsCommand {

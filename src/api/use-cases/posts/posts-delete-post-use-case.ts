@@ -1,10 +1,10 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { BlogModel } from "../../public/blogs/blogs.schema";
+import { BlogModel } from "../../blogs/blogs.schema";
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
-import { PostModel } from "../../public/posts/posts.schema";
+import { PostModel } from "../../posts/posts.schema";
 import { JwtService } from "../../../jwt.service";
-import { PostsRepository } from "../../public/posts/posts.repository";
-import { BlogsRepository } from "../../public/blogs/blogs.repository";
+import { PostsRepository } from "../../posts/posts.repository";
+import { BlogsRepository } from "../../blogs/blogs.repository";
 
 export class DeletePostPostsCommand {
   constructor(public postId : string,public blogId: string,public token : string) {

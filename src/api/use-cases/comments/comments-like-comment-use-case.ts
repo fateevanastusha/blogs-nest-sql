@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CommentsRepository } from "../../public/comments/comments.repository";
-import { CommentModel } from "../../public/comments/comments.schema";
+import { CommentsRepository } from "../../comments/comments.repository";
+import { CommentModel } from "../../comments/comments.schema";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { LikesRepository } from "../../../likes/likes.repository";
 

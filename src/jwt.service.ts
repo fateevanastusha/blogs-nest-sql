@@ -1,18 +1,18 @@
 import * as jwt from 'jsonwebtoken';
 import { Injectable } from "@nestjs/common";
-import { AccessToken, RefreshToken } from "./api/public/security/security.schema";
+import { AccessToken, RefreshToken } from "./api/security/security.schema";
 import { settings } from "./settings";
 
 @Injectable()
 export class JwtService {
   async createJWTAccess (userId : string) : Promise <AccessToken>{
-    const accessToken = jwt.sign({ userId : userId }, settings.JWT_SECRET, { expiresIn: '10s' })
+    const accessToken = jwt.sign({ userId : userId }, settings.JWT_SECRET, { expiresIn: '10m' })
     return {
       accessToken : accessToken
     }
   }
   async createJWTRefresh (userId : string, deviceId: string) : Promise <RefreshToken>{
-    const refreshToken = jwt.sign({ userId : userId, deviceId: deviceId }, settings.JWT_SECRET, { expiresIn: '20s' })
+    const refreshToken = jwt.sign({ userId : userId, deviceId: deviceId }, settings.JWT_SECRET, { expiresIn: '20m' })
     return {
       refreshToken : refreshToken
     }

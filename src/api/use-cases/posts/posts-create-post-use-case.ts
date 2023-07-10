@@ -1,13 +1,13 @@
-import { PostsDto } from "../../public/posts/posts.dto";
+import { PostsDto } from "../../posts/posts.dto";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CreatePostModel, PostModel } from "../../public/posts/posts.schema";
-import { BlogModel } from "../../public/blogs/blogs.schema";
-import { UserModel } from "../../superadmin/users/users.schema";
+import { CreatePostModel, PostModel } from "../../posts/posts.schema";
+import { BlogModel } from "../../blogs/blogs.schema";
+import { UserModel } from "../../users/users.schema";
 import { BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
-import { PostsRepository } from "../../public/posts/posts.repository";
+import { PostsRepository } from "../../posts/posts.repository";
 import { JwtService } from "../../../jwt.service";
-import { UsersRepository } from "../../superadmin/users/users.repository";
-import { BlogsRepository } from "../../public/blogs/blogs.repository";
+import { UsersRepository } from "../../users/users.repository";
+import { BlogsRepository } from "../../blogs/blogs.repository";
 
 export class CreatePostPostsCommand {
   constructor(public post: PostsDto, public token : string) {

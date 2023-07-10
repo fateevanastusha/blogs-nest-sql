@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { BlogModel, BlogViewModel, CreateBlogModel } from "../../public/blogs/blogs.schema";
+import { BlogModel, BlogViewModel, CreateBlogModel } from "../../blogs/blogs.schema";
 import { JwtService } from "../../../jwt.service";
-import { UsersRepository } from "../../superadmin/users/users.repository";
-import { BlogDto } from "../../public/blogs/blogs.dto";
-import { BlogsRepository } from "../../public/blogs/blogs.repository";
+import { UsersRepository } from "../../users/users.repository";
+import { BlogDto } from "../../blogs/blogs.dto";
+import { BlogsRepository } from "../../blogs/blogs.repository";
 
 export class CreateBlogBlogsCommand {
   constructor(public blog: BlogDto, public token : string) {}}

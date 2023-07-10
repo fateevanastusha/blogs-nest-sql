@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { BlogModel} from "../../public/blogs/blogs.schema";
+import { BlogModel} from "../../blogs/blogs.schema";
 import { JwtService } from "../../../jwt.service";
-import { BlogDto } from "../../public/blogs/blogs.dto";
+import { BlogDto } from "../../blogs/blogs.dto";
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
-import { BlogsRepository } from "../../public/blogs/blogs.repository";
+import { BlogsRepository } from "../../blogs/blogs.repository";
 
 
 export class UpdateBlogBlogsCommand {

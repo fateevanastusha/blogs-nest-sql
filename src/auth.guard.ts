@@ -9,11 +9,11 @@ import {
 import { Observable } from "rxjs";
 import { Request } from "express";
 import { JwtService } from "./jwt.service";
-import { AuthRepository } from "./api/public/auth/auth.repository";
-import { RefreshTokensMetaModel } from "./api/public/security/security.schema";
-import { SecurityRepository } from "./api/public/security/security.repository";
-import { UsersRepository } from "./api/superadmin/users/users.repository";
-import { CommentsRepository } from "./api/public/comments/comments.repository";
+import { AuthRepository } from "./api/auth/auth.repository";
+import { RefreshTokensMetaModel } from "./api/security/security.schema";
+import { SecurityRepository } from "./api/security/security.repository";
+import { UsersRepository } from "./api/users/users.repository";
+import { CommentsRepository } from "./api/comments/comments.repository";
 
 @Injectable()
 export class AuthGuard implements CanActivate {

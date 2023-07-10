@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { BlogsRepository } from "../../public/blogs/blogs.repository";
-import { BlogModel, BlogViewModel } from "../../public/blogs/blogs.schema";
+import { BlogsRepository } from "../../blogs/blogs.repository";
+import { BlogModel, BlogViewModel } from "../../blogs/blogs.schema";
 import { NotFoundException } from "@nestjs/common";
 
 

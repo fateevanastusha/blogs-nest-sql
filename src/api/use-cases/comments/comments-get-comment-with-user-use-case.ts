@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CommentsRepository } from "../../public/comments/comments.repository";
-import { CommentModel, CommentViewModel, LikesInfo } from "../../public/comments/comments.schema";
-import { UserModel } from "../../superadmin/users/users.schema";
+import { CommentsRepository } from "../../comments/comments.repository";
+import { CommentModel, CommentViewModel, LikesInfo } from "../../comments/comments.schema";
+import { UserModel } from "../../users/users.schema";
 import { NotFoundException } from "@nestjs/common";
-import { UsersRepository } from "../../superadmin/users/users.repository";
+import { UsersRepository } from "../../users/users.repository";
 import { LikesRepository } from "../../../likes/likes.repository";
 
 export class GetCommentWithUserCommentsCommand {

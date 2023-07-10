@@ -2,7 +2,7 @@ import {
   BlogModel,
   PaginatedClass,
   BlogViewModel, BannedUserInfo
-} from "../api/public/blogs/blogs.schema";
+} from "../api/blogs/blogs.schema";
 import {
   QueryCommentsUsers,
   QueryModelBannedUsersForBlog,
@@ -12,12 +12,12 @@ import {
 } from "./helpers.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { PostModel } from "../api/public/posts/posts.schema";
-import { UserModel, UserViewModel } from "../api/superadmin/users/users.schema";
-import { CommentModel, CommentForBloggerViewModel } from "../api/public/comments/comments.schema";
+import { PostModel } from "../api/posts/posts.schema";
+import { UserModel, UserViewModel } from "../api/users/users.schema";
+import { CommentModel, CommentForBloggerViewModel } from "../api/comments/comments.schema";
 import { LikesRepository } from "../likes/likes.repository";
 import { LikeDocument } from "../likes/likes.schema";
-import { UsersRepository } from "../api/superadmin/users/users.repository";
+import { UsersRepository } from "../api/users/users.repository";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 
@@ -51,7 +51,7 @@ export class QueryRepository {
   }
   async paginationForBlogsWithUser(query : QueryModelBlogs, userId : string) : Promise <BlogViewModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
-    return this.dataSource.query(`
+    return await this.dataSource.query(`
     SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM public."Blogs"
         WHERE "name" LIKE '%${query.searchNameTerm}%' AND "userId" = ${userId} AND "isBanned" = false
