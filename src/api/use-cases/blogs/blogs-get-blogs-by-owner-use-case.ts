@@ -16,7 +16,6 @@ export class GetBlogsByOwnerUseCase implements ICommandHandler<GetBlogsByOwnerBl
               protected queryRepository : QueryRepository
               ) {}
   async execute (command : GetBlogsByOwnerBlogsCommand) : Promise<PaginatedClass>{
-    console.log(command.query.searchNameTerm);
     const userId = await this.jwtService.getUserIdByToken(command.token)
     const total = await this.blogsRepository.getBlogsCountWithUser(command.query.searchNameTerm, userId)
     const pageCount = Math.ceil( total / +command.query.pageSize)
