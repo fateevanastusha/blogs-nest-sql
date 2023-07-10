@@ -14,7 +14,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { PostModel } from "../api/posts/posts.schema";
 import { UserModel, UserViewModel } from "../api/users/users.schema";
-import { CommentModel, CommentForBloggerViewModel } from "../api/comments/comments.schema";
+import { CommentModel } from "../api/comments/comments.schema";
 import { LikesRepository } from "../api/likes/likes.repository";
 import { LikeDocument } from "../api/likes/likes.schema";
 import { UsersRepository } from "../api/users/users.repository";
@@ -33,7 +33,7 @@ export class QueryRepository {
     return this.dataSource.query(`
     SELECT *
         FROM public."Blogs"
-        WHERE "name" LIKE '%' || CASE WHEN '${query.searchNameTerm}' = '' THEN '' ELSE '${query.searchNameTerm}' END || '%' 
+        WHERE "name" ILIKE '%' || CASE WHEN '${query.searchNameTerm}' = '' THEN '' ELSE '${query.searchNameTerm}' END || '%' 
         AND "isBanned" = false
         ORDER BY "${query.sortBy}" ${query.sortDirection}
         OFFSET ${skipSize} LIMIT ${query.pageSize};
@@ -44,7 +44,7 @@ export class QueryRepository {
     return this.dataSource.query(`
     SELECT *
         FROM public."Blogs"
-        WHERE "name" LIKE '%' || CASE WHEN '${query.searchNameTerm}' = '' THEN '' ELSE '${query.searchNameTerm}' END || '%'
+        WHERE "name" ILIKE '%' || CASE WHEN '${query.searchNameTerm}' = '' THEN '' ELSE '${query.searchNameTerm}' END || '%'
         ORDER BY "${query.sortBy}" ${query.sortDirection}
         OFFSET ${skipSize} LIMIT ${query.pageSize};
     `)
@@ -54,7 +54,7 @@ export class QueryRepository {
     return await this.dataSource.query(`
     SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM public."Blogs"
-        WHERE ("name" LIKE '%${query.searchNameTerm}%' OR "userId" = ${userId}) AND "isBanned" = false
+        WHERE ("name" ILIKE '%${query.searchNameTerm}%' OR "userId" = ${userId}) AND "isBanned" = false
         ORDER BY "${query.sortBy}" ${query.sortDirection}
         OFFSET ${skipSize} LIMIT ${query.pageSize};
     `)
