@@ -43,7 +43,7 @@ export class BlogsRepository{
     const count = await this.dataSource.query(`
     SELECT COUNT(*) AS "total"
     FROM public."Blogs"
-    WHERE "name" LIKE '%' || CASE WHEN '${searchNameTerm}' = '' THEN '' ELSE '${searchNameTerm}' END || '%'
+    WHERE "name" ILIKE '%' || CASE WHEN '${searchNameTerm}' = '' THEN '' ELSE '${searchNameTerm}' END || '%'
     AND "isBanned" = false
     `)
     return +(count[0].total)
@@ -52,7 +52,7 @@ export class BlogsRepository{
     const count = await this.dataSource.query(`
     SELECT COUNT(*) AS "total"
         FROM public."Blogs"
-        WHERE "name" LIKE '%' || CASE WHEN '${searchNameTerm}' = '' THEN '' ELSE '${searchNameTerm}' END || '%'
+        WHERE "name" ILIKE '%' || CASE WHEN '${searchNameTerm}' = '' THEN '' ELSE '${searchNameTerm}' END || '%'
         AND "isBanned" = false 
         AND "userId"=${userId}
     `)
