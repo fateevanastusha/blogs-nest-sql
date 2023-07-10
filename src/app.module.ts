@@ -45,8 +45,8 @@ import { CreatePostUseCase } from './api/use-cases/posts/posts-create-post-use-c
 import { DeletePostUseCase } from './api/use-cases/posts/posts-delete-post-use-case';
 import { DeleteBlogUseCase } from './api/use-cases/blogs/blogs-delete-blog-use-case';
 import { CreateCommentUseCase } from './api/use-cases/comments/comments-create-comment-use-case';
-import { BloggersUsersService } from './api/blogs/bloggers.users.service';
-import { BloggersUsersController } from './api/blogs/bloggers.users.controller';
+import { BloggersUsersService } from './api/users/bloggers.users.service';
+import { BloggersUsersController } from './api/users/bloggers.users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TestRepo } from './test.repo';
 import { CqrsModule } from '@nestjs/cqrs';

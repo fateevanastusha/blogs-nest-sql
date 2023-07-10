@@ -5,7 +5,7 @@ import {
 import { CheckIfUserExist } from "../../auth.guard";
 import { BloggersUsersService } from "./bloggers.users.service";
 import { Request } from "express";
-import { BanUserForBlogDto } from "../users/users.dto";
+import { BanUserForBlogDto } from "./users.dto";
 
 
 @Controller('blogger/users/')
@@ -33,7 +33,7 @@ export class BloggersUsersController {
                                  @Query('sortBy', new DefaultValuePipe('banDate')) sortBy : string,
                                  @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                                  @Query('searchLoginTerm', new DefaultValuePipe('')) searchLoginTerm : string,){
-    if (!blogId.match(/^\d+$/)) throw new NotFoundException()
+    if (!blogId.match(/^\d+$/)) throw new NotFoundException();
     const token = req.headers.authorization!.split(" ")[1]
     return await this.usersService.getAllBannedUsers(token, blogId, {
       pageSize : pageSize,

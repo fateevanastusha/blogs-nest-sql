@@ -2,12 +2,12 @@ import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/commo
 import { JwtService } from "../../jwt.service";
 import { QueryRepository } from "../../helpers/query.repository";
 import { QueryModelBannedUsersForBlog } from "../../helpers/helpers.schema";
-import { BannedUserInfo, BlogModel, CreateBannedUserInfo, PaginatedClass } from "./blogs.schema";
-import { UsersRepository } from "../users/users.repository";
-import { UserModel } from "../users/users.schema";
-import { BannedUsersRepository } from "../users/bloggers.banned.users.repository";
-import { BlogsRepository } from "./blogs.repository";
-import { BanUserForBlogDto } from "../users/users.dto";
+import { BannedUserInfo, BlogModel, CreateBannedUserInfo, PaginatedClass } from "../blogs/blogs.schema";
+import { UsersRepository } from "./users.repository";
+import { UserModel } from "./users.schema";
+import { BannedUsersRepository } from "./bloggers.banned.users.repository";
+import { BlogsRepository } from "../blogs/blogs.repository";
+import { BanUserForBlogDto } from "./users.dto";
 
 @Injectable()
 export class BloggersUsersService {
@@ -36,6 +36,9 @@ export class BloggersUsersService {
     }
   }
   async getAllBannedUsers(token : string, blogId : string, query : QueryModelBannedUsersForBlog) : Promise<PaginatedClass>{
+    const userId = await this.jwtService.getUserIdByToken(token)
+    const blog = await this.bloggerRepository.getFullBlog(blogId)
+    if(blog.userId !== userId) throw new ForbiddenException()
     const total: number = await this.banRepository.getBannedUsersCount(blogId)
     const pageCount = Math.ceil( total / +query.pageSize)
     const bannedUsers : BannedUserInfo[] = await this.queryRepository.paginationForBlogBannedUsers(query, blogId)
