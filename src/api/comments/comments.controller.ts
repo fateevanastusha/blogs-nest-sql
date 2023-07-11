@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Put, Req, UseGuards } from '@nestjs/common';
 import { CommentsDto } from "./comments dto";
 import { CheckIfUserExist, CommentCheckForSameUser } from "../../auth.guard";
 import { CommentViewModel } from "./comments.schema";
@@ -34,6 +34,7 @@ export class CommentsController {
   @UseGuards(CommentCheckForSameUser)
   @Delete(':id')
   async deleteComment(@Param('id') commentId : string){
+    if (!commentId.match(/^\d+$/)) throw new NotFoundException()
     return await this.commandBus.execute(new DeleteCommentCommentsCommand(commentId))
   }
   @HttpCode(204)
@@ -41,6 +42,7 @@ export class CommentsController {
   @Put(':id')
   async updateComment(@Param('id') commentId : string,
                       @Body() comment : CommentsDto){
+    if (!commentId.match(/^\d+$/)) throw new NotFoundException()
     return await this.commandBus.execute(new UpdateCommentCommentsCommand(comment.content, commentId))
   }
 
@@ -50,6 +52,7 @@ export class CommentsController {
   async changeLikeStatus(@Param('id') commentId : string,
                          @Body() requestType : LikesDto,
                          @Req() req: any){
+    if (!commentId.match(/^\d+$/)) throw new NotFoundException()
     const token = req.headers.authorization!.split(" ")[1]
     const userId : string = await this.jwtService.getUserIdByToken(token);
     return await this.commandBus.execute(new LikeCommentCommentsCommand(requestType.likeStatus, commentId, userId))

@@ -77,6 +77,7 @@ export class PostsController{
   async setLike(@Param('id') postId : string,
                 @Body() like : LikesDto,
                 @Req() req: any){
+    if (!postId.match(/^\d+$/)) throw new NotFoundException()
     const status : boolean = await this.postsService.changeLikeStatus(like.likeStatus, postId, req.headers.authorization)
     if (!status) throw new NotFoundException()
     return
