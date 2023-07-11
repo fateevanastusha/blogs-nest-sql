@@ -87,6 +87,7 @@ export class CommentCheckForSameUser implements CanActivate {
     if (!userId) throw new UnauthorizedException();
     const user = await this.userRepo.getFullUser(userId)
     if(!user) throw new UnauthorizedException()
+    if (!(req.params.id).match(/^\d+$/)) throw new NotFoundException()
     const comment = await this.commentsRepository.getCommentById(req.params.id);
     if (!comment) throw new NotFoundException();
     if(comment.userId !== userId ) throw new ForbiddenException();
