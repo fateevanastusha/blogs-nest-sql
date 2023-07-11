@@ -69,6 +69,7 @@ export class PostsController{
   async postComment(@Param('postId') postId : string,
                     @Body() comment : CommentsDto,
                     @Req() req: any){
+    if (!postId.match(/^\d+$/)) throw new NotFoundException()
     const token = req.headers.authorization!.split(" ")[1]
     return await this.commandBus.execute(new CreateCommentCommentsCommand(postId, comment.content, token))
   }
