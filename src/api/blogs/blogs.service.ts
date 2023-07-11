@@ -14,19 +14,11 @@ export class BlogsService {
     const items : BlogModel[] = await this.queryRepository.paginationForBlogs(query);
     const mappedItems = items.map(a => {
       return {
-        blogOwnerInfo: {
-          userId: a.userId + '',
-          userLogin: a.userLogin
-        },
         createdAt: a.createdAt,
         description: a.description,
         id: a.id + '',
         isMembership: a.isMembership,
         name: a.name,
-        banInfo: {
-          banDate : a.banDate,
-          isBanned : a.isBanned
-        },
         websiteUrl: a.websiteUrl
       }
     })

@@ -36,6 +36,7 @@ export class BlogsController{
   }
   @Get(':id')
   async getBlog(@Param('id') blogId : string){
+    if (!blogId.match(/^\d+$/)) throw new NotFoundException()
     return await this.commandBus.execute(new GetBlogBlogsCommand(blogId))
   }
   @Get(':id/posts')
@@ -46,6 +47,7 @@ export class BlogsController{
                  @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                  @Req() req: Request
   ){
+    if (!blogId.match(/^\d+$/)) throw new NotFoundException()
     const header = req.headers.authorization
     let token : string
     if (!header) {
