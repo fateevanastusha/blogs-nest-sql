@@ -36,7 +36,6 @@ export class BloggersUsersService {
     }
   }
   async getAllBannedUsers(token : string, blogId : string, query : QueryModelBannedUsersForBlog) : Promise<PaginatedClass>{
-    console.log(query);
     if(query.sortBy === 'login') query.sortBy = 'userLogin'
     const userId = await this.jwtService.getUserIdByToken(token)
     const blog = await this.bloggerRepository.getFullBlog(blogId)
