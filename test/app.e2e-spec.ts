@@ -41,6 +41,9 @@ describe('AppController (e2e)', () => {
 
   let token_1 : any = null
   let token_2 : any = null
+  let token_3 : any = null
+  let token_4 : any = null
+  let token_5 : any = null
   let tokenOfBannedUser : any = null
   let createResponseBlog_1 : any = null
   let createResponsePost_1 : any = null
@@ -1148,7 +1151,7 @@ describe('AppController (e2e)', () => {
       "totalCount": 1,
       items : [
         {
-          id : userId,
+          id : userId + '',
           login : 'alina28',
           banInfo : {
             isBanned : true,
@@ -1795,10 +1798,207 @@ describe('AppController (e2e)', () => {
       .expect(401)
   })
   afterAll(async () => {
-    /*await request(server)
+    await request(server)
       .delete('/testing/all-data')
       .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
-      .expect(204)*/
+      .expect(204)
+    await server.close()
+  })
+
+  it('create new 4 users, blog and post', async () => {
+
+    await request(server)
+      .post('/sa/users')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        login: 'user1',
+        password: 'qwerty',
+        email: 'user1@gmail.com'
+      })
+      .expect(201)
+    await request(server)
+      .post('/sa/users')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        login: 'user2',
+        password: 'qwerty',
+        email: 'user2@gmail.com'
+      })
+      .expect(201)
+    await request(server)
+      .post('/sa/users')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        login: 'user3',
+        password: 'qwerty',
+        email: 'user3@gmail.com'
+      })
+      .expect(201)
+    await request(server)
+      .post('/sa/users')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        login: 'user4',
+        password: 'qwerty',
+        email: 'user4@gmail.com'
+      })
+      .expect(201)
+    await request(server)
+      .post('/sa/users')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        login: 'user5',
+        password: 'qwerty',
+        email: 'user5@gmail.com'
+      })
+      .expect(201)
+    token_1 = await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'user1',
+        password : 'qwerty'
+      })
+      .expect(200)
+    token_2 = await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'user2',
+        password : 'qwerty'
+      })
+      .expect(200)
+    token_3 = await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'user3',
+        password : 'qwerty'
+      })
+      .expect(200)
+    token_4 = await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'user4',
+        password : 'qwerty'
+      })
+      .expect(200)
+    token_5 = await request(server)
+      .post('/auth/login')
+      .send({
+        loginOrEmail : 'user5',
+        password : 'qwerty'
+      })
+      .expect(200)
+    createResponseBlog_1 = await request(server)
+      .post('/blogger/blogs')
+      .send({
+        "name": "blog",
+        "description": "description",
+        "websiteUrl": "http://www.someurl.com"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    createResponsePost_1 = await request(server)
+      .post('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts')
+      .send({
+        "title": "title",
+        "shortDescription": "shortDescription",
+        "content": "content"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(201)
+  })
+
+  it('check likes for posts', async () => {
+    await request(server)
+      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .send({
+        "likeStatus": "Like"
+      })
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    await request(server)
+      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .send({
+        "likeStatus": "Like"
+      })
+      .auth(token_3.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    await request(server)
+      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .send({
+        "likeStatus": "Dislike"
+      })
+      .auth(token_4.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    res = await request(server)
+      .get('/posts/' + createResponsePost_1.body.id)
+      .auth(token_4.body.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      blogId: expect.any(String),
+      blogName: "blog",
+      content: "content",
+      createdAt: expect.any(String),
+      extendedLikesInfo: {
+        dislikesCount: 1,
+        likesCount: 2,
+        myStatus: "Dislike",
+        newestLikes: [
+          {
+            addedAt: expect.any(String),
+            login: "user3",
+            userId: expect.any(String)
+          },
+          {
+            addedAt: expect.any(String),
+            login: "user2",
+            userId: expect.any(String)
+          }
+        ]
+      },
+      id: expect.any(String),
+      shortDescription: "shortDescription",
+      title: "title"
+    })
+    await request(server)
+      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .send({
+        "likeStatus": "None"
+      })
+      .auth(token_4.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    res = await request(server)
+      .get('/posts/' + createResponsePost_1.body.id)
+      .auth(token_4.body.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.body).toStrictEqual({
+      blogId: expect.any(String),
+      blogName: "blog",
+      content: "content",
+      createdAt: expect.any(String),
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 2,
+        myStatus: "None",
+        newestLikes: [
+          {
+            addedAt: expect.any(String),
+            login: "user3",
+            userId: expect.any(String)
+          },
+          {
+            addedAt: expect.any(String),
+            login: "user2",
+            userId: expect.any(String)
+          }
+        ]
+      },
+      id: expect.any(String),
+      shortDescription: "shortDescription",
+      title: "title"
+    })
+  })
+
+  afterAll(async () => {
     await server.close()
   })
 });

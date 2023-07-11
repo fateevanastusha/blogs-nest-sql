@@ -100,7 +100,6 @@ export class QueryRepository {
     `)
   }
   async paginationForBlogBannedUsers(query: QueryModelBannedUsersForBlog, blogId : string): Promise<BannedUserInfo[]> {
-    console.log(query);
     const skipSize: number = query.pageSize * (query.pageNumber - 1)
     return this.dataSource.query(`
       SELECT *

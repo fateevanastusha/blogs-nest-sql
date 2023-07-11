@@ -92,16 +92,13 @@ export class PostsService {
       postOrCommentId : postId,
       createdAt : new Date().toISOString()
     }
-    //if no status
     if (currentStatus === "None"){
-      //add new like or dislike
       await this.likesRepository.createNewStatusForPost(status)
     }
     else if (requestType === "None"){
-      //delete status
+
       await this.likesRepository.deleteStatus(postId, userId)
     } else {
-      //change status
       await this.likesRepository.updateStatus(status)
     }
     return true;

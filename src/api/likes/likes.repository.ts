@@ -84,10 +84,11 @@ export class LikesRepository {
         WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "userId" = ${userId}
     `)
   }
-  async deleteStatus(commentId : string, userId : string) : Promise<boolean> {
+  async deleteStatus(postOrCommentId : string, userId : string) : Promise<boolean> {
     await this.dataSource.query(`
-    DELETE FROM public."Likes"
-        WHERE "commentId" = ${commentId} AND "userId" = ${userId}
+    DELETE 
+        FROM public."Likes"
+        WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "userId" = ${userId}
     `)
     return true
   }
