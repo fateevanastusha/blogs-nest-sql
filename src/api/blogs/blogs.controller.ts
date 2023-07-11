@@ -49,7 +49,7 @@ export class BlogsController{
     const header = req.headers.authorization
     let token : string
     if (!header) {
-      token = 'no token'
+      token = null
     } else {
       token  = header.split(" ")[1]
     }

@@ -181,15 +181,10 @@ export class QueryRepository {
     )
   }
 
-  async postsMapping(posts : PostModel[], userId : string) {
+  async postsMapping(posts : PostModel[]) {
     return await Promise.all(
       posts.map(async (post) => {
         let newestLikes = await this.likesRepository.getLastLikes(post.id)
-        let status = null;
-        if (userId) {
-          status = await this.likesRepository.findStatus(post.id, userId);
-          if (status) status = status.status
-        }
         return {
           id: post.id + '',
           title: post.title,
@@ -201,7 +196,32 @@ export class QueryRepository {
           extendedLikesInfo: {
             likesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Like"}),
             dislikesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Dislike"}),
-            myStatus: status || "None",
+            myStatus: "None",
+            newestLikes : newestLikes
+          }
+        }
+      })
+    );
+  }
+  async postsMappingWithUser(posts : PostModel[], userId : string) {
+    return await Promise.all(
+      posts.map(async (post) => {
+        let newestLikes = await this.likesRepository.getLastLikes(post.id)
+        let currentStatus = await this.likesRepository.findStatus(post.id, userId);
+        let status
+        if(currentStatus.length > 0) status = currentStatus[0].status
+        return {
+          id: post.id + '',
+          title: post.title,
+          shortDescription: post.shortDescription,
+          content: post.content,
+          blogId: post.blogId + '',
+          blogName: post.blogName,
+          createdAt: post.createdAt,
+          extendedLikesInfo: {
+            likesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Like"}),
+            dislikesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Dislike"}),
+            myStatus: status,
             newestLikes : newestLikes
           }
         }

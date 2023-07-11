@@ -19,6 +19,7 @@ export class CommentsController {
   @Get(':id')
   async getComment(@Param('id') commentId : string,
                    @Req() req: any){
+    if (!commentId.match(/^\d+$/)) throw new NotFoundException()
     const token = req.headers.authorization;
     if (!token){
       const comment : CommentViewModel = await this.commandBus.execute(new GetCommentCommentsCommand(commentId));

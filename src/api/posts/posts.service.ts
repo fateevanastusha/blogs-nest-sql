@@ -29,7 +29,7 @@ export class PostsService {
     const total : number = (await this.postsRepository.getPosts()).length
     const pageCount = Math.ceil( total / query.pageSize)
     const items = await this.queryRepository.paginatorForPosts(query)
-    const paginatedItems = await this.queryRepository.postsMapping(items, undefined)
+    const paginatedItems = await this.queryRepository.postsMapping(items)
     return await this.queryRepository.paginationForm(pageCount,total,paginatedItems,query)
   }
   async getPostsWithUser(query : QueryModelPosts, token : string) : Promise<PaginatedClass>{
@@ -37,7 +37,7 @@ export class PostsService {
     const total : number = (await this.postsRepository.getPosts()).length
     const pageCount = Math.ceil( total / query.pageSize)
     const items = await this.queryRepository.paginatorForPosts(query)
-    const paginatedItems = await this.queryRepository.postsMapping(items, userId)
+    const paginatedItems = await this.queryRepository.postsMappingWithUser(items, userId)
     return await this.queryRepository.paginationForm(pageCount,total,paginatedItems,query)
   }
   async getPostsByBlogId (query : QueryModelPosts, blogId: string, token : string) : Promise<PaginatedClass>{
@@ -51,7 +51,13 @@ export class PostsService {
       total = 0
       pageCount = 0
     }
-    const paginatedPosts : PostModel[] = await this.queryRepository.postsMapping(items, userId)
+    let paginatedPosts : PostModel[]
+    if(!token){
+      paginatedPosts = await this.queryRepository.postsMapping(items)
+    }
+    else {
+      paginatedPosts = await this.queryRepository.postsMappingWithUser(items, userId)
+    }
     return await this.queryRepository.paginationForm(pageCount, total, paginatedPosts, query)
   }
   async getComments(query : QueryModelComments, header : string, postId : string) : Promise<PaginatedClass>{
