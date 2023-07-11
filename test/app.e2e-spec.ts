@@ -1890,21 +1890,42 @@ describe('AppController (e2e)', () => {
     createResponseBlog_1 = await request(server)
       .post('/blogger/blogs')
       .send({
-        "name": "blog",
-        "description": "description",
+        "name": "blog1",
+        "description": "description1",
         "websiteUrl": "http://www.someurl.com"
       })
       .auth(token_1.body.accessToken, {type : 'bearer'})
       .expect(201)
+    createResponseBlog_2 = await request(server)
+      .post('/blogger/blogs')
+      .send({
+        "name": "blog2",
+        "description": "description2",
+        "websiteUrl": "http://www.someurl.com"
+      })
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(201)
     createResponsePost_1 = await request(server)
       .post('/blogger/blogs/' + createResponseBlog_1.body.id + '/posts')
       .send({
-        "title": "title",
-        "shortDescription": "shortDescription",
-        "content": "content"
+        "title": "title1",
+        "shortDescription": "shortDescription1",
+        "content": "content1"
       })
       .auth(token_1.body.accessToken, {type : 'bearer'})
       .expect(201)
+    createResponsePost_2 = await request(server)
+      .post('/blogger/blogs/' + createResponseBlog_2.body.id + '/posts')
+      .send({
+        "title": "title2",
+        "shortDescription": "shortDescription2",
+        "content": "content2"
+      })
+      .auth(token_2.body.accessToken, {type : 'bearer'})
+      .expect(201)
+    await request(server)
+      .get('/posts/423dasdsaadasdasdadadas312315/comments')
+      .expect(404)
   })
 
   it('check likes for posts', async () => {
@@ -1935,8 +1956,8 @@ describe('AppController (e2e)', () => {
       .expect(200)
     expect(res.body).toStrictEqual({
       blogId: expect.any(String),
-      blogName: "blog",
-      content: "content",
+      blogName: "blog1",
+      content: "content1",
       createdAt: expect.any(String),
       extendedLikesInfo: {
         dislikesCount: 1,
@@ -1956,8 +1977,8 @@ describe('AppController (e2e)', () => {
         ]
       },
       id: expect.any(String),
-      shortDescription: "shortDescription",
-      title: "title"
+      shortDescription: "shortDescription1",
+      title: "title1"
     })
     await request(server)
       .put('/posts/' + createResponsePost_1.body.id + '/like-status')
@@ -1972,8 +1993,8 @@ describe('AppController (e2e)', () => {
       .expect(200)
     expect(res.body).toStrictEqual({
       blogId: expect.any(String),
-      blogName: "blog",
-      content: "content",
+      blogName: "blog1",
+      content: "content1",
       createdAt: expect.any(String),
       extendedLikesInfo: {
         dislikesCount: 0,
@@ -1993,9 +2014,36 @@ describe('AppController (e2e)', () => {
         ]
       },
       id: expect.any(String),
-      shortDescription: "shortDescription",
-      title: "title"
+      shortDescription: "shortDescription1",
+      title: "title1"
     })
+
+    await request(server)
+      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .send({
+        "likeStatus": "Like"
+      })
+      .auth(token_1.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    await request(server)
+      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .send({
+        "likeStatus": "Like"
+      })
+      .auth(token_3.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    await request(server)
+      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .send({
+        "likeStatus": "Dislike"
+      })
+      .auth(token_4.body.accessToken, {type : 'bearer'})
+      .expect(204)
+    res = await request(server)
+      .get('/posts/')
+      .auth(token_5.body.accessToken, {type : 'bearer'})
+      .expect(200)
+    expect(res.body).toStrictEqual({})
   })
 
   afterAll(async () => {

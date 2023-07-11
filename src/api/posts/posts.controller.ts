@@ -56,6 +56,7 @@ export class PostsController{
                     @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
                     @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                     @Req() req: any){
+    if (!postId.match(/^\d+$/)) throw new NotFoundException()
     return await this.postsService.getComments({
       pageSize : pageSize,
       pageNumber : pageNumber,

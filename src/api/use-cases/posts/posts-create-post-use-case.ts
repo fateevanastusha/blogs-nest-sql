@@ -22,7 +22,6 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostPostsCommand
               protected usersRepository : UsersRepository) {}
   async execute (command : CreatePostPostsCommand) : Promise<PostModel>{
     const blog = await this.blogsRepository.getFullBlog(command.post.blogId)
-
     const userId : string = await this.jwtService.getUserIdByToken(command.token)
     const user : UserModel[] = await this.usersRepository.getFullUser(userId)
     if (user[0].id !== blog.userId) throw new ForbiddenException()
