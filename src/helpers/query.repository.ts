@@ -54,7 +54,7 @@ export class QueryRepository {
     return await this.dataSource.query(`
     SELECT "id", "name", "description", "websiteUrl", "createdAt", "isMembership"
         FROM public."Blogs"
-        WHERE ("name" ILIKE '%${query.searchNameTerm}%' AND "userId" = ${userId} AND "isBanned" = false
+        WHERE "name" ILIKE '%${query.searchNameTerm}%' AND "userId" = ${userId} AND "isBanned" = false
         ORDER BY "${query.sortBy}" ${query.sortDirection}
         OFFSET ${skipSize} LIMIT ${query.pageSize};
     `)
