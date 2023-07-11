@@ -1797,12 +1797,11 @@ describe('AppController (e2e)', () => {
       .set('Cookie', token_1.header['set-cookie'][0].split(';')[0])
       .expect(401)
   })
-  afterAll(async () => {
+  it('delete all data', async () => {
     await request(server)
       .delete('/testing/all-data')
       .set({Authorization : "Basic YWRtaW46cXdlcnR5"})
       .expect(204)
-    await server.close()
   })
 
   it('create new 4 users, blog and post', async () => {
@@ -2019,23 +2018,23 @@ describe('AppController (e2e)', () => {
     })
 
     await request(server)
-      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .put('/posts/' + createResponsePost_2.body.id + '/like-status')
       .send({
         "likeStatus": "Like"
       })
       .auth(token_1.body.accessToken, {type : 'bearer'})
       .expect(204)
     await request(server)
-      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .put('/posts/' + createResponsePost_2.body.id + '/like-status')
       .send({
         "likeStatus": "Like"
       })
       .auth(token_3.body.accessToken, {type : 'bearer'})
       .expect(204)
     await request(server)
-      .put('/posts/' + createResponsePost_1.body.id + '/like-status')
+      .put('/posts/' + createResponsePost_2.body.id + '/like-status')
       .send({
-        "likeStatus": "Dislike"
+        "likeStatus": "Like"
       })
       .auth(token_4.body.accessToken, {type : 'bearer'})
       .expect(204)
@@ -2043,7 +2042,71 @@ describe('AppController (e2e)', () => {
       .get('/posts/')
       .auth(token_5.body.accessToken, {type : 'bearer'})
       .expect(200)
-    expect(res.body).toStrictEqual({})
+    expect(res.body).toStrictEqual({
+      "items": [
+        {
+          "blogId": expect.any(String),
+          "blogName": "blog2",
+          "content": "content2",
+          "createdAt": expect.any(String),
+          "extendedLikesInfo": {
+            "dislikesCount": 0,
+            "likesCount": 3,
+            "myStatus": "None",
+            "newestLikes": [
+              {
+                "addedAt": expect.any(String),
+                "login": "user4",
+                "userId": expect.any(String)
+              },
+              {
+                "addedAt": expect.any(String),
+                "login": "user3",
+                "userId": expect.any(String)
+              },
+              {
+                "addedAt": expect.any(String),
+                "login": "user1",
+                "userId": expect.any(String)
+              }
+            ]
+          },
+          "id": expect.any(String),
+          "shortDescription": "shortDescription2",
+          "title": "title2"
+        },
+        {
+          "blogId": expect.any(String),
+          "blogName": "blog1",
+          "content": "content1",
+          "createdAt": expect.any(String),
+          "extendedLikesInfo": {
+            "dislikesCount": 0,
+            "likesCount": 2,
+            "myStatus": "None",
+            "newestLikes": [
+              {
+                "addedAt": expect.any(String),
+                "login": "user3",
+                "userId": expect.any(String)
+              },
+              {
+                "addedAt": expect.any(String),
+                "login": "user2",
+                "userId": expect.any(String)
+              }
+            ]
+          },
+          "id": expect.any(String),
+          "shortDescription": "shortDescription1",
+          "title": "title1"
+        }
+      ],
+      "page": 1,
+      "pageSize": 10,
+      "pagesCount": 1,
+      "totalCount": 2
+    })
   })
 
   afterAll(async () => {

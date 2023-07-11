@@ -184,6 +184,7 @@ export class QueryRepository {
     return await Promise.all(
       posts.map(async (post) => {
         let newestLikes = await this.likesRepository.getLastLikes(post.id)
+        let likesInfo = await this.likesRepository.getLikesInfo(post.id)
         return {
           id: post.id + '',
           title: post.title,
@@ -193,10 +194,16 @@ export class QueryRepository {
           blogName: post.blogName,
           createdAt: post.createdAt,
           extendedLikesInfo: {
-            likesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Like"}),
-            dislikesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Dislike"}),
+            likesCount: likesInfo[0].likesCount,
+            dislikesCount: likesInfo[0].dislikesCount,
             myStatus: "None",
-            newestLikes : newestLikes
+            newestLikes : newestLikes.map(like => {
+              return {
+                addedAt : like.addedAt,
+                userId : like.userId + '',
+                login : like.login
+              }
+            })
           }
         }
       })
@@ -205,10 +212,12 @@ export class QueryRepository {
   async postsMappingWithUser(posts : PostModel[], userId : string) {
     return await Promise.all(
       posts.map(async (post) => {
+        let likesInfo = await this.likesRepository.getLikesInfo(post.id)
         let newestLikes = await this.likesRepository.getLastLikes(post.id)
         let currentStatus = await this.likesRepository.findStatus(post.id, userId);
         let status
-        if(currentStatus.length > 0) status = currentStatus[0].status
+        if(currentStatus.length === 0) {status = 'None'}
+        else {status = currentStatus[0].status}
         return {
           id: post.id + '',
           title: post.title,
@@ -218,10 +227,16 @@ export class QueryRepository {
           blogName: post.blogName,
           createdAt: post.createdAt,
           extendedLikesInfo: {
-            likesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Like"}),
-            dislikesCount: await this.likesModel.countDocuments({postOrCommentId : post.id, status : "Dislike"}),
+            likesCount: likesInfo[0].likesCount,
+            dislikesCount: likesInfo[0].dislikesCount,
             myStatus: status,
-            newestLikes : newestLikes
+            newestLikes : newestLikes.map(like => {
+                return {
+                  addedAt : like.addedAt,
+                  userId : like.userId + '',
+                  login : like.login
+                }
+            })
           }
         }
       })
