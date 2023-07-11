@@ -47,6 +47,7 @@ export class PostsController{
   @Get(':id')
   async getPost(@Param('id') postId : string,
                 @Req() req: Request) {
+    if (!postId.match(/^\d+$/)) throw new NotFoundException()
     return await this.commandBus.execute(new GetPostPostsCommand(postId, req.headers.authorization))
   }
   @Get(':id/comments')
