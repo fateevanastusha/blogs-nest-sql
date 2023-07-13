@@ -30,10 +30,10 @@ import { UpdatePostPostsCommand } from "../../posts/use-cases/posts-update-post-
 import { GetCommentsByBlogCommand } from '../../comments/use-cases/comments-get-comments-by-blog-use-case';
 import { GetBlogsByOwnerBlogsCommand } from '../use-cases/blogs-get-blogs-by-owner-use-case';
 
+@UseGuards(CheckIfUserExist)
 @Controller('blogger/blogs/')
 export class BloggersController {
   constructor(protected commandBus : CommandBus) {}
-  @UseGuards(CheckIfUserExist)
   @Get()
   async getBlogs(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
@@ -51,7 +51,6 @@ export class BloggersController {
     }, token));
   }
   @HttpCode(200)
-  @UseGuards(CheckIfUserExist)
   @Get('comments')
   async getComments(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
@@ -67,7 +66,6 @@ export class BloggersController {
       sortDirection : sortDirection
     }, token))
   }
-  @UseGuards(CheckIfUserExist)
   @Post()
   async createBlog(
     @Body() blog : BlogDto,
@@ -77,7 +75,6 @@ export class BloggersController {
     if (!createdBlog) throw new BadRequestException()
     return createdBlog
   }
-  @UseGuards(CheckIfUserExist)
   @Post(':id/posts')
   async createPost(@Param('id') blogId : string,
                    @Body() post : PostsBlogDto,
@@ -96,7 +93,6 @@ export class BloggersController {
   }
 
   @HttpCode(204)
-  @UseGuards(CheckIfUserExist)
   @Put(':id')
   async updateBlog(
     @Body() blog : BlogDto,
@@ -108,7 +104,6 @@ export class BloggersController {
   }
 
   @HttpCode(204)
-  @UseGuards(CheckIfUserExist)
   @Put(':blogId/posts/:postId')
   async updatePost(
     @Param('blogId') blogId : string,
@@ -122,7 +117,6 @@ export class BloggersController {
   }
 
   @HttpCode(204)
-  @UseGuards(CheckIfUserExist)
   @Delete(':id')
   async deleteBlog(@Param('id') blogId : string,
                    @Req() req: Request){
@@ -130,7 +124,6 @@ export class BloggersController {
     return await this.commandBus.execute(new DeleteBlogBlogsCommand(blogId, token))
 
   }
-  @UseGuards(CheckIfUserExist)
   @Delete(':blogId/posts/:postId')
   async deletePost(@Param('blogId') blogId : string,
                    @Param('postId') postId : string,

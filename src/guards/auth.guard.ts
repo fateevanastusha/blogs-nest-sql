@@ -4,7 +4,7 @@ import {
   ExecutionContext,
   UnauthorizedException,
   NotFoundException,
-  ForbiddenException, HttpStatus, HttpException
+  ForbiddenException,
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { Request } from "express";
@@ -51,7 +51,7 @@ export class CheckIfUserExist implements CanActivate {
     return true
   }
 }
-//For DELETE and PUT comment request
+
 @Injectable()
 export class CommentCheckForSameUser implements CanActivate {
   constructor(
@@ -129,24 +129,5 @@ export class CheckForSameUser implements CanActivate {
     if(userId.userId !== Number(session[0].userId)) throw new ForbiddenException()
     return true
 
-  }
-}
-@Injectable()
-export class CheckDeviceId implements CanActivate {
-  constructor(protected securityRepository: SecurityRepository,
-              protected jwtService : JwtService) {}
-  async canActivate(
-    context: ExecutionContext
-  ): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
-    const deviceId = req.params.id;
-    const session = await this.securityRepository.findSessionByDeviceId(deviceId)
-    if (session.length === 0) throw new NotFoundException()
-    if (!req.cookies.refreshToken) throw new UnauthorizedException()
-    const token = req.cookies.refreshToken
-    const userId = await this.jwtService.getIdByRefreshToken(token)
-    if (!userId) throw new UnauthorizedException()
-    if(userId.userId !== session[0].userId) throw new ForbiddenException()
-    return true
   }
 }
