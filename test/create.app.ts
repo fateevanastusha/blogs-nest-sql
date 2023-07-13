@@ -1,6 +1,6 @@
 import { AppModule } from "../src/app.module";
 import { INestApplication, ValidationPipe } from "@nestjs/common";
-import { HttpExceptionFilter } from "../src/exception.filters";
+import { HttpExceptionFilter } from "../src/utils/exception.filters";
 import { useContainer } from "class-validator";
 import cookieParser from 'cookie-parser';
 

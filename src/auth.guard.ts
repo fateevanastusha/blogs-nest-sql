@@ -8,12 +8,12 @@ import {
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { Request } from "express";
-import { JwtService } from "./jwt.service";
-import { AuthRepository } from "./api/auth/auth.repository";
-import { RefreshTokensMetaModel } from "./api/security/security.schema";
-import { SecurityRepository } from "./api/security/security.repository";
-import { UsersRepository } from "./api/users/users.repository";
-import { CommentsRepository } from "./api/comments/comments.repository";
+import { JwtService } from "./utils/jwt.service";
+import { AuthRepository } from "./modules/auth/auth.repository";
+import { RefreshTokensMetaModel } from "./modules/security/schemas/security.schema";
+import { SecurityRepository } from "./modules/security/repository/security.repository";
+import { UsersRepository } from "./modules/users/repository/users.repository";
+import { CommentsRepository } from "./modules/comments/repository/comments.repository";
 
 @Injectable()
 export class AuthGuard implements CanActivate {

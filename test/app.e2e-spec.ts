@@ -3,8 +3,8 @@ import { INestApplication } from "@nestjs/common";
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { createApp } from "./create.app";
-import { BusinessService } from "../src/business.service";
-import { UsersRepository } from "../src/api/users/users.repository";
+import { BusinessService } from "../src/mail/business.service";
+import { UsersRepository } from "../src/modules/users/repository/users.repository";
 
 describe('AppController (e2e)', () => {
   jest.setTimeout(3 * 60 * 1000)
