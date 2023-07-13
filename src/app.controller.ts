@@ -37,9 +37,9 @@ export class AppController{
     `)
     res.sendStatus(204)
   }
-  @Get('/likes')
-  async getAllLikes(){
-    return await this.likesRepository.getAllLikes()
+  @Get('/')
+  async app(){
+    return('Welcome to APP')
   }
   @Post('/blog')
   async createBlog(@Body() blog : BlogDto){
