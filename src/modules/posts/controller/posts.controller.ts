@@ -11,19 +11,21 @@ import {
   Query, Req,
   UseGuards
 } from "@nestjs/common";
-import { PostsService } from "../domain/posts.service";
 import { CommentsDto } from "../dto/posts.dto";
 import { Request } from "express";
-import { CheckIfUserExist } from "../../../auth.guard";
+import { CheckIfUserExist } from "../../../guards/auth.guard";
 import { LikesDto } from "../../likes/dto/likes.dto";
 import { CommandBus } from "@nestjs/cqrs";
 import { CreateCommentCommentsCommand } from "../../comments/use-cases/comments-create-comment-use-case";
 import { GetPostPostsCommand } from "../use-cases/posts-get-post-use-case";
+import { GetPostsCommand } from '../use-cases/posts-get-posts-use-case';
+import { GetPostsWithUserCommand } from '../use-cases/posts-get-posts-with-user-use-case';
+import { ChangeLikeStatusPostsCommand } from '../use-cases/posts-change-like-status-use-case';
+import { GetCommentsByPostCommand } from '../../comments/use-cases/comments-get-comments-by-post-use-case';
 
 @Controller('posts')
 export class PostsController{
-  constructor(protected postsService : PostsService,
-              protected commandBus : CommandBus) {}
+  constructor(protected commandBus : CommandBus) {}
   @Get()
   async getPosts(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
@@ -38,10 +40,10 @@ export class PostsController{
       sortDirection : sortDirection,
     }
     if (!req.headers.authorization){
-      return await this.postsService.getPosts(query)
+      return await this.commandBus.execute(new GetPostsCommand(query))
     } else {
       const token = req.headers.authorization!.split(" ")[1]
-      return await this.postsService.getPostsWithUser(query, token)
+      return await this.commandBus.execute(new GetPostsWithUserCommand(query, token))
     }
   }
   @Get(':id')
@@ -58,12 +60,13 @@ export class PostsController{
                     @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                     @Req() req: any){
     if (!postId.match(/^\d+$/)) throw new NotFoundException()
-    return await this.postsService.getComments({
+    const query = {
       pageSize : pageSize,
       pageNumber : pageNumber,
       sortBy : sortBy,
       sortDirection : sortDirection,
-    }, req.headers.authorization, postId)
+    }
+    return await this.commandBus.execute(new GetCommentsByPostCommand(query, req.headers.authorization, postId))
   }
   @UseGuards(CheckIfUserExist)
   @Post(':postId/comments')
@@ -77,13 +80,13 @@ export class PostsController{
   @UseGuards(CheckIfUserExist)
   @HttpCode(204)
   @Put(':id/like-status')
-  async setLike(@Param('id') postId : string,
-                @Body() like : LikesDto,
-                @Req() req: any){
+  async changeLikeStatus(@Param('id') postId : string,
+                         @Body() like : LikesDto,
+                         @Req() req: any){
     if (!postId.match(/^\d+$/)) throw new NotFoundException()
-    const status : boolean = await this.postsService.changeLikeStatus(like.likeStatus, postId, req.headers.authorization)
-    if (!status) throw new NotFoundException()
-    return
+    const token = req.headers.authorization!.split(" ")[1]
+    return await this.commandBus.execute(new ChangeLikeStatusPostsCommand(like.likeStatus, postId, token))
+
   }
 
 }

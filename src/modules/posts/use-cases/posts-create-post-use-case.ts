@@ -1,9 +1,8 @@
 import { PostsDto } from "../dto/posts.dto";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CreatePostModel, PostModel } from "../schemas/posts.schema";
-import { BlogModel } from "../../blogs/schemas/blogs.schema";
 import { UserModel } from "../../users/schemas/users.schema";
-import { BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
+import { ForbiddenException } from "@nestjs/common";
 import { PostsRepository } from "../repository/posts.repository";
 import { JwtService } from "../../../utils/jwt.service";
 import { UsersRepository } from "../../users/repository/users.repository";

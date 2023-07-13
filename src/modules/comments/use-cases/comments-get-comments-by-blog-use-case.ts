@@ -1,5 +1,4 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { QueryModelComments } from '../../../utils/query.schema';
 import { PaginatedClass } from '../../blogs/schemas/blogs.schema';
 import { CommentModel } from '../schemas/comments.schema';
 import { JwtService } from '../../../utils/jwt.service';
@@ -7,9 +6,10 @@ import { CommentsRepository } from '../repository/comments.repository';
 import { QueryRepository } from '../../../utils/query.repository';
 import { LikesRepository } from '../../likes/repository/likes.repository';
 import { PostsRepository } from '../../posts/repository/posts.repository';
+import { QueryModel } from '../../../utils/query.schemas';
 
 export class GetCommentsByBlogCommand {
-  constructor(public query : QueryModelComments,public token : string) {}
+  constructor(public query : QueryModel,public token : string) {}
 }
 @CommandHandler(GetCommentsByBlogCommand)
 export class GetCommentsByBlogUseCase implements ICommandHandler<GetCommentsByBlogCommand>{

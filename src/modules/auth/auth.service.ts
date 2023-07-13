@@ -65,8 +65,6 @@ export class AuthService {
     return await this.securityRepository.deleteOneSessions(idList.deviceId)
   }
 
-  //CREATE NEW TOKENS
-
   async createNewToken (refreshToken : string, ip : string, title : string) : Promise<TokenList> {
     await this.authRepository.addRefreshTokenToBlackList(refreshToken)
     const session = await this.securityRepository.findSessionByIp(ip)
@@ -85,13 +83,9 @@ export class AuthService {
       refreshToken : newRefreshToken.refreshToken
     }
   }
-
   async addRefreshTokenToBlackList (refreshToken : string) : Promise<boolean> {
     return await this.authRepository.addRefreshTokenToBlackList(refreshToken)
   }
-
-
-  //GET USER BY TOKEN
 
   async getUserByToken (token : string) : Promise<UserModel | null> {
     const userId : string = await this.jwtService.getUserIdByToken(token)
@@ -100,9 +94,6 @@ export class AuthService {
     return null
   }
 
-  async authFindUser (loginOrEmail : string) : Promise<UserModel> {
-    return await this.usersRepository.returnUserByField(loginOrEmail)
-  }
   async checkForConfirmationCode (confirmationCode : string) : Promise <boolean>  {
     const statusOfCode : boolean = await this.usersRepository.checkForConfirmationCode(confirmationCode)
     if (!statusOfCode) throw new BadRequestException({ message : ['code is wrong'] })

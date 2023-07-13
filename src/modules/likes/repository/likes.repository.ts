@@ -84,14 +84,6 @@ export class LikesRepository {
         WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "userId" = ${userId}
     `)
   }
-  async deleteStatus(postOrCommentId : string, userId : string) : Promise<boolean> {
-    await this.dataSource.query(`
-    DELETE 
-        FROM public."Likes"
-        WHERE ("postId" = ${postOrCommentId} OR "commentId" = ${postOrCommentId}) AND "userId" = ${userId}
-    `)
-    return true
-  }
   async updateStatus(status : LikeModel) : Promise<boolean> {
     await this.dataSource.query(`
     UPDATE public."Likes"

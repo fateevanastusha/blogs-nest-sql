@@ -2,47 +2,49 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
-  Get, HttpCode, NotFoundException,
+  Get,
+  HttpCode,
   Param,
   Put,
   Query,
   UseGuards
 } from "@nestjs/common";
-import { BlogsSuperAdminService } from "../domain/blogs.super.admin.service";
-import { AuthGuard } from "../../../auth.guard";
+import { AuthGuard } from "../../../guards/auth.guard";
 import { BanBlogDto } from "../dto/blogs.dto";
+import { CommandBus } from '@nestjs/cqrs';
+import { GetBlogsSaBlogsCommand } from '../use-cases/blogs-get-blogs-sa-use-case';
+import { BanBlogBlogsCommand } from '../use-cases/blogs-ban-blog-use-case';
+import { BingBlogBlogsCommand } from '../use-cases/blogs-bind-blog-use-case';
 
 @UseGuards(AuthGuard)
 @Controller('sa/blogs')
 export class BlogsSuperAdminController {
-  constructor(protected blogsService : BlogsSuperAdminService,) {}
+  constructor(protected commandBus : CommandBus) {}
   @Get()
   async getBlogs(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
                  @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
                  @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                  @Query('searchNameTerm', new DefaultValuePipe('')) searchNameTerm : string){
-    return await this.blogsService.getBlogs({
+    const query = {
       pageSize : pageSize,
       pageNumber : pageNumber,
       sortBy : sortBy,
       sortDirection : sortDirection,
       searchNameTerm : searchNameTerm
-    })
+    }
+    return await this.commandBus.execute(new GetBlogsSaBlogsCommand(query))
   }
   @HttpCode(204)
   @Put(':blogId/ban')
   async banBlog(@Param('blogId') blogId : string,
                 @Body() request : BanBlogDto){
-    const status : boolean = await this.blogsService.banBlog(blogId, request)
-    if(!status) throw new NotFoundException()
-    return status
+    return await this.commandBus.execute(new BanBlogBlogsCommand(blogId, request))
   }
   @HttpCode(204)
-  @Put(':id/bind-with-user/:userId')
-  async bindBlogWithUser(@Param() params){
-    const status : boolean = await this.blogsService.bindBlog(params.id, params.userId)
-    if (!status) throw new NotFoundException()
-    return
+  @Put(':blogId/bind-with-user/:userId')
+  async bindBlogWithUser(@Param('blogId') blogId : string,
+                         @Param('userId') userId : string){
+    return await this.commandBus.execute(new BingBlogBlogsCommand(blogId, userId))
   }
 }

@@ -1,7 +1,24 @@
 import { Prop, Schema } from "@nestjs/mongoose";
 import { IsOptional } from "class-validator";
 
-@Schema()
+export class QueryModel {
+  @IsOptional()
+  @Prop({ default: 10 })
+  pageSize?: number = 10
+
+  @IsOptional()
+  @Prop({ default: 1 })
+  pageNumber?: number = 1
+
+  @IsOptional()
+  @Prop({ default: "createdAt" })
+  sortBy?: string = 'createdAt'
+
+  @IsOptional()
+  @Prop({ default: 'asc'})
+  sortDirection?: "asc" | "desc" = 'asc'
+}
+
 export class QueryModelBlogs {
   @IsOptional()
   @Prop({ default: 10 })
@@ -22,42 +39,6 @@ export class QueryModelBlogs {
   @IsOptional()
   @Prop({ default: "" })
   searchNameTerm?: string = ''
-}
-
-export class QueryModelPosts {
-  @IsOptional()
-  @Prop({ default: 10 })
-  pageSize?: number = 10
-
-  @IsOptional()
-  @Prop({ default: 1 })
-  pageNumber?: number = 1
-
-  @IsOptional()
-  @Prop({ default: "createdAt" })
-  sortBy?: string = 'createdAt'
-
-  @IsOptional()
-  @Prop({ default: 'asc'})
-  sortDirection?: "asc" | "desc" = 'asc'
-}
-
-export class QueryModelComments {
-  @IsOptional()
-  @Prop({ default: 10 })
-  pageSize?: number = 10
-
-  @IsOptional()
-  @Prop({ default: 1 })
-  pageNumber?: number = 1
-
-  @IsOptional()
-  @Prop({ default: "createdAt" })
-  sortBy?: string = 'createdAt'
-
-  @IsOptional()
-  @Prop({ default: 'asc'})
-  sortDirection?: "asc" | "desc" = 'asc'
 }
 
 export class QueryModelUsers {

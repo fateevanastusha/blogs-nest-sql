@@ -7,9 +7,9 @@ import {
   QueryCommentsUsers,
   QueryModelBannedUsersForBlog,
   QueryModelBlogs,
-  QueryModelPosts,
+  QueryModel,
   QueryModelUsers
-} from "./query.schema";
+} from "./query.schemas";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { PostModel } from "../modules/posts/schemas/posts.schema";
@@ -68,7 +68,7 @@ export class QueryRepository {
         OFFSET ${skipSize} LIMIT ${query.pageSize};
     `)
   }
-  async paginatorForPostsWithBlog(query : QueryModelBlogs | QueryModelPosts, id : string): Promise<PostModel[]> {
+  async paginatorForPostsWithBlog(query : QueryModelBlogs | QueryModel, id : string): Promise<PostModel[]> {
     const skipSize: number = +query.pageSize * (+query.pageNumber - 1)
     return this.dataSource.query(`
     SELECT "id", "title", "shortDescription", "content", "blogName", "createdAt", "blogId"

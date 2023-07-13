@@ -4,29 +4,33 @@ import { CommentModel } from "../schemas/comments.schema";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { LikesRepository } from "../../likes/repository/likes.repository";
 
-export class LikeCommentCommentsCommand {
+export class ChangeLikeStatusCommentsCommand {
   constructor(public requestType : string,public commentId : string,public userId : string) {}
 }
-@CommandHandler(LikeCommentCommentsCommand)
-export class LikeCommentUseCase implements ICommandHandler<LikeCommentCommentsCommand>{
+@CommandHandler(ChangeLikeStatusCommentsCommand)
+export class LikeCommentUseCase implements ICommandHandler<ChangeLikeStatusCommentsCommand>{
   constructor(protected commentsRepository : CommentsRepository,
               protected likesRepository : LikesRepository) {}
-  async execute (command : LikeCommentCommentsCommand) : Promise<boolean>{
+  async execute (command : ChangeLikeStatusCommentsCommand) : Promise<boolean>{
+
     await this.commentsRepository.getCommentById(command.commentId)
-    const currentStatus = await this.likesRepository.findStatus(command.commentId, command.userId)
+
+    const foundStatus = await this.likesRepository.findStatus(command.commentId, command.userId)
+    const currentStatus = foundStatus.length === 0 ? 'None' : foundStatus[0].status
+
+    if (currentStatus === command.requestType) return true
+
     const newStatus = {
       status : command.requestType,
       userId : command.userId,
       postOrCommentId : command.commentId,
       createdAt : new Date().toISOString()
     }
-    if(currentStatus.length === 0){
-      const statusOfCreateRequest = await this.likesRepository.createNewStatusForComment(newStatus)
-      if(!statusOfCreateRequest) throw new BadRequestException()
-      return true
+
+    if (currentStatus === "None"){
+      await this.likesRepository.createNewStatusForComment(newStatus)
     } else {
-      const statusOfUpdateRequest = await this.likesRepository.updateStatus(newStatus)
-      if(!statusOfUpdateRequest) throw new BadRequestException()
+      await this.likesRepository.updateStatus(newStatus)
     }
     return true
   }

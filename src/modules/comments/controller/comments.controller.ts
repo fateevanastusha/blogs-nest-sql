@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Put, Req, UseGuards } from '@nestjs/common';
 import { CommentsDto } from "../dto/comments dto";
-import { CheckIfUserExist, CommentCheckForSameUser } from "../../../auth.guard";
+import { CheckIfUserExist, CommentCheckForSameUser } from "../../../guards/auth.guard";
 import { CommentViewModel } from "../schemas/comments.schema";
 import { JwtService } from "../../../utils/jwt.service";
 import { LikesDto } from "../../likes/dto/likes.dto";
@@ -9,7 +9,7 @@ import { UpdateCommentCommentsCommand } from "../use-cases/comments-update-comme
 import { GetCommentCommentsCommand } from "../use-cases/comments-get-comment-use-case";
 import { GetCommentWithUserCommentsCommand } from "../use-cases/comments-get-comment-with-user-use-case";
 import { DeleteCommentCommentsCommand } from "../use-cases/comments-delete-comment-use-case";
-import { LikeCommentCommentsCommand } from "../use-cases/comments-like-comment-use-case";
+import { ChangeLikeStatusCommentsCommand } from "../use-cases/comments-like-comment-use-case";
 
 @Controller('comments')
 export class CommentsController {
@@ -56,6 +56,6 @@ export class CommentsController {
     if (!commentId.match(/^\d+$/)) throw new NotFoundException()
     const token = req.headers.authorization!.split(" ")[1]
     const userId : string = await this.jwtService.getUserIdByToken(token);
-    return await this.commandBus.execute(new LikeCommentCommentsCommand(requestType.likeStatus, commentId, userId))
+    return await this.commandBus.execute(new ChangeLikeStatusCommentsCommand(requestType.likeStatus, commentId, userId))
   }
 }

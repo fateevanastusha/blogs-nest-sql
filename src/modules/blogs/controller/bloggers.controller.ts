@@ -19,7 +19,7 @@ import { BlogDto, PostsBlogDto } from "../dto/blogs.dto";
 import { BlogModel } from "../schemas/blogs.schema";
 import { Response, Request } from "express";
 import { PostModel } from "../../posts/schemas/posts.schema";
-import { CheckIfUserExist } from "../../../auth.guard";
+import { CheckIfUserExist } from "../../../guards/auth.guard";
 import { CommandBus } from "@nestjs/cqrs";
 import { CreateBlogBlogsCommand } from "../use-cases/blogs-create-blog-use-case";
 import { CreatePostPostsCommand } from "../../posts/use-cases/posts-create-post-use-case";

@@ -1,11 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BloggersController } from './modules/blogs/controller/bloggers.controller';
 import { QueryRepository } from './utils/query.repository';
 import { MongoModule } from './db/mongo.module';
-import { PostsService } from './modules/posts/domain/posts.service';
 import { PostsRepository } from './modules/posts/repository/posts.repository';
 import { UsersService } from './modules/users/domain/users.service';
 import { UsersRepository } from './modules/users/repository/users.repository';
@@ -23,10 +21,9 @@ import { AuthController } from './modules/auth/auth.controller';
 import { CommentsRepository } from './modules/comments/repository/comments.repository';
 import { LikesRepository } from './modules/likes/repository/likes.repository';
 import { SecurityService } from './modules/security/domain/security.service';
-import { LikesHelpers } from './utils/likes.mapper';
 import { JwtService } from './utils/jwt.service';
 import { AuthService } from './modules/auth/auth.service';
-import { AuthGuard } from './auth.guard';
+import { AuthGuard } from './guards/auth.guard';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './modules/auth/strategies/passport.strategy';
 import { BusinessService } from './mail/business.service';
@@ -36,8 +33,6 @@ import { BlogSchema } from './modules/blogs/schemas/blogs.schema';
 import { BlogsController } from './modules/blogs/controller/blogs.controller';
 import { BlogsSuperAdminController } from './modules/blogs/controller/blogs.super.admin.controller';
 import { BlogsRepository } from './modules/blogs/repository/blogs.repository';
-import { BlogsService } from './modules/blogs/domain/blogs.service';
-import { BlogsSuperAdminService } from './modules/blogs/domain/blogs.super.admin.service';
 import { CreateUserUseCase } from './modules/users/use-cases/users-create-user-use-case';
 import { DeleteUserUseCase } from './modules/users/use-cases/users-delete-user-use-case';
 import { CreateBlogUseCase } from './modules/blogs/use-cases/blogs-create-blog-use-case';
@@ -48,7 +43,6 @@ import { CreateCommentUseCase } from './modules/comments/use-cases/comments-crea
 import { BloggersUsersService } from './modules/users/domain/bloggers.users.service';
 import { BloggersUsersController } from './modules/users/controller/bloggers.users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TestRepo } from './test.repo';
 import { CqrsModule } from '@nestjs/cqrs';
 import { BannedUsersRepository } from './modules/users/repository/bloggers.banned.users.repository';
 import { DeleteCommentUseCase } from './modules/comments/use-cases/comments-delete-comment-use-case';
@@ -71,6 +65,15 @@ import { GetPostUseCase } from './modules/posts/use-cases/posts-get-post-use-cas
 import { GetCommentsByBlogUseCase } from './modules/comments/use-cases/comments-get-comments-by-blog-use-case';
 import { GetBlogsByOwnerUseCase } from './modules/blogs/use-cases/blogs-get-blogs-by-owner-use-case';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { GetBlogsUseCase } from './modules/blogs/use-cases/blogs-get-blogs-use-case';
+import { GetBlogsSaUseCase } from './modules/blogs/use-cases/blogs-get-blogs-sa-use-case';
+import { BanBlogUseCase } from './modules/blogs/use-cases/blogs-ban-blog-use-case';
+import { BindBlogUseCase } from './modules/blogs/use-cases/blogs-bind-blog-use-case';
+import { GetPostsUseCase } from './modules/posts/use-cases/posts-get-posts-use-case';
+import { ChangePostLikeStatusUseCase } from './modules/posts/use-cases/posts-change-like-status-use-case';
+import { GetPostsByBlogIdUseCase } from './modules/posts/use-cases/posts-get-posts-by-blog-id-use-case';
+import { GetPostsWithUserUseCase } from './modules/posts/use-cases/posts-get-posts-with-user-use-case';
+import { GetCommentsByPostUseCase } from './modules/comments/use-cases/comments-get-comments-by-post-use-case';
 
 const repositories = [
   UsersRepository,
@@ -80,19 +83,14 @@ const repositories = [
   CommentsRepository,
   AuthRepository,
   BlogsRepository,
-  TestRepo,
   BannedUsersRepository,
 ];
 const services = [
   UsersService,
   BloggersUsersService,
   SecurityService,
-  PostsService,
-  BlogsService,
-  BlogsSuperAdminService,
   AuthService,
   BusinessService,
-  AppService,
   JwtService,
 ];
 
@@ -102,18 +100,27 @@ const useCases = [
   CreateBlogUseCase,
   DeleteBlogUseCase,
   UpdateBlogUseCase,
+  BanBlogUseCase,
+  BindBlogUseCase,
   GetBlogUseCase,
+  GetBlogsUseCase,
+  GetBlogsSaUseCase,
   GetBlogsByOwnerUseCase,
   CreatePostUseCase,
   DeletePostUseCase,
   UpdatePostUseCase,
   GetPostUseCase,
+  GetPostsUseCase,
+  ChangePostLikeStatusUseCase,
+  GetPostsByBlogIdUseCase,
+  GetPostsWithUserUseCase,
   CreateCommentUseCase,
   DeleteCommentUseCase,
   UpdateCommentUseCase,
   GetCommentUseCase,
   GetCommentWithUserUseCase,
   GetCommentsByBlogUseCase,
+  GetCommentsByPostUseCase,
   LikeCommentUseCase,
 ];
 
@@ -197,7 +204,6 @@ const entities = [
     ...services,
     ...useCases,
     QueryRepository,
-    LikesHelpers,
     AuthGuard,
     LocalStrategy,
   ],

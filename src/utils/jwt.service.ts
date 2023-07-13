@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 import { Injectable } from "@nestjs/common";
 import { AccessToken, RefreshToken } from "../modules/security/schemas/security.schema";
-import { settings } from "../settings";
+import { settings } from "../app-settings/settings";
 
 @Injectable()
 export class JwtService {

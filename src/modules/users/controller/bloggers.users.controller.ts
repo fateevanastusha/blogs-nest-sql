@@ -2,7 +2,7 @@ import {
   Body,
   Controller, DefaultValuePipe, Get, HttpCode, NotFoundException, Param, Put, Query, Req, UseGuards
 } from "@nestjs/common";
-import { CheckIfUserExist } from "../../../auth.guard";
+import { CheckIfUserExist } from "../../../guards/auth.guard";
 import { BloggersUsersService } from "../domain/bloggers.users.service";
 import { Request } from "express";
 import { BanUserForBlogDto } from "../dto/users.dto";

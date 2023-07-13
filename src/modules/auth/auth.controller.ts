@@ -9,7 +9,7 @@ import {
   HttpCode,
   BadRequestException, UnauthorizedException
 } from "@nestjs/common";
-import { CheckForRefreshToken } from "../../auth.guard";
+import { CheckForRefreshToken } from "../../guards/auth.guard";
 import { AuthService } from "./auth.service";
 import { AccessToken, TokenList } from "../security/schemas/security.schema";
 import { UserModel } from "../users/schemas/users.schema";

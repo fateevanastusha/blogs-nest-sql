@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { BlogsRepository } from "../repository/blogs.repository";
 import { BlogViewModel, PaginatedClass } from '../schemas/blogs.schema';
-import { QueryModelBlogs } from '../../../utils/query.schema';
+import { QueryModelBlogs } from '../../../utils/query.schemas';
 import { JwtService } from '../../../utils/jwt.service';
 import { QueryRepository } from '../../../utils/query.repository';
 

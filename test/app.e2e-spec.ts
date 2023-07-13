@@ -730,51 +730,27 @@ describe('AppController (e2e)', () => {
       "totalCount": 3,
       "items": [
         {
-          "blogOwnerInfo": {
-            "userId": expect.any(String),
-            "userLogin": "alina28"
-          },
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
           "isMembership": false,
           "name": "2bloguser2",
-          "banInfo": {
-            banDate : null,
-            isBanned : false
-          },
           "websiteUrl": "http://www.nastyastar.com"
         },
         {
-          "blogOwnerInfo": {
-            "userId": expect.any(String),
-            "userLogin": "nastya1"
-          },
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
           "isMembership": false,
           "name": "2bloguser1",
-          "banInfo": {
-            banDate : null,
-            isBanned : false
-          },
           "websiteUrl": "http://www.nastyastar.com"
         },
         {
-          "blogOwnerInfo": {
-            "userId": expect.any(String),
-            "userLogin": "nastya1"
-          },
           "createdAt": expect.any(String),
           "description": "about me",
           "id": expect.any(String),
           "isMembership": false,
           "name": "updatedname",
-          "banInfo": {
-            banDate : null,
-            isBanned : false
-          },
           "websiteUrl": "http://www.nastyastar.com"
         }
       ]

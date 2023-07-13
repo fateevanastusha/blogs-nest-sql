@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { JwtService } from "../../../utils/jwt.service";
 import { QueryRepository } from "../../../utils/query.repository";
-import { QueryModelBannedUsersForBlog } from "../../../utils/query.schema";
+import { QueryModelBannedUsersForBlog } from "../../../utils/query.schemas";
 import { BannedUserInfo, BlogModel, CreateBannedUserInfo, PaginatedClass } from "../../blogs/schemas/blogs.schema";
 import { UsersRepository } from "../repository/users.repository";
 import { UserModel } from "../schemas/users.schema";

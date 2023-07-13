@@ -1,7 +1,7 @@
 import { UsersRepository } from "../repository/users.repository";
 import { UserBanInfo, UserModel, UserViewModel } from "../schemas/users.schema";
 import { QueryRepository } from "../../../utils/query.repository";
-import { QueryModelUsers } from "../../../utils/query.schema";
+import { QueryModelUsers } from "../../../utils/query.schemas";
 import { PaginatedClass } from "../../blogs/schemas/blogs.schema";
 import { BanUserDto } from "../dto/users.dto";
 import * as bcrypt from 'bcrypt';

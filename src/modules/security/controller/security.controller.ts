@@ -9,7 +9,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { CheckForRefreshToken, CheckForSameUser } from "../../../auth.guard";
+import { CheckForRefreshToken, CheckForSameUser } from "../../../guards/auth.guard";
 import { SecurityService } from "../domain/security.service";
 
 @Controller('security/devices')

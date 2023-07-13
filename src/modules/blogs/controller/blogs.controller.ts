@@ -7,32 +7,29 @@ import {
   Query,
   Req
 } from "@nestjs/common";
-import { BlogsService } from "../domain/blogs.service";
-import { PostsService } from "../../posts/domain/posts.service";
-import { PaginatedClass } from "../schemas/blogs.schema";
 import { Request } from "express";
 import { CommandBus } from "@nestjs/cqrs";
 import { GetBlogBlogsCommand } from "../use-cases/blogs-get-blog-use-case";
+import { GetBlogsCommand } from '../use-cases/blogs-get-blogs-use-case';
+import { GetPostsByBlogIdPostsCommand } from '../../posts/use-cases/posts-get-posts-by-blog-id-use-case';
 
 @Controller('blogs')
 export class BlogsController{
-  constructor(protected blogsService : BlogsService,
-              protected postsService : PostsService,
-              protected commandBus : CommandBus
-  ) {}
+  constructor(protected commandBus : CommandBus) {}
   @Get()
   async getBlogs(@Query('pageSize', new DefaultValuePipe(10)) pageSize : number,
                  @Query('pageNumber', new DefaultValuePipe(1)) pageNumber : number,
                  @Query('sortBy', new DefaultValuePipe('createdAt')) sortBy : string,
                  @Query('sortDirection', new DefaultValuePipe('desc')) sortDirection : "asc" | "desc",
                  @Query('searchNameTerm', new DefaultValuePipe('')) searchNameTerm : string){
-    return await this.blogsService.getBlogs({
+    const query = {
       pageSize : pageSize,
       pageNumber : pageNumber,
       sortBy : sortBy,
       sortDirection : sortDirection,
       searchNameTerm : searchNameTerm
-    })
+    }
+    return await this.commandBus.execute(new GetBlogsCommand(query));
   }
   @Get(':id')
   async getBlog(@Param('id') blogId : string){
@@ -55,14 +52,13 @@ export class BlogsController{
     } else {
       token  = header.split(" ")[1]
     }
-    const posts : PaginatedClass | null = await this.postsService.getPostsByBlogId({
-    pageSize : pageSize,
-    pageNumber : pageNumber,
-    sortBy : sortBy,
-    sortDirection : sortDirection
-  }, blogId, token)
-    if (!posts) throw new NotFoundException()
-    return posts
+    const query = {
+      pageSize : pageSize,
+      pageNumber : pageNumber,
+      sortBy : sortBy,
+      sortDirection : sortDirection
+    }
+    return await this.commandBus.execute(new GetPostsByBlogIdPostsCommand(query, blogId, token))
   }
 
 }

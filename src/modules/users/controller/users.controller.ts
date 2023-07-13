@@ -14,7 +14,7 @@ import {
 } from "@nestjs/common";
 import { UsersService } from "../domain/users.service";
 import { BanUserDto, UsersDto } from "../dto/users.dto";
-import { AuthGuard } from "../../../auth.guard";
+import { AuthGuard } from "../../../guards/auth.guard";
 import { CommandBus } from "@nestjs/cqrs";
 import { CreateUserUsersCommand } from "../use-cases/users-create-user-use-case";
 import { DeleteUserUsersCommand } from "../use-cases/users-delete-user-use-case";
