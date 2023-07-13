@@ -3,6 +3,7 @@ import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 import { BlogDto } from "../dto/blogs.dto";
 import { NotFoundException } from '@nestjs/common';
+import { BlogsEntity } from '../entities/blogs.entity';
 
 export class BlogsRepository{
   constructor(@InjectDataSource() protected dataSource : DataSource) {}
@@ -15,6 +16,10 @@ export class BlogsRepository{
       FROM public."Blogs"
       WHERE "createdAt" = '${newBlog.createdAt}'
     `)
+  }
+
+  private async save(entity: BlogsEntity){
+    await this.dataSource.manager.save(entity);
   }
   async getFullBlog(blogId : string) : Promise<BlogModel>{
     const foundBlog = await this.dataSource.query(`
