@@ -19,7 +19,7 @@ import { CommandBus } from "@nestjs/cqrs";
 import { CreateUserUsersCommand } from "../use-cases/users-create-user-use-case";
 import { DeleteUserUsersCommand } from "../use-cases/users-delete-user-use-case";
 @UseGuards(AuthGuard)
-@Controller('sa/users')
+@Controller('/sa/users')
 export class UsersController{
   constructor(protected usersService : UsersService,
               protected commandBus : CommandBus) {}

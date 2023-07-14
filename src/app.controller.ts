@@ -8,8 +8,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { UsersRepository } from "./modules/users/repository/users.repository";
-import { Response} from "express";
-import { LikesRepository } from "./modules/likes/repository/likes.repository";
+import { Response} from "express"
 import { BlogDto } from "./modules/blogs/dto/blogs.dto";
 import { BlogViewModel, CreateBlogModel } from "./modules/blogs/schemas/blogs.schema";
 import { InjectDataSource } from "@nestjs/typeorm";
@@ -20,7 +19,6 @@ import { BlogsRepository } from "./modules/blogs/repository/blogs.repository";
 export class AppController{
   constructor(protected blogsRepository : BlogsRepository,
               protected usersRepository : UsersRepository,
-              protected likesRepository : LikesRepository,
               @InjectDataSource() protected dataSource : DataSource
               ) {}
 
