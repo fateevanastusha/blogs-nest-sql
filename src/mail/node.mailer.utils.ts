@@ -3,7 +3,7 @@ import * as nodemailer from 'nodemailer';
 export const transport = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "fateevanastushatest@gmail.com", // generated ethereal user
-    pass: "wyxeywekunawwoxq", // generated ethereal password
+    user: "testfornodemailerfateeva@gmail.com", // generated ethereal user
+    pass: "htyzhtdkicohwgnp", // generated ethereal password
   },
 });
