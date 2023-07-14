@@ -13,6 +13,8 @@ import { CheckForRefreshToken, CheckForSameUser } from "../../../guards/auth.gua
 import { SecurityService } from "../domain/security.service";
 import { SkipThrottle } from '@nestjs/throttler';
 
+
+
 @SkipThrottle()
 @Controller('security/devices')
 export class SecurityController{
