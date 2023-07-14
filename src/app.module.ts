@@ -64,7 +64,7 @@ import { RefreshTokensEntity } from './modules/security/entities/refresh.tokens.
 import { GetPostUseCase } from './modules/posts/use-cases/posts-get-post-use-case';
 import { GetCommentsByBlogUseCase } from './modules/comments/use-cases/comments-get-comments-by-blog-use-case';
 import { GetBlogsByOwnerUseCase } from './modules/blogs/use-cases/blogs-get-blogs-by-owner-use-case';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { GetBlogsUseCase } from './modules/blogs/use-cases/blogs-get-blogs-use-case';
 import { GetBlogsSaUseCase } from './modules/blogs/use-cases/blogs-get-blogs-sa-use-case';
 import { BanBlogUseCase } from './modules/blogs/use-cases/blogs-ban-blog-use-case';
@@ -74,6 +74,7 @@ import { ChangePostLikeStatusUseCase } from './modules/posts/use-cases/posts-cha
 import { GetPostsByBlogIdUseCase } from './modules/posts/use-cases/posts-get-posts-by-blog-id-use-case';
 import { GetPostsWithUserUseCase } from './modules/posts/use-cases/posts-get-posts-with-user-use-case';
 import { GetCommentsByPostUseCase } from './modules/comments/use-cases/comments-get-comments-by-post-use-case';
+import { APP_GUARD } from '@nestjs/core';
 
 const repositories = [
   UsersRepository,
@@ -199,7 +200,12 @@ const entities = [
     AuthController,
     SecurityController,
     BloggersUsersController],
-  providers: [IsUserAlreadyExistConstraint,
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    },
+    IsUserAlreadyExistConstraint,
     ...repositories,
     ...services,
     ...useCases,

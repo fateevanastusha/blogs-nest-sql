@@ -11,7 +11,7 @@ export class SecurityService {
     if(!idList) throw new NotFoundException();
     const userId = idList.userId
     const sessions : RefreshTokensMetaModel[] | null = await this.securityRepository.getAllSessions(userId)
-    if (sessions.length === 0) throw new NotFoundException();
+    /*if (sessions.length === 0) throw new NotFoundException();*/
     return sessions
   }
   async deleteAllSessions(refreshToken : string) : Promise<boolean> {
