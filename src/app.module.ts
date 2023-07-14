@@ -201,10 +201,10 @@ const entities = [
     SecurityController,
     BloggersUsersController],
   providers: [
-    {
+    /*{
       provide: APP_GUARD,
       useClass: ThrottlerGuard
-    },
+    },*/
     IsUserAlreadyExistConstraint,
     ...repositories,
     ...services,
