@@ -11,7 +11,9 @@ import {
 } from '@nestjs/common';
 import { CheckForRefreshToken, CheckForSameUser } from "../../../guards/auth.guard";
 import { SecurityService } from "../domain/security.service";
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('security/devices')
 export class SecurityController{
   constructor(protected securityService : SecurityService) {}
