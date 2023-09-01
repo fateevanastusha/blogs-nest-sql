@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { BlogModel, BlogViewModel, CreateBlogModel } from "../schemas/blogs.schema";
+import { BlogViewModel, CreateBlogModel } from "../schemas/blogs.schema";
 import { JwtService } from "../../../utils/jwt.service";
 import { UsersRepository } from "../../users/repository/users.repository";
 import { BlogDto } from "../dto/blogs.dto";

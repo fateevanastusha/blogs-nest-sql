@@ -144,7 +144,7 @@ const entities = [
       type: 'postgres' as const,
       autoLoadEntities: false,
       entities,
-      synchronize: true,
+      synchronize: false,
       ssl: { rejectUnauthorized: false },
     }),
     ThrottlerModule.forRoot({

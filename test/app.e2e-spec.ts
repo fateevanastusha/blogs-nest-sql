@@ -81,6 +81,16 @@ describe('AppController (e2e)', () => {
     expect(res.status).toBe(200)
   })
   it ('SA create 1 user', async  () => {
+    res = await request(server)
+      .post('/sa/users')
+      .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
+      .send({
+        login: '',
+        password: '',
+        email: ''
+      })
+      .expect(400)
+    expect(res.body).toStrictEqual({})
     createResponseUser_1 = await request(server)
       .post('/sa/users')
       .set({Authorization: "Basic YWRtaW46cXdlcnR5"})
