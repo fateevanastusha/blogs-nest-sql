@@ -63,8 +63,6 @@ export class UserViewModel {
   id: string;
   @Prop({ required: true })
   createdAt: string;
-  @Prop({ required: true })
-  banInfo: UserBanInfo;
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserModel);

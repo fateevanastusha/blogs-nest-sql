@@ -72,12 +72,7 @@ export class UsersRepository {
       id: createdUser.id + '',
       createdAt: createdUser.createdAt,
       email: createdUser.email,
-      login: createdUser.login,
-      banInfo: {
-        isBanned: createdUser.isBanned,
-        banReason: createdUser.banReason,
-        banDate: createdUser.banDate,
-      },
+      login: createdUser.login
     };
   }
   async checkForConfirmationCode(confirmedCode: string): Promise<boolean> {

@@ -54,13 +54,7 @@ export class UsersController {
   }
   @Post()
   async createUser(@Body() user: UsersDto) {
-    const createdUser : UserViewModel = await this.commandBus.execute(new CreateUserUsersCommand(user));
-    return {
-      createdAt : createdUser.createdAt,
-      email : createdUser.email,
-      id : createdUser.id,
-      login : createdUser.login
-    }
+    return await this.commandBus.execute(new CreateUserUsersCommand(user));
   }
   @HttpCode(204)
   @Put('/:id/ban')
