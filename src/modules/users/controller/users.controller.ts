@@ -18,6 +18,7 @@ import { AuthGuard } from '../../../guards/auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserUsersCommand } from '../use-cases/users-create-user-use-case';
 import { DeleteUserUsersCommand } from '../use-cases/users-delete-user-use-case';
+import { UserViewModel } from '../schemas/users.schema';
 @UseGuards(AuthGuard)
 @Controller('/sa/users')
 export class UsersController {
@@ -53,7 +54,13 @@ export class UsersController {
   }
   @Post()
   async createUser(@Body() user: UsersDto) {
-    return await this.commandBus.execute(new CreateUserUsersCommand(user));
+    const createdUser : UserViewModel = await this.commandBus.execute(new CreateUserUsersCommand(user));
+    return {
+      createdAt : createdUser.createdAt,
+      email : createdUser.email,
+      id : createdUser.id,
+      login : createdUser.login
+    }
   }
   @HttpCode(204)
   @Put('/:id/ban')
