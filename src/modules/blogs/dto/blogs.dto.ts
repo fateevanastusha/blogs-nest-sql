@@ -1,6 +1,12 @@
-import { IsBoolean, IsNotEmpty, IsString, IsUrl, Length } from 'class-validator';
-import { Transform, TransformFnParams } from "class-transformer";
-import { Schema } from "@nestjs/mongoose";
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsString,
+  IsUrl,
+  Length,
+} from 'class-validator';
+import { Transform, TransformFnParams } from 'class-transformer';
+import { Schema } from '@nestjs/mongoose';
 
 export class BlogDto {
   @IsString()
@@ -24,13 +30,13 @@ export class BlogDto {
 @Schema()
 export class BanBlogDto {
   @IsBoolean()
-  isBanned : boolean
+  isBanned: boolean;
 }
 
 export class PostsBlogDto {
   @Length(1, 30)
   @Transform(({ value }: TransformFnParams) => value?.trim())
-  title: string
+  title: string;
   @Length(1, 100)
   @Transform(({ value }: TransformFnParams) => value?.trim())
   shortDescription: string;

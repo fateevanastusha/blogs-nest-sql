@@ -1,11 +1,10 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({name: 'BlockedRefreshTokens'})
+@Entity({ name: 'BlockedRefreshTokens' })
 export class BlockedTokensEntity {
-
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar'})
+  @Column({ type: 'varchar' })
   refreshToken: string;
 }

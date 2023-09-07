@@ -1,10 +1,10 @@
-import { Length } from "class-validator";
-import { Transform, TransformFnParams } from "class-transformer";
+import { Length } from 'class-validator';
+import { Transform, TransformFnParams } from 'class-transformer';
 
 export class PostsDto {
   @Length(1, 30)
   @Transform(({ value }: TransformFnParams) => value?.trim())
-  title: string
+  title: string;
   @Length(1, 100)
   @Transform(({ value }: TransformFnParams) => value?.trim())
   shortDescription: string;
@@ -17,7 +17,7 @@ export class PostsDto {
 }
 
 export class CommentsDto {
-  @Length(20,300)
+  @Length(20, 300)
   @Transform(({ value }: TransformFnParams) => value?.trim())
-  content : string
+  content: string;
 }

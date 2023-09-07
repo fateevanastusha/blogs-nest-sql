@@ -15,7 +15,10 @@ import { CommentSchema } from './modules/comments/schemas/comments.schema';
 import { LikeSchema } from './modules/likes/schemas/likes.schema';
 import { CommentsController } from './modules/comments/controller/comments.controller';
 import { SecurityRepository } from './modules/security/repository/security.repository';
-import { RefreshTokensBlocked, RefreshTokensMetaSchema } from './modules/security/schemas/security.schema';
+import {
+  RefreshTokensBlocked,
+  RefreshTokensMetaSchema,
+} from './modules/security/schemas/security.schema';
 import { AuthRepository } from './modules/auth/auth.repository';
 import { AuthController } from './modules/auth/auth.controller';
 import { CommentsRepository } from './modules/comments/repository/comments.repository';
@@ -133,14 +136,16 @@ const entities = [
   LikesEntity,
   BannedForBlogUsersEntity,
   BlockedTokensEntity,
-  RefreshTokensEntity
-]
+  RefreshTokensEntity,
+];
 
 @Module({
   imports: [
     CqrsModule,
     TypeOrmModule.forRoot({
-      url: process.env.POSTGRES_CONNECTION_STRING || 'postgres://fateevanastusha:qzMDJ0ZXEam4@ep-still-star-556812.eu-central-1.aws.neon.tech/blogsapi',
+      url:
+        process.env.POSTGRES_CONNECTION_STRING ||
+        'postgres://fateevanastusha:qzMDJ0ZXEam4@ep-still-star-556812.eu-central-1.aws.neon.tech/blogsapi',
       type: 'postgres' as const,
       autoLoadEntities: false,
       entities,
@@ -154,10 +159,11 @@ const entities = [
     TypeOrmModule.forFeature(entities),
     PassportModule,
     MongoModule,
-    MongooseModule.forFeature([{
-      name: 'bloggers',
-      schema: BlogSchema,
-    },
+    MongooseModule.forFeature([
+      {
+        name: 'bloggers',
+        schema: BlogSchema,
+      },
       {
         name: 'posts',
         schema: PostSchema,
@@ -199,7 +205,8 @@ const entities = [
     AppController,
     AuthController,
     SecurityController,
-    BloggersUsersController],
+    BloggersUsersController,
+  ],
   providers: [
     /*{
       provide: APP_GUARD,

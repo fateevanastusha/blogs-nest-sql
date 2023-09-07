@@ -9,26 +9,29 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { CheckForRefreshToken, CheckForSameUser } from "../../../guards/auth.guard";
-import { SecurityService } from "../domain/security.service";
+import {
+  CheckForRefreshToken,
+  CheckForSameUser,
+} from '../../../guards/auth.guard';
+import { SecurityService } from '../domain/security.service';
 import { SkipThrottle } from '@nestjs/throttler';
-
-
 
 @SkipThrottle()
 @Controller('security/devices')
-export class SecurityController{
-  constructor(protected securityService : SecurityService) {}
+export class SecurityController {
+  constructor(protected securityService: SecurityService) {}
 
   @UseGuards(CheckForRefreshToken)
   @Get('/')
-  async getSessions(@Req() req: any){
-    return await this.securityService.getAllSessions(req.cookies.refreshToken)
+  async getSessions(@Req() req: any) {
+    return await this.securityService.getAllSessions(req.cookies.refreshToken);
   }
   @HttpCode(204)
   @Delete()
-  async deleteSessions(@Req() req: any){
-    const status : boolean = await this.securityService.deleteAllSessions(req.cookies.refreshToken)
+  async deleteSessions(@Req() req: any) {
+    const status: boolean = await this.securityService.deleteAllSessions(
+      req.cookies.refreshToken,
+    );
     if (!status) throw new UnauthorizedException();
     return;
   }
@@ -36,8 +39,10 @@ export class SecurityController{
   @UseGuards(CheckForRefreshToken)
   @UseGuards(CheckForSameUser)
   @Delete(':id')
-  async deleteSession(@Param('id') deviceId : string){
-    const status : boolean = await this.securityService.deleteOneSession(deviceId);
+  async deleteSession(@Param('id') deviceId: string) {
+    const status: boolean = await this.securityService.deleteOneSession(
+      deviceId,
+    );
     if (!status) throw new NotFoundException();
     return;
   }
