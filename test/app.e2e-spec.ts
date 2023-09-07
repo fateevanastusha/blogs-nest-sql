@@ -32,6 +32,18 @@ describe('AppController (e2e)', () => {
     service = app.get<UsersRepository>(UsersRepository);
   });
 
+  it('SA create blog by admin', async () => {
+    await request(server)
+      .post('/sa/blogs')
+      .send({
+        name: 'stringgggggggg',
+        description: 'stringggggggggggggg',
+        websiteUrl: 'http://www.test2.com',
+      })
+      .set({ Authorization: 'Basic YWRtaW46cXdlcnR5' })
+      .expect(201)
+  });
+
   beforeAll(async () => {
     //runDb()
     await request(server)
@@ -91,20 +103,22 @@ describe('AppController (e2e)', () => {
         email: '',
       })
       .expect(400);
-    expect(res.body).toStrictEqual({errorsMessages : [
+    expect(res.body).toStrictEqual({
+      errorsMessages: [
         {
-          field: "login",
+          field: 'login',
           message: expect.any(String),
         },
         {
-          field: "password",
+          field: 'password',
           message: expect.any(String),
         },
         {
-          field: "email",
+          field: 'email',
           message: expect.any(String),
         },
-      ]});
+      ],
+    });
     createResponseUser_1 = await request(server)
       .post('/sa/users')
       .set({ Authorization: 'Basic YWRtaW46cXdlcnR5' })

@@ -72,7 +72,7 @@ export class UsersRepository {
       id: createdUser.id + '',
       createdAt: createdUser.createdAt,
       email: createdUser.email,
-      login: createdUser.login
+      login: createdUser.login,
     };
   }
   async checkForConfirmationCode(confirmedCode: string): Promise<boolean> {

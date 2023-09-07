@@ -78,6 +78,7 @@ import { GetPostsByBlogIdUseCase } from './modules/posts/use-cases/posts-get-pos
 import { GetPostsWithUserUseCase } from './modules/posts/use-cases/posts-get-posts-with-user-use-case';
 import { GetCommentsByPostUseCase } from './modules/comments/use-cases/comments-get-comments-by-post-use-case';
 import { APP_GUARD } from '@nestjs/core';
+import { CreateBlogByAdminUseCase } from './modules/blogs/use-cases/blogs-create-blog-by-admin-use-case';
 
 const repositories = [
   UsersRepository,
@@ -102,6 +103,7 @@ const useCases = [
   CreateUserUseCase,
   DeleteUserUseCase,
   CreateBlogUseCase,
+  CreateBlogByAdminUseCase,
   DeleteBlogUseCase,
   UpdateBlogUseCase,
   BanBlogUseCase,
